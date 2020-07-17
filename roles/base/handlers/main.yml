@@ -1,0 +1,38 @@
+---
+- name: chrony_restart
+  service:
+    name: chronyd
+    state: restarted
+
+- name: rsyslog_restart
+  service:
+    name: rsyslog
+    state: restarted
+
+- name: sshd_restart
+  service:
+    name: sshd
+    state: restarted
+
+- name: firewall_reload
+  service:
+    name: firewalld
+    state: restarted
+
+- name: set_hostname
+  command: "hostnamectl set-hostname {{ fqdn }}"
+
+- name: fail2ban_restart
+  service:
+    name: fail2ban
+    state: restarted
+
+- name: auditd_reload
+  service:
+    name: auditd
+    state: restarted
+    use: service
+
+# update grub.cfg when changed
+- name: update_grub
+  command: 'grub2-mkconfig -o /boot/grub2/grub.cfg'

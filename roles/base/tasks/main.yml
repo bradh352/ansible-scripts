@@ -1,0 +1,268 @@
+---
+- name: set centos_ver8 fact
+  set_fact:
+    centos_ver8: "{{ true if '8' in ansible_distribution_major_version else false }}"
+  when: 'ansible_distribution == "CentOS"'
+
+# We do this because ansible_inventory isn't quite the right thing to do as that is read from the
+# destination machine, and if it hasn't been configured yet, it won't be right.
+- name: set host names
+  set_fact:
+    short_host: "{{ ansible_host.split('.')[0] }}"
+    fqdn: "{{ ansible_host }}"  # We do this because ansible_host isn't available in some circumstances.
+
+- name: configure hosts for hostname
+  template:
+    src: hosts.j2
+    dest: /etc/hosts
+    backup: yes
+    owner: root
+    group: root
+    mode: 0644
+  notify: set_hostname
+
+- name: configure hostname
+  template:
+    src: hostname.j2
+    dest: /etc/hostname
+    backup: yes
+    owner: root
+    group: root
+    mode: 0644
+  notify: set_hostname
+
+- name: configure network interface
+  lineinfile:
+    dest: /etc/sysconfig/network-scripts/ifcfg-{{ ansible_default_ipv4.alias }}
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: "{{ item.state }}"
+  with_items:
+    - { regexp: 'DNS1\=*', line: "DNS1=8.8.8.8", state: "present" }
+    - { regexp: 'DNS2\=*', line: "DNS2=8.8.4.4", state: "present" }
+    - { regexp: 'DNS3\=*', line: "",             state: "absent" }
+
+- name: Make sure the infrastructure user is created for management. Use password used to run this script as user password.
+  user:
+    name: "infra"
+    create_home: yes
+    shell: "/bin/bash"
+    groups: [ "wheel", "users", "adm", "lp" ]
+    state: present
+    append: yes
+    password: "{{ ansible_password | default('ansible_sudo_pass') | password_hash('sha512') }}"
+    update_password: "on_create"
+
+- name: Ensure /home/infra/.ssh exists
+  file:
+    path: /home/infra/.ssh/
+    state: directory
+    mode: 0700
+    owner: infra
+    group: infra
+
+- name: Make sure the public key for ssh authentication is configured for the infra user
+  lineinfile:
+    path: /home/infra/.ssh/authorized_keys
+    state: present
+    create: yes
+    owner: infra
+    group: infra
+    mode: 0600
+    line: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCuCYhgb5Jt4vOS+KtwQyXpp6AZuqL7Ff5DR7Criqrs1isSVnOBPb2hozQ9y6FnUFofJTc3aW0z7a8UHRV3iR8K2LjNu95aGTys5h8txLlg5NPsN57plZlFX+J3j3jfuzatiFdeIp2FmV5Cy47owlWw9jidgM7RkDcJIUyC27vhKT9/Ik3G4uOcPL85UlMv3nXqPHtAyEOSVFojx1pNnQlhD5oyVtNL3JtC6yGDbnAH+kqijabJXAqLRN5vESbHwBOozQqP4A5o6gtTIGelwwfBNl6+DimN+r8gvHDkUAe4x/PkBPgNbe+EZPKYeG9RziYfYvU+YjvP8bKfEgk/b8/vIBwSY1lZe+vKBYsAlf6PZyyVppix8n0a4HVzqLINcZFLjHap95PAzptC81uYsd15s3tHERdCsOW4xOARyAc4DVxv5UX6xX3avks1X5VhXdqVhJBVapjsZx87uIMdx1ZBFlXqFB3vQHCKM+U/aLeuTtmtS3A4b2bggIPRYeJdAkCrLmR6iMtDyL0Mf02v4xqOk92xsolvIfFgevxh08jtIsv1AsOzYTBh/4tcA3LbEApu1oJOFZ3l2bFWcWYgoFsmqTjr7uPPH7ppMwsrfwlGohiP5RXSVuy+TszzwIg2H3VTDw+p5X1hm6wHtCTzUR0hJalCos2Agbv/sSqU1ePsQQ== brad@brad-house.com"
+
+- name: ensure EPEL is installed
+  yum:
+    name: "epel-release"
+    state: latest
+
+- name: upgrade all packages to the latest versions
+  yum:
+    name: "*"
+    state: latest
+    update_cache: true
+  ignore_errors: false
+
+- name: install base build packages CentOS
+  yum:
+    name: ["wget", "openssh-clients", "chrony", "acpid", "nano", "nc", "bzip2",
+           "yum-utils", "rsyslog", "tar", "unzip", "python3-policycoreutils" ]
+    state: installed
+
+- name: ensure firewalld is installed
+  yum:
+    name: firewalld
+    state: installed
+
+- name: ensure firewalld is started and enabled
+  service:
+    name: firewalld
+    state: started
+    enabled: true
+
+- name: check if systemd-timesyncd is installed
+  shell: systemctl status systemd-timesyncd
+  register: timesyncd_status
+  failed_when: not (timesyncd_status.rc == 4 or timesyncd_status.rc == 3 or timesyncd_status.rc == 0)
+  changed_when: False
+
+- name: disable systemd-timesyncd
+  service:
+    name: systemd-timesyncd
+    state: stopped
+    enabled: no
+  when: (timesyncd_status == 3 or timesyncd_status == 0)
+
+- name: install /etc/chrony.conf
+  copy:
+    src: chrony.conf
+    dest: /etc/chrony.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: chrony_restart
+
+- name: ensure chronyd is started and enabled
+  service:
+    name: chronyd
+    state: started
+    enabled: true
+
+- name: Set timezone to eastern
+  file:
+    path: /etc/localtime
+    src: /usr/share/zoneinfo/America/New_York
+    state: link
+
+- name: open up port 5022 for SSHd alternative port
+  firewalld:
+    immediate: yes
+    permanent: yes
+    port: "5022/tcp"
+    state: enabled
+
+- name: SELinux allow SSHd to use port 5022
+  seport:
+    proto: tcp
+    ports: 5022
+    setype: ssh_port_t
+
+- name: install /etc/ssh/sshd_config
+  copy:
+    src: sshd_config
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: 0600
+    backup: true
+  notify: sshd_restart
+
+# Rsyslog recommends using imuxsock, so that means we need ForwardToSyslog
+# and we want to otherwise make journald unused as we don't want stuff to persist.
+# https://www.rsyslog.com/doc/v8-stable/configuration/modules/imjournal.html
+- name: configure journald settings (/etc/systemd/journald.conf)
+  ini_file:
+    dest: /etc/systemd/journald.conf
+    section: Journal
+    option: "{{ item.key }}"
+    value: "{{ item.val }}"
+  with_items:
+    - { key: "{{ 'RateLimitIntervalSec' if centos_ver8 else 'RateLimitInterval' }}", val: "0" }
+    - { key: "RateLimitBurst",       val: "0" }
+    - { key: "RuntimeMaxUse",        val: "100M" }
+    - { key: "Storage",              val: "volatile" }
+    - { key: "ForwardToSyslog",      val: "true" }
+    - { key: "MaxLevelSyslog",       val: "debug" }
+    - { key: "MaxRetentionSec",      val: "2h" }
+
+- name: install /etc/rsyslog.conf
+  copy:
+    src: rsyslog.conf
+    dest: /etc/rsyslog.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: rsyslog_restart
+
+- name: add compress to /etc/logrotate.conf
+  lineinfile:
+    dest: /etc/logrotate.conf
+    insertafter: "# uncomment this if you want your log files compressed"
+    line: compress
+  notify: rsyslog_restart
+
+- name: configure logrotate
+  copy:
+    src: logrotate_rsyslog
+    dest: /etc/logrotate.d/syslog
+    owner: root
+    group: root
+    mode: 0644
+
+- name: install /etc/profile.d/99-prompt.sh
+  copy:
+    src: 99-prompt.sh
+    dest: /etc/profile.d/99-prompt.sh
+    owner: root
+    group: root
+    mode: 0644
+
+- name: install /etc/profile.d/tout.sh
+  copy:
+    src: tout.sh
+    dest: /etc/profile.d/tout.sh
+    owner: root
+    group: root
+    mode: 0644
+
+- name: install /usr/local/bin/trim.sh
+  copy:
+    src: trim.sh
+    dest: /usr/local/bin/trim.sh
+    owner: root
+    group: root
+    mode: 0755
+
+- name: insert link in /etc/cron.weekly
+  file:
+    src: /usr/local/bin/trim.sh
+    dest: /etc/cron.weekly/trim
+    state: link
+
+- name: fix MAILTO in /etc/crontab
+  lineinfile:
+    dest: /etc/crontab
+    regexp: MAILTO
+    line: "MAILTO=brad@brad-house.com"
+    backrefs: true
+
+- name: install exim package
+  yum:
+    name: exim
+
+- name: configure exim
+  copy:
+    src: exim.conf
+    dest: /etc/exim/exim.conf
+    backup: yes
+    owner: root
+    group: root
+    mode: 0644
+
+- name: make sure exim doesn't start, we don't need the daemon
+  service:
+    name: exim
+    state: stopped
+    enabled: no
+
+- name: check if mta is already set to sendmail
+  shell: alternatives --display mta | grep link | grep /usr/sbin/sendmail.exim
+  changed_when: false
+  failed_when: false
+  register: mta
+
+- name: set mta alternative to exim
+  command: alternatives --set mta /usr/sbin/sendmail.exim
+  when: mta.failed
+
+
