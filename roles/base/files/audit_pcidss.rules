@@ -1,0 +1,41 @@
+# Exclude excessive, irrelevant logging
+-a exclude,always -F msgtype=CWD
+
+# Log root access (10.2.2)
+#  - But don't log automated stuff, we only want to log root commands run
+#    directly as a user otherwise this is just way too verbose.  Unfortunately
+#    there's no easy way to do this, we need to exclude based on selinux profiles.
+-a exit,always -F arch=b64 -F euid=0 -F subj_type!=keepalived_t -F subj_type!=initrc_t -F subj_type!=system_cronjob_t -S execve -k root-commands
+-a exit,always -F arch=b32 -F euid=0 -F subj_type!=keepalived_t -F subj_type!=initrc_t -F subj_type!=system_cronjob_t -S execve -k root-commands
+
+# Log access to all audit trails (10.2.3)
+#  - We only need to log modifications, not reads since we only need to care
+#    about someone trying to cover their tracks.  Also, we shouldn't log
+#    syslog writing to itself, that doesn't make sense.
+-a always,exit -S all -F dir=/var/log/audit -F perm=wa -F subj_type!=syslogd_t -k audit-logs
+-a always,exit -S all -F dir=/var/log -F perm=wa -F subj_type!=syslogd_t -k logs
+
+# Log invalid logical access attempts (10.2.4) - already in CIS.
+# If it didn't we might use the below rule:
+#   -a always,exit -F arch=b64 -S all -F exit=-13 -k access
+
+# Log creation and deletion of system-level objects (10.2.7)
+
+# We need to monitor /etc but exclude /etc/pki/nssdb which is a db folder
+# so we can't use the classic:   -w /etc -p wa -k sys_object
+# NOTE: doesn't appear to be installed and won't load if we reference a directory that doesn't exist
+#-a exit,never -F dir=/etc/pki/nssdb -F perm=wa -k sys_object
+-a exit,always -F dir=/etc -F perm=wa -k sys_object
+
+-w /bin -p wa -k sys_object
+-w /sbin -p wa -k sys_object
+-w /usr/bin -p wa -k sys_object
+-w /usr/sbin -p wa -k sys_object
+# Too verbose
+# -w /var/lib -p wa -k sys_object
+-w /lib -p wa -k sys_object
+-w /usr/lib -p wa -k sys_object
+-w /usr/libexec -p wa -k sys_object
+-w /lib64 -p wa -k sys_object
+-w /usr/lib64 -p wa -k sys_object
+
