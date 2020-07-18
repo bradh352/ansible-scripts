@@ -4,6 +4,11 @@
     name: chronyd
     state: restarted
 
+- name: journald_restart
+  service:
+    name: systemd-journald
+    state: restarted
+
 - name: rsyslog_restart
   service:
     name: rsyslog
@@ -36,3 +41,4 @@
 # update grub.cfg when changed
 - name: update_grub
   command: 'grub2-mkconfig -o /boot/grub2/grub.cfg'
+

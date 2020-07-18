@@ -52,6 +52,13 @@
     append: yes
     password: "{{ '!' if not ansible_password is defined else ansible_password | password_hash('sha512') }}"
     update_password: "on_create"
+  notify: disable_root
+
+- name: disable root user
+  user:
+    name: root
+    password: "!"
+    update_password: always
 
 - name: Ensure /home/infra/.ssh exists
   file:
@@ -184,6 +191,7 @@
     - { key: "ForwardToSyslog",      val: "true" }
     - { key: "MaxLevelSyslog",       val: "debug" }
     - { key: "MaxRetentionSec",      val: "2h" }
+  notify: journald_restart
 
 - name: install /etc/rsyslog.conf
   copy:
@@ -384,7 +392,7 @@
     group: root
     mode: 0640
 
-- name: "CIS: enable daemons"
+- name: "CIS: enable critical daemons"
   service:
     name: "{{ item }}"
     state: started
@@ -435,7 +443,7 @@
     group: root
     mode: 0700
 
-- name: copy banner to /etc/issue, /etc/issue.net
+- name: "CIS: copy banner to /etc/issue, /etc/issue.net"
   copy:
     src: banner
     dest: "/etc/{{ item }}"
@@ -454,3 +462,29 @@
     mode: 0600
     force: no
     content: ""
+
+- name: "CIS: ensure SELinux is enforcing"
+  selinux:
+    policy: targeted
+    state: enforcing
+
+- name: check if server needs rebooting
+  command: "needs-restarting -r"
+  register: reboot_req
+  changed_when: (reboot_req.rc == 1)
+  failed_when: (reboot_req.rc > 1)
+
+- name: if rebooting make sure username and port are set properly
+  set_fact:
+    ansible_user: "infra"
+    ansible_ssh_port: 5022
+  when: reboot_req.rc == 1
+
+- name: reboot
+  reboot:
+    pre_reboot_delay: 60
+    msg: "rebooting now"
+    connect_timeout: 30
+    post_reboot_delay: 120
+  when: reboot_req.rc == 1
+
