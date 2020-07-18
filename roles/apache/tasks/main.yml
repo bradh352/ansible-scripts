@@ -14,13 +14,18 @@
     - "80/tcp"
     - "443/tcp"
 
-- name: load revised welcome.conf file
-  copy:
-    src: http_welcome.conf
-    dest: /etc/httpd/conf.d/welcome.conf
-    owner: root
-    group: root
-    mode: 0644
+- name: See if welcome.conf consists of only comments or blank lines
+  command:
+    cmd: 'grep -E -q -v "(^#.*|^$)" /etc/httpd/conf.d/welcome.conf'
+  register: welcome_uncommented
+  changed_when: false
+  failed_when: false
+
+- name: Make sure all lines in welcome.conf are commented out
+  command:
+    cmd: 'sed -E -i -e "s/^([^#].+)$/#\1/" /etc/httpd/conf.d/welcome.conf'
+    warn: false
+  when: welcome_uncommented.rc == 0
   notify: httpd_restart
 
 - name: set proper ssl options
