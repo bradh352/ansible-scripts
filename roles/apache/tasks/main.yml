@@ -1,0 +1,81 @@
+---
+- name: install apache/mod_ssl/php
+  yum:
+    name: [ "httpd", "mod_ssl" ]
+    state: latest
+
+- name: open up http ports
+  firewalld:
+    immediate: yes
+    permanent: yes
+    port: "{{ item }}"
+    state: enabled
+  with_items:
+    - "80/tcp"
+    - "443/tcp"
+
+- name: load revised welcome.conf file
+  copy:
+    src: http_welcome.conf
+    dest: /etc/httpd/conf.d/welcome.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: httpd_restart
+
+- name: set proper ssl options
+  template:
+    src: http_ssl.conf
+    dest: /etc/httpd/conf.d/ssl.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: httpd_restart
+
+- name: add security settings
+  copy:
+    src: http_security.conf
+    dest: /etc/httpd/conf.d/security.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: httpd_restart
+
+- name: configure logging to go to syslog
+  copy:
+    src: http_log.conf
+    dest: /etc/httpd/conf.d/log.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: httpd_restart
+
+- name: comment out error log setting in httpd.conf
+  lineinfile:
+    dest: /etc/httpd/conf/httpd.conf
+    regexp: ErrorLog
+    line: '# ErrorLog "logs/error_log"'
+  notify: httpd_restart
+
+- name: add web logging config to /etc/rsyslog.conf
+  copy:
+    src: rsyslog_apache.conf
+    dest: /etc/rsyslog.d/apache.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: rsyslog_restart
+
+- name: logrotate for httpd
+  copy:
+    src: logrotate_http
+    dest: /etc/logrotate.d/http
+    owner: root
+    group: root
+    mode: 0644
+
+- name: systemd - enable and start httpd
+  service:
+    name: httpd
+    state: started
+    enabled: yes
