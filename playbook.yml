@@ -1,0 +1,26 @@
+---
+
+# For bootstrapping, run:
+#  ansible-playbook -vv playbook.yml --ask-pass -e ansible_ssh_port=22 -e ansible_user=root --limit bradhouse.dev
+
+
+- hosts: all
+  become: no
+  gather_facts: False
+  tasks:
+  - name: make sure --limit was passed to ansible
+    fail:
+      msg: "you must use -l or --limit"
+    when: ansible_limit is not defined
+    run_once: true
+    delegate_to: localhost
+
+- hosts: all
+  become: yes
+  tasks:
+  - name: Run roles for hosts
+    include_role:
+      name: "{{ _loop_role }}"
+    with_items: "{{ host_roles }}"
+    loop_control:
+      loop_var: "_loop_role"

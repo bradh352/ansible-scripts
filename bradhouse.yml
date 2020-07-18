@@ -1,9 +1,0 @@
----
-
-# For bootstrapping, run:
-#  ansible-playbook -vv bradhouse.yml --ask-pass -e ansible_ssh_port=22 -e ansible_user=root
-
-- hosts: bradhouse.dev
-  become: yes
-  roles:
-  - base

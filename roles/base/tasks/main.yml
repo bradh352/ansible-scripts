@@ -52,7 +52,6 @@
     append: yes
     password: "{{ '!' if not ansible_password is defined else ansible_password | password_hash('sha512') }}"
     update_password: "on_create"
-  notify: disable_root
 
 - name: disable root user
   user:
@@ -352,7 +351,7 @@
   lineinfile:
     dest: /etc/login.defs
     state: present
-    line: "UMASK           027"
+    line: "UMASK           077"
     regexp: "^UMASK .*"
 
 - name: "CIS: add auditd.conf configuration"
@@ -433,7 +432,7 @@
   replace:
     path: /etc/bashrc
     regexp: 'umask [0-9]+'
-    replace: "umask 027"
+    replace: "umask 077"
 
 - name: "CIS: set user umask in /etc/profile.d/cis.sh"
   copy:
@@ -470,21 +469,9 @@
 
 - name: check if server needs rebooting
   command: "needs-restarting -r"
+  notify: reboot
   register: reboot_req
   changed_when: (reboot_req.rc == 1)
   failed_when: (reboot_req.rc > 1)
 
-- name: if rebooting make sure username and port are set properly
-  set_fact:
-    ansible_user: "infra"
-    ansible_ssh_port: 5022
-  when: reboot_req.rc == 1
-
-- name: reboot
-  reboot:
-    pre_reboot_delay: 60
-    msg: "rebooting now"
-    connect_timeout: 30
-    post_reboot_delay: 120
-  when: reboot_req.rc == 1
 

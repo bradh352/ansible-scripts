@@ -42,3 +42,8 @@
 - name: update_grub
   command: 'grub2-mkconfig -o /boot/grub2/grub.cfg'
 
+- name: reboot
+  reboot:
+    msg: "rebooting now"
+    connect_timeout: 30
+    post_reboot_delay: 120
