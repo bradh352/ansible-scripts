@@ -8,3 +8,8 @@
   service:
     name: rsyslog
     state: restarted
+
+- name: fail2ban_restart
+  service:
+    name: fail2ban
+    state: restarted

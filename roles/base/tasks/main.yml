@@ -92,7 +92,7 @@
 - name: install base build packages CentOS
   yum:
     name: ["wget", "openssh-clients", "chrony", "acpid", "nano", "nc", "bzip2",
-           "yum-utils", "rsyslog", "tar", "unzip", "python3-policycoreutils" ]
+           "yum-utils", "rsyslog", "tar", "unzip", "python3-policycoreutils", "fail2ban" ]
     state: installed
 
 - name: ensure firewalld is installed
@@ -140,21 +140,21 @@
     src: /usr/share/zoneinfo/America/New_York
     state: link
 
-- name: open up port 5022 for SSHd alternative port
+- name: "open up port {{ ssh_port }} for SSHd alternative port"
   firewalld:
     immediate: yes
     permanent: yes
-    port: "5022/tcp"
+    port: "{{ ssh_port }}/tcp"
     state: enabled
 
-- name: SELinux allow SSHd to use port 5022
+- name: "SELinux allow SSHd to use port {{ ssh_port }}"
   seport:
     proto: tcp
-    ports: 5022
+    ports: "{{ ssh_port }}"
     setype: ssh_port_t
 
 - name: install /etc/ssh/sshd_config
-  copy:
+  template:
     src: sshd_config
     dest: /etc/ssh/sshd_config
     owner: root
@@ -466,6 +466,32 @@
   selinux:
     policy: targeted
     state: enforcing
+
+- name: "fail2ban: create /etc/fail2ban/jail.d/sshd.local file"
+  template:
+    src: fail2ban_sshd.local
+    dest: /etc/fail2ban/jail.d/sshd.local
+    owner: root
+    group: root
+    mode: 0600
+  notify: fail2ban_restart
+
+- name: "fail2ban: create directory - /var/run/fail2ban"
+  file:
+    path: /var/run/fail2ban
+    state: directory
+    seuser: system_u
+    setype: fail2ban_var_run_t
+    owner: root
+    group: root
+    mode: 0755
+  notify: fail2ban_restart
+
+- name: "fail2ban: start and enable"
+  service:
+    name: fail2ban
+    state: started
+    enabled: yes
 
 - name: check if server needs rebooting
   command: "needs-restarting -r"

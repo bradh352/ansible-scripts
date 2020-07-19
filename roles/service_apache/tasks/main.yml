@@ -1,5 +1,5 @@
 ---
-- name: install apache/mod_ssl/php
+- name: install apache/mod_ssl
   yum:
     name: [ "httpd", "mod_ssl", "mod_md" ]
     state: latest
@@ -106,3 +106,12 @@
     name: httpd
     state: started
     enabled: yes
+
+- name: install apache fail2ban rules
+  copy:
+    src: fail2ban_apache.local
+    dest: /etc/fail2ban/jail.d/apache.local
+    owner: root
+    group: root
+    mode: 0600
+  notify: fail2ban_restart

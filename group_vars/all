@@ -1,2 +1,8 @@
 ---
 admin_email: brad@brad-house.com
+
+# Overwritten by host vars
+ssh_port: 22
+
+# Either the above, or the one from host vars.  Host vars wins.
+ansible_port: "{{ ssh_port }}"

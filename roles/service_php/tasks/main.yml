@@ -1,0 +1,59 @@
+---
+- name: install php 7.3 stream
+  dnf:
+    name: '@php:7.3'
+    state: present
+  notify:
+    - phpfpm_restart
+    - httpd_restart
+
+- name: install php-fpm and modules
+  dnf:
+    name: [ "php-fpm", "php-mysqlnd", "php-opcache", "php-gd", "php-xml",
+            "php-mbstring", "php-pdo" ]
+    state: latest
+  notify:
+    - phpfpm_restart
+    - httpd_restart
+
+- name: Configure apache to use php-fpm
+  copy:
+    src: apache_php.conf
+    dest: /etc/httpd/conf.d/php.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: httpd_restart
+
+- name: Install basic php preferences
+  copy:
+    src: local.ini
+    dest: /etc/php.d/90-local.ini
+    owner: root
+    group: root
+    mode: 0644
+  notify: phpfpm_restart
+
+- name: Install php hardening/security
+  copy:
+    src: security.ini
+    dest: /etc/php.d/90-security.ini
+    owner: root
+    group: root
+    mode: 0644
+  notify: phpfpm_restart
+
+- name: Install php-fpm default pool
+  copy:
+    src: php-fpm-pool-www.conf
+    dest: /etc/php-fpm.d/www.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: phpfpm_restart
+
+- name: systemd - enable and start php-fpm
+  service:
+    name: php-fpm
+    state: started
+    enabled: yes

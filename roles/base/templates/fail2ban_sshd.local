@@ -1,0 +1,4 @@
+[sshd]
+enabled = true
+mode    = aggressive
+port    = {{ ssh_port | default(22) }}
