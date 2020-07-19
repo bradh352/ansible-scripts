@@ -1,0 +1,53 @@
+---
+# NOTE: for some reason this command no longer returns a version, and there's no way to get one in Centos 8
+#  https://access.redhat.com/solutions/2760071
+#  https://bugzilla.redhat.com/show_bug.cgi?id=1392573
+# Instead we will do a comparison on the modules by extracting it on the host.
+- name: "semodule: check for {{ selinux_module_name }} module"
+  shell: "semodule -l | grep {{ selinux_module_name }}"
+  register: semodule_exists
+  failed_when: false
+  changed_when: false
+
+- name: "semodule: copy {{ selinux_module_file }} to /tmp/semodule.pp"
+  copy:
+    src: "{{ selinux_module_file }}"
+    dest: "/tmp/semodule.pp"
+  changed_when: false
+
+- name: "semodule: make sure /tmp/{{ selinux_module_name }}.pp does not already exist"
+  file:
+    path: "/tmp/{{ selinux_module_name }}.pp"
+    state: absent
+
+- name: "semodule: extract existing module {{ selinux_module_name }} to compare"
+  command:
+    cmd: "semodule -H -E {{ selinux_module_name }}"
+    chdir: /tmp
+  when: semodule_exists.rc == 0
+  changed_when: false
+
+- name: "semodule: compare existing module to new module for {{ selinux_module_name }}"
+  command:
+    cmd: "diff -q /tmp/semodule.pp /tmp/{{ selinux_module_name }}.pp"
+  register: semodule_compare
+  failed_when: false
+  changed_when: semodule_compare.rc != 0
+  when: semodule_exists.rc == 0
+
+- name: "semodule: install selinux module {{ selinux_module_name }}"
+  command: "semodule -i /tmp/semodule.pp"
+  when: semodule_exists.rc != 0 or semodule_compare.rc != 0
+
+- name: "semodule: remove /tmp/semodule.pp"
+  file:
+    path: /tmp/semodule.pp
+    state: absent
+  changed_when: false
+
+- name: "semodule: make sure /tmp/{{ selinux_module_name }}.pp is deleted"
+  file:
+    path: "/tmp/{{ selinux_module_name }}.pp"
+    state: absent
+  when: semodule_exists.rc == 0
+  changed_when: false

@@ -1,0 +1,13 @@
+module httpd-md 1.0;
+
+require {
+        type httpd_config_t;
+        type httpd_t;
+        class dir { add_name create remove_name rename reparent rmdir setattr };
+        class file { create rename setattr unlink write };
+}
+
+#============= httpd_t ==============
+allow httpd_t httpd_config_t:dir { add_name create remove_name rename reparent rmdir setattr };
+allow httpd_t httpd_config_t:file { create rename setattr unlink write };
+
