@@ -323,11 +323,6 @@
   ignore_errors: yes
   notify: update_grub
 
-- name: "CIS: generate pbkdf2 grub password"
-  shell: "echo -e '{{ vault_root_password }}\n{{ vault_root_password }}' | grub2-mkpasswd-pbkdf2 2>/dev/null | grep 'password is' | sed 's/.*password is //'"
-  register: grub_passwd
-  changed_when: false
-
 - name: "CIS: install /etc/grub.d/40_custom for boot loader password"
   template:
     src: grub_40_custom

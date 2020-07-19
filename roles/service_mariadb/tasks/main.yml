@@ -1,0 +1,61 @@
+---
+- name: Install MariaDB AppStream
+  dnf:
+    name: "@mariadb:10.3"
+    state: installed
+
+- name: Install MariaDB Server
+  dnf:
+    name: [ "mariadb-server", "python3-PyMySQL" ]
+    state: installed
+
+- name: Install configuration
+  template:
+    src: zcustom_base.cnf
+    dest: /etc/my.cnf.d/zcustom_base.cnf
+    owner: root
+    group: root
+    mode: 0644
+  notify: mysql_restart
+
+- name: Create mysql tmp directory
+  file:
+    path: /var/lib/mysql-tmp
+    state: directory
+    owner: mysql
+    group: mysql
+    mode: 0750
+  notify: mysql_restart
+
+- name: Start and Enable MariaDB
+  service:
+    name: mariadb
+    enabled: true
+    state: started
+
+- name: Set root password for MariaDB for localhost
+  mysql_user:
+    login_user: root
+    login_password: "{{ vault_root_password }}"
+    check_implicit_admin: true
+    user: root
+    password: "{{ vault_root_password }}"
+    host: localhost
+
+- name: Remove root password for MariaDB for non-localhost users
+  mysql_user:
+    login_user: root
+    login_password: "{{ vault_root_password }}"
+    check_implicit_admin: true
+    user: root
+    host: "{{ fqdn }}"
+    state: absent
+
+- name: Remove all anonymous users from MariaDB
+  mysql_user:
+    login_user: root
+    login_password: "{{ vault_root_password }}"
+    check_implicit_admin: true
+    name: ''
+    host_all: yes
+    state: absent

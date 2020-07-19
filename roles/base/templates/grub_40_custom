@@ -4,5 +4,5 @@ exec tail -n +3 $0
 # menu entries you want to add after this comment.  Be careful not to change
 # the 'exec tail' line above.
 set superusers="root"
-password_pbkdf2 root {{ grub_passwd.stdout }}
+password_pbkdf2 root {{ vault_grub_root_password }}
 

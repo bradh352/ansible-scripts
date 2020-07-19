@@ -1,0 +1,50 @@
+[mysqld]
+bind-address                   = localhost
+# move tmpdir due to /tmp being a memory backed tempfs filesystem, mysql uses this for on disk sorting
+tmpdir                         = /var/lib/mysql-tmp
+default_storage_engine         = innodb
+binlog_format                  = ROW
+binlog_row_event_max_size      = 2M
+binlog_cache_size              = 2M
+# Expire off bin logs we no longer need for slaves
+expire_logs_days               = 7
+
+enforce_gtid_consistency       = 1
+gtid_mode                      = ON
+
+innodb_adaptive_hash_index_parts = 8
+innodb_buffer_pool_instances   = 16
+innodb_buffer_pool_size        = {{ (ansible_memtotal_mb / 2)|int|abs }}MB
+innodb_log_checksums           = ON
+innodb_file_format             = barracuda
+innodb_file_per_table          = 1
+innodb_flush_method            = ALL_O_DIRECT
+innodb_flush_neighbors         = 0
+#innodb_io_capacity             = 3000
+#innodb_io_capacity_max         = 6000
+innodb_log_write_ahead_size    = 4096
+innodb_log_file_size           = 1G
+innodb_stats_on_metadata       = OFF
+#innodb_thread_concurrency      = 12
+
+# Query Cache causes additional locking, reducing parallelization.  More harm than good.
+query_cache_size               = 0
+query_cache_type               = OFF
+
+log_bin
+log_slave_updates
+max_allowed_packet             = 16M
+max_connections                = 512
+
+key_buffer_size                = 256M
+sort_buffer_size               = 2M
+table_open_cache_instances     = 16
+
+# This settings makes MySQL prefer indexes with low cardinality over table scans (essentially, trust DBA more)
+max_seeks_for_key              = 100
+
+# Specific to use, keygen can create huge concat columns on license skus
+group_concat_max_len           = 102400
+
+sql_mode = "NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION,ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES"
+
