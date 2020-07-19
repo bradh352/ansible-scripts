@@ -57,7 +57,7 @@
 
 # See https://www.server-world.info/en/note?os=CentOS_8&p=httpd2&f=1
 - name: Support ACME authentication for letsencrypt via mod_md
-  copy:
+  template:
     src: http_acme.conf
     dest: /etc/httpd/conf.d/acme.conf
     owner: root
