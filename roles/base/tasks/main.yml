@@ -42,7 +42,7 @@
     - { regexp: 'DNS2\=*', line: "DNS2=8.8.4.4", state: "present" }
     - { regexp: 'DNS3\=*', line: "",             state: "absent" }
 
-- name: Make sure the infrastructure user is created for management. Use password used to run this script as user password.
+- name: Make sure the infrastructure user is created for management.
   user:
     name: "infra"
     create_home: yes
@@ -50,7 +50,7 @@
     groups: [ "wheel", "users", "adm", "lp" ]
     state: present
     append: yes
-    password: "{{ '!' if not ansible_password is defined else ansible_password | password_hash('sha512') }}"
+    password: "{{ vault_root_password | password_hash('sha512') }}"
     update_password: "on_create"
 
 - name: disable root user
@@ -321,6 +321,20 @@
     group: root
     mode: 0600
   ignore_errors: yes
+  notify: update_grub
+
+- name: "CIS: generate pbkdf2 grub password"
+  shell: "echo -e '{{ vault_root_password }}\n{{ vault_root_password }}' | grub2-mkpasswd-pbkdf2 2>/dev/null | grep 'password is' | sed 's/.*password is //'"
+  register: grub_passwd
+  changed_when: false
+
+- name: "CIS: install /etc/grub.d/40_custom for boot loader password"
+  template:
+    src: grub_40_custom
+    dest: /etc/grub.d/40_custom
+    owner: root
+    group: root
+    mode: 0755
   notify: update_grub
 
 - name: "CIS: update /etc/default/grub to enable audit logging at boot"
