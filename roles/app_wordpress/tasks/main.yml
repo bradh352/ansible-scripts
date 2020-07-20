@@ -1,0 +1,55 @@
+---
+- name: Check to see if WordPress is already installed
+  stat:
+    path: "{{ wordpress_install_path }}/wp-admin"
+  register: wordpress_installed
+
+- name: Ensure we fetch the most current wordpress release
+  delegate_to: localhost
+  become: no
+  file:
+    path: /tmp/wordpress-latest.tar.gz
+    state: absent
+  when: not wordpress_installed.stat.exists
+  run_once: true
+
+- name: Download the latest wordpress release
+  delegate_to: localhost
+  become: no
+  get_url:
+    url: https://wordpress.org/latest.tar.gz
+    dest: /tmp/wordpress-latest.tar.gz
+  when: not wordpress_installed.stat.exists
+  run_once: true
+
+- name: Ensure directory exists for web content
+  file:
+    path: "{{ wordpress_install_path }}"
+    state: directory
+    recurse: yes
+    owner: apache
+    group: apache
+    mode: 0750
+    setype: httpd_sys_content_t
+
+- name: Extract WordPress
+  unarchive:
+    src: /tmp/wordpress-latest.tar.gz
+    copy: yes
+    dest: "{{ wordpress_install_path }}"
+    owner: apache
+    group: apache
+    setype: httpd_sys_content_t
+    extra_opts: [--strip-components=1]
+  when: not wordpress_installed.stat.exists
+
+- name: cleanup download
+  delegate_to: localhost
+  become: no
+  file:
+    path: /tmp/wordpress-latest.tar.gz
+    state: absent
+  when: not wordpress_installed.stat.exists
+  run_once: true
+
+
