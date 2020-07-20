@@ -1,3 +1,13 @@
+{% if ansible_memtotal_mb >= 8192 %}
+{%   set innodb_buffer_pool_size=(ansible_memtotal_mb * 0.75)|int|abs %}
+{% elif ansible_memtotal_mb >= 4096 %}
+{%   set innodb_buffer_pool_size=(ansible_memtotal_mb * 0.50)|int|abs %}
+{% elif ansible_memtotal_mb >= 2048 %}
+{%   set innodb_buffer_pool_size=(ansible_memtotal_mb * 0.33)|int|abs %}
+{% else %}
+{%   set innodb_buffer_pool_size=(ansible_memtotal_mb * 0.25)|int|abs %}
+{% endif %}
+
 [mysqld]
 bind-address                   = localhost
 # move tmpdir due to /tmp being a memory backed tempfs filesystem, mysql uses this for on disk sorting
@@ -11,7 +21,7 @@ expire_logs_days               = 7
 
 innodb_adaptive_hash_index_parts = 8
 innodb_buffer_pool_instances   = 16
-innodb_buffer_pool_size        = {{ (ansible_memtotal_mb / 2)|int|abs }}MB
+innodb_buffer_pool_size        = {{ innodb_buffer_pool_size }}MB
 innodb_log_checksums           = ON
 innodb_file_per_table          = 1
 #innodb_flush_method            = ALL_O_DIRECT
