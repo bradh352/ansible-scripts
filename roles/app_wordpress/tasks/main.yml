@@ -52,4 +52,56 @@
   when: not wordpress_installed.stat.exists
   run_once: true
 
+- name: create database for wordpress
+  mysql_db:
+    login_user: root
+    login_password: "{{ vault_root_password }}"
+    name: "{{ wordpress_db_name }}"
+    state: present
 
+- name: create db user for wordpress
+  mysql_user:
+    login_user: root
+    login_password: "{{ vault_root_password }}"
+    check_implicit_admin: true
+    user: "{{ wordpress_db_user }}"
+    password: "{{ wordpress_db_pass }}"
+    host: "{{ item }}"
+    priv: "{{ wordpress_db_name }}.*:ALL"
+  with_items:
+    - localhost
+    - 127.0.0.1
+    - ::1
+
+- name: Create apache configuration for site
+  template:
+    src: apache_vhost.conf
+    dest: "/etc/httpd/conf.d/{{ wordpress_domain }}.conf"
+    owner: root
+    group: root
+    mode: 0644
+  notify: httpd_restart
+
+- name: Check to see if the WordPress keys have been generated
+  stat:
+    path: "{{ wordpress_install_path }}/wp-config-keys.php"
+  register: wordpress_keys
+
+- name: Configure WordPress keys.  Must only run once as otherwise will kill all existing sessions.
+  template:
+    src: wp-config-keys.php
+    dest: "{{ wordpress_install_path }}/wp-config-keys.php"
+    owner: apache
+    group: apache
+    mode: 0640
+    setype: httpd_sys_content_t
+  when: not wordpress_keys.stat.exists
+
+- name: Configure WordPress
+  template:
+    src: wp-config.php
+    dest: "{{ wordpress_install_path }}/wp-config.php"
+    owner: apache
+    group: apache
+    mode: 0640
+    setype: httpd_sys_content_t
