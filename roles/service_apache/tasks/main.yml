@@ -4,6 +4,11 @@
     name: [ "httpd", "mod_ssl", "mod_md" ]
     state: latest
 
+- name: Install ACME/mod_md for letsencrypt support
+  yum:
+    name: [ "mod_md" ]
+    state: "{{ 'installed' if apache_letsencrypt else 'absent' }}"
+
 - name: open up http ports
   firewalld:
     immediate: yes
@@ -64,6 +69,14 @@
     group: root
     mode: 0644
   notify: httpd_restart
+  when: apache_letsencrypt
+
+- name: Ensure ACME is not configured if letsencrypt is not enabled
+  file:
+    path: /etc/httpd/conf.d/acme.conf
+    state: absent
+  notify: httpd_restart
+  when: not apache_letsencrypt
 
 - name: Allow httpd to connect outbound (needed for letsencrypt)
   seboolean:
@@ -76,6 +89,7 @@
   vars:
     selinux_module_name: httpd-md
     selinux_module_file: selinux_httpd_mod_md.pp
+  when: apache_letsencrypt
 
 - name: comment out error log setting in httpd.conf
   lineinfile:

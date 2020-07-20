@@ -9,7 +9,7 @@
 {% endif %}
 
 [mysqld]
-bind-address                   = localhost
+bind-address                   = {{ "0.0.0.0" if mariadb_external_access else "localhost" }}
 # move tmpdir due to /tmp being a memory backed tempfs filesystem, mysql uses this for on disk sorting
 tmpdir                         = /var/lib/mysql-tmp
 default_storage_engine         = innodb

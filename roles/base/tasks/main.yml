@@ -216,7 +216,7 @@
     group: root
     mode: 0644
 
-- name: install /etc/profile.d/99-prompt.sh
+- name: install custom prompt for shell access
   copy:
     src: 99-prompt.sh
     dest: /etc/profile.d/99-prompt.sh
@@ -224,7 +224,7 @@
     group: root
     mode: 0644
 
-- name: install /etc/profile.d/tout.sh
+- name: install idle timeout
   copy:
     src: tout.sh
     dest: /etc/profile.d/tout.sh
@@ -232,7 +232,7 @@
     group: root
     mode: 0644
 
-- name: install /usr/local/bin/trim.sh
+- name: automatically perform discard/trim operations weekly to free up disk space
   copy:
     src: trim.sh
     dest: /usr/local/bin/trim.sh
@@ -240,7 +240,7 @@
     group: root
     mode: 0755
 
-- name: insert link in /etc/cron.weekly
+- name: insert link in /etc/cron.weekly for discard/trim
   file:
     src: /usr/local/bin/trim.sh
     dest: /etc/cron.weekly/trim
@@ -250,7 +250,7 @@
   lineinfile:
     dest: /etc/crontab
     regexp: MAILTO
-    line: "MAILTO=brad@brad-house.com"
+    line: "MAILTO={{ admin_email }}"
     backrefs: true
 
 - name: install exim package
@@ -258,7 +258,7 @@
     name: exim
 
 - name: configure exim
-  copy:
+  template:
     src: exim.conf
     dest: /etc/exim/exim.conf
     backup: yes

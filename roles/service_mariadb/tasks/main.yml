@@ -70,3 +70,11 @@
     name: ''
     host_all: yes
     state: absent
+
+- name: enable or disable mariadb port depending on if external access is allowed
+  firewalld:
+    immediate: yes
+    permanent: yes
+    port: "3306/tcp"
+    state: "{{ 'enabled' if mariadb_external_access else 'disabled' }}"
+
