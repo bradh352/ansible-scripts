@@ -44,7 +44,7 @@
 
 - name: Make sure the infrastructure user is created for management.
   user:
-    name: "infra"
+    name: "{{ superuser }}"
     create_home: yes
     shell: "/bin/bash"
     groups: [ "wheel", "users", "adm", "lp" ]
@@ -59,23 +59,23 @@
     password: "!"
     update_password: always
 
-- name: Ensure /home/infra/.ssh exists
+- name: "Ensure /home/{{ superuser }}/.ssh exists"
   file:
-    path: /home/infra/.ssh/
+    path: "/home/{{ superuser }}/.ssh/"
     state: directory
     mode: 0700
     owner: infra
     group: infra
 
-- name: Make sure the public key for ssh authentication is configured for the infra user
+- name: "Make sure the public key for ssh authentication is configured for the {{ superuser }} user"
   lineinfile:
-    path: /home/infra/.ssh/authorized_keys
+    path: "/home/{{ superuser }}/.ssh/authorized_keys"
     state: present
     create: yes
     owner: infra
     group: infra
     mode: 0600
-    line: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCuCYhgb5Jt4vOS+KtwQyXpp6AZuqL7Ff5DR7Criqrs1isSVnOBPb2hozQ9y6FnUFofJTc3aW0z7a8UHRV3iR8K2LjNu95aGTys5h8txLlg5NPsN57plZlFX+J3j3jfuzatiFdeIp2FmV5Cy47owlWw9jidgM7RkDcJIUyC27vhKT9/Ik3G4uOcPL85UlMv3nXqPHtAyEOSVFojx1pNnQlhD5oyVtNL3JtC6yGDbnAH+kqijabJXAqLRN5vESbHwBOozQqP4A5o6gtTIGelwwfBNl6+DimN+r8gvHDkUAe4x/PkBPgNbe+EZPKYeG9RziYfYvU+YjvP8bKfEgk/b8/vIBwSY1lZe+vKBYsAlf6PZyyVppix8n0a4HVzqLINcZFLjHap95PAzptC81uYsd15s3tHERdCsOW4xOARyAc4DVxv5UX6xX3avks1X5VhXdqVhJBVapjsZx87uIMdx1ZBFlXqFB3vQHCKM+U/aLeuTtmtS3A4b2bggIPRYeJdAkCrLmR6iMtDyL0Mf02v4xqOk92xsolvIfFgevxh08jtIsv1AsOzYTBh/4tcA3LbEApu1oJOFZ3l2bFWcWYgoFsmqTjr7uPPH7ppMwsrfwlGohiP5RXSVuy+TszzwIg2H3VTDw+p5X1hm6wHtCTzUR0hJalCos2Agbv/sSqU1ePsQQ== brad@brad-house.com"
+    line: "{{ superuser_pubkey }}"
 
 - name: ensure EPEL is installed
   yum:
@@ -120,7 +120,7 @@
   when: (timesyncd_status == 3 or timesyncd_status == 0)
 
 - name: install /etc/chrony.conf
-  copy:
+  template:
     src: chrony.conf
     dest: /etc/chrony.conf
     owner: root
@@ -137,7 +137,7 @@
 - name: Set timezone to eastern
   file:
     path: /etc/localtime
-    src: /usr/share/zoneinfo/America/New_York
+    src: "/usr/share/zoneinfo/{{ base_timezone}}"
     state: link
 
 - name: "open up port {{ ssh_port }} for SSHd alternative port"
