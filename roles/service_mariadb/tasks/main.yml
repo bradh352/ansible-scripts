@@ -25,7 +25,14 @@
     owner: mysql
     group: mysql
     mode: 0750
+    setype: mysqld_db_t
   notify: mysql_restart
+
+- name: Set SELinux file context appropriately for /var/lib/mysql-tmp
+  sefcontext:
+    state: present
+    setype: mysqld_db_t
+    target: /var/lib/mysql-tmp
 
 - name: Start and Enable MariaDB
   service:
@@ -40,7 +47,11 @@
     check_implicit_admin: true
     user: root
     password: "{{ vault_root_password }}"
-    host: localhost
+    host: "{{ item }}"
+  with_items:
+    - localhost
+    - 127.0.0.1
+    - ::1
 
 - name: Remove root password for MariaDB for non-localhost users
   mysql_user:

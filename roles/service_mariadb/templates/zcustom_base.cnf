@@ -9,16 +9,12 @@ binlog_cache_size              = 2M
 # Expire off bin logs we no longer need for slaves
 expire_logs_days               = 7
 
-enforce_gtid_consistency       = 1
-gtid_mode                      = ON
-
 innodb_adaptive_hash_index_parts = 8
 innodb_buffer_pool_instances   = 16
 innodb_buffer_pool_size        = {{ (ansible_memtotal_mb / 2)|int|abs }}MB
 innodb_log_checksums           = ON
-innodb_file_format             = barracuda
 innodb_file_per_table          = 1
-innodb_flush_method            = ALL_O_DIRECT
+#innodb_flush_method            = ALL_O_DIRECT
 innodb_flush_neighbors         = 0
 #innodb_io_capacity             = 3000
 #innodb_io_capacity_max         = 6000
@@ -31,7 +27,7 @@ innodb_stats_on_metadata       = OFF
 query_cache_size               = 0
 query_cache_type               = OFF
 
-log_bin
+log_bin                        = mariadb-bin
 log_slave_updates
 max_allowed_packet             = 16M
 max_connections                = 512
