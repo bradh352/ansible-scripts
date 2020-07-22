@@ -1,7 +1,7 @@
 ---
 - name: install apache/mod_ssl
   yum:
-    name: [ "httpd", "mod_ssl", "mod_md" ]
+    name: [ "httpd", "mod_ssl", "mod_http2" ]
     state: latest
 
 - name: Install ACME/mod_md for letsencrypt support
@@ -46,6 +46,15 @@
   copy:
     src: http_security.conf
     dest: /etc/httpd/conf.d/security.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: httpd_restart
+
+- name: enable http2 support
+  copy:
+    src: http_http2.conf
+    dest: /etc/httpd/conf.d/http2.conf
     owner: root
     group: root
     mode: 0644
