@@ -32,7 +32,7 @@
   sefcontext:
     state: present
     setype: mysqld_db_t
-    target: /var/lib/mysql-tmp
+    target: /var/lib/mysql-tmp(/.*)?
 
 - name: Start and Enable MariaDB
   service:

@@ -105,3 +105,25 @@
     group: apache
     mode: 0640
     setype: httpd_sys_content_t
+
+- name: Set up .htaccess for mod_rewrite rules
+  copy:
+    src: htaccess
+    dest: "{{ wordpress_install_path }}/.htaccess"
+    owner: apache
+    group: apache
+    mode: 0640
+    setype: httpd_sys_content_t
+
+- name: Set up selinux policies to allow some areas to be writable by apache
+  sefcontext:
+    state: present
+    setype: httpd_sys_rw_content_t
+    target: "{{ wordpress_install_path }}{{ item }}"
+  with_items:
+    - "/wp-content(/.*)?"
+
+- name: Apply new SELinux file context to filesystem
+  command: restorecon -irv "{{ wordpress_install_path }}"
+  register: restorecon
+  changed_when: restorecon.stdout
