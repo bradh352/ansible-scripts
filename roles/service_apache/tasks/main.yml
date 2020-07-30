@@ -69,6 +69,15 @@
     mode: 0644
   notify: httpd_restart
 
+- name: enable compression for text resources
+  copy:
+    src: http_deflate.conf
+    dest: /etc/httpd/conf.d/deflate.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: httpd_restart
+
 # See https://www.server-world.info/en/note?os=CentOS_8&p=httpd2&f=1
 - name: Support ACME authentication for letsencrypt via mod_md
   template:
