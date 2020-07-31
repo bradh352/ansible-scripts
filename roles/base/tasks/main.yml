@@ -282,6 +282,48 @@
   command: alternatives --set mta /usr/sbin/sendmail.exim
   when: mta.failed
 
+
+# Automatic updates
+- name: "Automatic updates: {{ 'yes' if base_autoupdate else 'no' }}"
+  yum:
+    name: dnf-automatic
+    state: "{{ 'installed' if base_autoupdate else 'absent' }}"
+
+- name: "Automatic updates: config"
+  copy:
+    src: dnf_automatic.conf
+    dest: /etc/dnf/automatic.conf
+    mode: 0600
+    owner: root
+    group: root
+  when: base_autoupdate
+
+
+- name: "Automatic updates: systemd timer config dir"
+  file:
+    path: /etc/systemd/system/dnf-automatic.timer.d/
+    state: directory
+    mode: 0700
+    owner: root
+    group: root
+  when: base_autoupdate
+
+- name: "Automatic updates: schedule"
+  copy:
+    src: dnf_automatic_schedule.conf
+    dest: /etc/systemd/system/dnf-automatic.timer.d/local.conf
+    mode: 0600
+    owner: root
+    group: root
+  when: base_autoupdate
+
+- name: "Automatic updates: started"
+  systemd:
+    name: dnf-automatic.timer
+    enabled: yes
+    state: started
+  when: base_autoupdate
+
 # Hardening as per CIS
 - name: "CIS: disable loading of unneeded filesystem types"
   copy:

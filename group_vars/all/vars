@@ -24,6 +24,9 @@ base_ntp_peers: [ ]
 # Timezone for server.  Can be overwritten by host config.
 base_timezone: "America/New_York"
 
+# Whether or not to automatically apply OS-supplied updates
+base_autoupdate: false
+
 # Whether to enable letsencrypt support for apache
 apache_letsencrypt: false
 
