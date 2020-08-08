@@ -1,4 +1,14 @@
 ---
+# wordpress_backup=true/false
+#  If true, go to https://console.developers.google.com/
+#  Enable the google drive API.
+#  Create a new project, name it "Wordpress Backup Client"
+#  It will require you create an OAuth2 consent screen, add perms of "../auth/drive.file"
+#  Create new credentials-> OAuth client id.  Application type should be "Desktop App".
+#  You can name it "Wordpress Backup Client".
+#  Run  wp gdrive auth  and enter in the id and secret, and go to the web page provided.
+#  A code will be returned on the web page you need to enter back into the auth command.
+
 - name: Check to see if WordPress is already installed
   stat:
     path: "{{ wordpress_install_path }}/wp-admin"
@@ -192,10 +202,13 @@
   when: "'WP-CLI is at the latest version' not in wpcli_checkupdate.stdout"
 
 - name: "wp-cli: check to see if wp-cli-gdrive-command is installed"
-  shell: "/usr/local/bin/wp package list | grep 'wp-cli-gdrive-command'"
+  command:
+    argv:
+      - "/usr/local/bin/wp"
+      - "package"
+      - "list"
   environment:
     PHP_INI_SCAN_DIR: /etc/php-cli.d/
-  failed_when: false
   changed_when: false
   register: wpcli_gdrive
 
@@ -208,7 +221,7 @@
       - "wp-packagist/wp-cli-gdrive-command"
   environment:
     PHP_INI_SCAN_DIR: /etc/php-cli.d/
-  when: "wpcli_gdrive.rc != 0"
+  when: "'gdrive' not in wpcli_gdrive.stdout"
 
 - name: "wp-cli: update all wp-cli packages"
   command:
@@ -218,3 +231,19 @@
       - "update"
   environment:
     PHP_INI_SCAN_DIR: /etc/php-cli.d/
+
+- name: "Install wordpress update script for {{ wordpress_domain }}"
+  template:
+    src: wp-update.sh
+    dest: "/usr/local/bin/wp-update-{{ wordpress_domain }}.sh"
+    owner: root
+    group: root
+    mode: 0750
+
+- name: "Install auto-update cron task for {{ wordpress_domain }}"
+  template:
+    src: cron_wp-update
+    dest: "/etc/cron.d/wp-update-{{ wordpress_domain }}"
+    owner: root
+    group: root
+    mode: 0644
