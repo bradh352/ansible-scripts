@@ -184,6 +184,8 @@
       - "/usr/local/bin/wp"
       - "cli"
       - "check-update"
+      - "--skip-plugins"
+      - "--skip-themes"
   register: wpcli_checkupdate
   environment:
     PHP_INI_SCAN_DIR: /etc/php-cli.d/
@@ -197,6 +199,8 @@
       - "update"
       - "--stable"
       - "--yes"
+      - "--skip-plugins"
+      - "--skip-themes"
   environment:
     PHP_INI_SCAN_DIR: /etc/php-cli.d/
   when: "'WP-CLI is at the latest version' not in wpcli_checkupdate.stdout"
@@ -207,6 +211,8 @@
       - "/usr/local/bin/wp"
       - "package"
       - "list"
+      - "--skip-plugins"
+      - "--skip-themes"
   environment:
     PHP_INI_SCAN_DIR: /etc/php-cli.d/
   changed_when: false
@@ -219,6 +225,8 @@
       - "package"
       - "install"
       - "wp-packagist/wp-cli-gdrive-command"
+      - "--skip-plugins"
+      - "--skip-themes"
   environment:
     PHP_INI_SCAN_DIR: /etc/php-cli.d/
   when: "'gdrive' not in wpcli_gdrive.stdout"
@@ -229,6 +237,8 @@
       - "/usr/local/bin/wp"
       - "package"
       - "update"
+      - "--skip-plugins"
+      - "--skip-themes"
   environment:
     PHP_INI_SCAN_DIR: /etc/php-cli.d/
 
@@ -244,6 +254,22 @@
   template:
     src: cron_wp-update
     dest: "/etc/cron.d/wp-update-{{ wordpress_domain }}"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: "Install wordpress backup script for {{ wordpress_domain }}"
+  template:
+    src: wp-backup.sh
+    dest: "/usr/local/bin/wp-backup-{{ wordpress_domain }}.sh"
+    owner: root
+    group: root
+    mode: 0750
+
+- name: "Install auto-backup cron task for {{ wordpress_domain }}"
+  template:
+    src: cron_wp-backup
+    dest: "/etc/cron.d/wp-backup-{{ wordpress_domain }}"
     owner: root
     group: root
     mode: 0644
