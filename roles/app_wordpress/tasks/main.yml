@@ -191,3 +191,30 @@
     PHP_INI_SCAN_DIR: /etc/php-cli.d/
   when: "'WP-CLI is at the latest version' not in wpcli_checkupdate.stdout"
 
+- name: "wp-cli: check to see if wp-cli-gdrive-command is installed"
+  shell: "/usr/local/bin/wp package list | grep 'wp-cli-gdrive-command'"
+  environment:
+    PHP_INI_SCAN_DIR: /etc/php-cli.d/
+  failed_when: false
+  changed_when: false
+  register: wpcli_gdrive
+
+- name: "wp-cli: install wp-cli-gdrive-command"
+  command:
+    argv:
+      - "/usr/local/bin/wp"
+      - "package"
+      - "install"
+      - "wp-packagist/wp-cli-gdrive-command"
+  environment:
+    PHP_INI_SCAN_DIR: /etc/php-cli.d/
+  when: "wpcli_gdrive.rc != 0"
+
+- name: "wp-cli: update all wp-cli packages"
+  command:
+    argv:
+      - "/usr/local/bin/wp"
+      - "package"
+      - "update"
+  environment:
+    PHP_INI_SCAN_DIR: /etc/php-cli.d/

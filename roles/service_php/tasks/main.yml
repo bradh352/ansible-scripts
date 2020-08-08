@@ -1,7 +1,7 @@
 ---
-- name: install php 7.3 stream
+- name: install php 7.2 stream
   dnf:
-    name: '@php:7.3'
+    name: '@php:7.2'
     state: present
   notify:
     - phpfpm_restart
@@ -10,7 +10,7 @@
 - name: install php-fpm and modules
   dnf:
     name: [ "php-fpm", "php-mysqlnd", "php-opcache", "php-gd", "php-xml",
-            "php-mbstring", "php-pdo" ]
+            "php-mbstring", "php-pdo", "php-pecl-zip" ]
     state: latest
   notify:
     - phpfpm_restart
