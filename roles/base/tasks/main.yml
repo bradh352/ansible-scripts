@@ -224,6 +224,14 @@
     group: root
     mode: 0644
 
+- name: Put /usr/local/bin in default path
+  copy:
+    src: profile_local_paths.sh
+    dest: /etc/profile.d/local_paths.sh
+    owner: root
+    group: root
+    mode: 0644
+
 - name: install idle timeout
   copy:
     src: tout.sh

@@ -126,3 +126,68 @@
   command: restorecon -irv "{{ wordpress_install_path }}"
   register: restorecon
   changed_when: restorecon.stdout
+
+- name: "wp-cli: check to see if it is installed"
+  stat:
+    path: "/usr/local/bin/wp"
+  register: wpcli_installed
+
+- name: "wp-cli: clear any cached download"
+  delegate_to: localhost
+  become: no
+  file:
+    path: /tmp/wp-cli.phar
+    state: absent
+  when: not wpcli_installed.stat.exists
+  run_once: true
+
+- name: "wp-cli: Download the latest release"
+  delegate_to: localhost
+  become: no
+  get_url:
+    url: https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+    dest: /tmp/wp-cli.phar
+  when: not wpcli_installed.stat.exists
+  run_once: true
+
+- name: "wp-cli: install"
+  copy:
+    src: /tmp/wp-cli.phar
+    dest: /usr/local/bin/wp
+    owner: root
+    group: root
+    mode: 0750
+  when: not wpcli_installed.stat.exists
+
+- name: "wp-cli: cleanup download"
+  delegate_to: localhost
+  become: no
+  file:
+    path: /tmp/wp-cli.phar
+    state: absent
+  when: not wpcli_installed.stat.exists
+  run_once: true
+
+- name: "wp-cli: check-update"
+  command:
+    argv:
+      - "/usr/local/bin/wp"
+      - "cli"
+      - "check-update"
+  register: wpcli_checkupdate
+  environment:
+    PHP_INI_SCAN_DIR: /etc/php-cli.d/
+  changed_when: false
+
+- name: "wp-cli: update to the latest version"
+  command:
+    argv:
+      - "/usr/local/bin/wp"
+      - "cli"
+      - "update"
+      - "--stable"
+      - "--yes"
+  environment:
+    PHP_INI_SCAN_DIR: /etc/php-cli.d/
+  when: "'WP-CLI is at the latest version' not in wpcli_checkupdate.stdout"
+

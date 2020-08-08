@@ -34,10 +34,10 @@
     mode: 0644
   notify: phpfpm_restart
 
-- name: Install php hardening/security
+- name: Install php hardening/security (noncli only)
   copy:
     src: security.ini
-    dest: /etc/php.d/90-security.ini
+    dest: /etc/php.d/90-noncli-security.ini
     owner: root
     group: root
     mode: 0644
@@ -57,3 +57,32 @@
     name: php-fpm
     state: started
     enabled: yes
+
+- name: "php-cli should use a different include directory"
+  copy:
+    src: profile_php-cli.sh
+    dest: /etc/profile.d/php-cli.sh
+    owner: root
+    group: root
+    mode: 0644
+
+- name: "php-cli config directory"
+  file:
+    path: /etc/php-cli.d/
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: get a list of aux configuration files for php. exclude noncli ones.
+  shell: "ls /etc/php.d/ | grep -v noncli"
+  register: php_configs
+  changed_when: false
+
+- name: symlink aux configs to php-cli.d
+  file:
+    state: link
+    path: "/etc/php-cli.d/{{ item }}"
+    src: "/etc/php.d/{{ item }}"
+  with_items: "{{ php_configs.stdout_lines }}"
+
