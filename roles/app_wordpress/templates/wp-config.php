@@ -37,6 +37,11 @@ define( 'DB_CHARSET', 'utf8' );
 /** The Database Collate type. Don't change this if in doubt. */
 define( 'DB_COLLATE', '' );
 
+/** Wordpress has automatic updates by default.  these won't work due to our SELinux policies.
+ *  we do this via wp-cli and a cron task instead.  Disable so it doesn't even try and prevents
+ *  warnings. */
+define( 'automatic_updater_disabled', true );
+
 /**#@+
  * Authentication Unique Keys and Salts.
  *
