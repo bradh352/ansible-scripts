@@ -42,6 +42,9 @@ define( 'DB_COLLATE', '' );
  *  warnings. */
 define( 'automatic_updater_disabled', true );
 
+/** Limit the number of post revisions kept.  It just eats up DB space. */
+define( 'WP_POST_REVISIONS', 10 );
+
 /**#@+
  * Authentication Unique Keys and Salts.
  *
