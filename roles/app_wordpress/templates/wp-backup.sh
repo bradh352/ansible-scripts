@@ -1,7 +1,7 @@
 #!/bin/bash
 
 LOCAL_TEMP="/tmp/wpbackup"
-REMOTE_PREFIX="WordpressBackups/"
+REMOTE_PREFIX="WordpressBackups"
 LOCAL_SITEPATH="{{ wordpress_install_path }}"
 DOMAIN="{{ wordpress_domain }}"
 # Days to retain
@@ -9,6 +9,11 @@ DAYSKEEP=30
 
 DATE_CURRENT=`date +"%Y-%m-%d"`
 DATE_OLDEST=`date +"%Y-%m-%d" -d "-${DAYSKEEP} days"`
+
+export PATH="$PATH:/usr/bin:/bin:/usr/local/bin"
+
+# we have hardening settings that cause issues, so we have a php-cli-specific config dir
+export PHP_INI_SCAN_DIR=/etc/php-cli.d/
 
 WP=/usr/local/bin/wp
 
@@ -30,7 +35,10 @@ ${WP} gdrive mkdir "${REMOTE_PREFIX}" --quiet || die "failed to create remote go
 # check remote backup folder exists on gdrive
 #   Its formatted as a table, so we have to do quite a bit of manipulation
 #   All files we care about are prefixed with "wpbackup-"
-REMOTE_FILE_LIST=`${WP} gdrive ls "${REMOTE_PREFIX}" 2>/dev/null | cut -d'|' -f 2 | grep -v '+$' | sed -e 's/ *$//' -e 's/^ //' -e '1d' | grep -i -v '^wpbackup-'`
+REMOTE_FILE_LIST=`${WP} gdrive ls "${REMOTE_PREFIX}" 2>/dev/null | cut -d'|' -f 2 | grep -v '+$' | sed -e 's/ *$//' -e 's/^ //' -e '1d' | grep -i '^wpbackup-'`
+
+echo " * Remote file list:"
+echo "${REMOTE_FILE_LIST}"
 
 # clear all files that are older than we want to keep
 while read -r file ; do
@@ -39,10 +47,13 @@ while read -r file ; do
 	fi
 	name=`echo $file | sed -e 's/.tar.gz//' -e 's/.sql.gz//'`
 
+	echo "   * Comparing ${name} to wpbackup-${DATE_OLDEST}"
 	# Delete files less than oldest allowed date
 	if [[ "${name}" < "wpbackup-${DATE_OLDEST}" ]] ; then
 		echo " * Deleting ${REMOTE_PREFIX}/${file}"
 		${WP} gdrive rm "${REMOTE_PREFIX}/${file}" --force --quiet || die "failed to delete remote google drive file ${REMOTE_PREFIX}/${file}"
+	else
+		echo " * Keeping ${REMOTE_PREFIX}/${file}"
 	fi
 done < <(echo "$REMOTE_FILE_LIST")
 
