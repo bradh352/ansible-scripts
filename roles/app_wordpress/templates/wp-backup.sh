@@ -11,6 +11,7 @@ DATE_CURRENT=`date +"%Y-%m-%d"`
 DATE_OLDEST=`date +"%Y-%m-%d" -d "-${DAYSKEEP} days"`
 
 export PATH="$PATH:/usr/bin:/bin:/usr/local/bin"
+export COLUMNS=1000  # Don't truncate output
 
 # we have hardening settings that cause issues, so we have a php-cli-specific config dir
 export PHP_INI_SCAN_DIR=/etc/php-cli.d/
