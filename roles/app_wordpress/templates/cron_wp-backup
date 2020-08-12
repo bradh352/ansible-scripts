@@ -1,4 +1,5 @@
 SHELL=/bin/bash
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
+MAILTO={{ admin_email }}
 5 3 * * * root /usr/local/bin/wp-backup-{{ wordpress_domain }}.sh
 
