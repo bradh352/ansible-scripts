@@ -1,4 +1,4 @@
 SHELL=/bin/bash
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
-5 3 * * * root /usr/local/bin/wp-backup-{{ wordpress_domain }}.sh >> /var/log/wp-backup-{{ wordpress_domain}}.log 2>&1
+5 3 * * * root /usr/local/bin/wp-backup-{{ wordpress_domain }}.sh
 
