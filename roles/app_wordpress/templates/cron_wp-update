@@ -1,4 +1,5 @@
 SHELL=/bin/bash
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
-5 2 * * * root /usr/local/bin/wp-update-{{ wordpress_domain }}.sh >> /var/log/wp-update-{{ wordpress_domain }}.log 2>&1
+MAILTO={{ admin_email }}
+5 2 * * * root /usr/local/bin/wp-update-{{ wordpress_domain }}.sh
 

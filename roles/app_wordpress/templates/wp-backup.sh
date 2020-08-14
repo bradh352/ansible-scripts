@@ -22,11 +22,11 @@ export PHP_INI_SCAN_DIR=/etc/php-cli.d/
 WP=/usr/local/bin/wp
 
 log() {
-	logger -t wpbackup -i -p cron.notice "$*"
+	logger -t wpbackup -p cron.notice "$*"
 }
 
 log_pipe() {
-	{ sed -e 's/\x1b\[[0-9;]*m//g' -e 's/\r//g' -e 's/Upload .*%] *//g' -e 's/Please wait ...//g' || true; } | logger -t wpbackup -i -p cron.notice
+	{ sed -e 's/\x1b\[[0-9;]*m//g' -e 's/\r//g' -e 's/Upload .*%] *//g' -e 's/Please wait ...//g' || true; } | logger -t wpbackup -p cron.notice
 }
 
 die() {
