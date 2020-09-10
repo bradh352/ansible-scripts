@@ -3,7 +3,6 @@
 # For bootstrapping, run:
 #  ansible-playbook -vv playbook.yml --ask-pass -e ansible_ssh_port=22 -e ansible_user=root --limit bradhouse.dev
 
-
 - hosts: all
   become: no
   gather_facts: False
