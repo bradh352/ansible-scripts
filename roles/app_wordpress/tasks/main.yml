@@ -241,6 +241,8 @@
       - "--skip-themes"
   environment:
     PHP_INI_SCAN_DIR: /etc/php-cli.d/
+  register: wpcliupdate
+  changed_when: "'Nothing to install or update' not in wpcliupdate.stdout"
 
 - name: "Install wordpress update script for {{ wordpress_domain }}"
   template:
