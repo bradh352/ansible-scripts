@@ -40,7 +40,8 @@ define( 'DB_COLLATE', '' );
 /** Wordpress has automatic updates by default.  these won't work due to our SELinux policies.
  *  we do this via wp-cli and a cron task instead.  Disable so it doesn't even try and prevents
  *  warnings. */
-define( 'automatic_updater_disabled', true );
+define( 'AUTOMATIC_UPDATER_DISABLED', true );
+define( 'WP_AUTO_UPDATE_CORE', false );
 
 /** Limit the number of post revisions kept.  It just eats up DB space. */
 define( 'WP_POST_REVISIONS', 10 );
