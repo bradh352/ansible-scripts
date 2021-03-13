@@ -1,8 +1,7 @@
 ---
-# NOTE: php 7.3 appears to be missing php-pecl-zip ... which wp-cli requires
-- name: install php 7.2 stream
+- name: install php 7.4 stream
   dnf:
-    name: '@php:7.2'
+    name: '@php:7.4'
     state: present
   notify:
     - phpfpm_restart
