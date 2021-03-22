@@ -385,7 +385,7 @@
 - name: "CIS: update /etc/default/grub to enable audit logging at boot"
   lineinfile:
     dest: /etc/default/grub
-    regexp: "^GRUB_CMDLINE_LINUX_DEFAULT="
+    regexp: '^GRUB_CMDLINE_LINUX_DEFAULT='
     state: present
     line: 'GRUB_CMDLINE_LINUX_DEFAULT="audit=1"'
   notify: update_grub
@@ -551,6 +551,22 @@
     name: fail2ban
     state: started
     enabled: yes
+
+# Kernel Dump is not needed on a production system, disable.
+# This frees up about 160MB of RAM, especially important on low-memory systems.
+- name: "kdump: disable service"
+  service:
+    name: kdump
+    state: stopped
+    enabled: no
+- name: "kdump: disable crashkernel"
+  lineinfile:
+     path: /etc/default/grub
+     backrefs: yes
+     regexp: '^GRUB_CMDLINE_LINUX=(.*)crashkernel=[a-z]+(.*)'
+     line: 'GRUB_CMDLINE_LINUX=\1crashkernel=no\2'
+     state: present
+  notify: update_grub
 
 - name: check if server needs rebooting
   command: "needs-restarting -r"
