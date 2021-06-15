@@ -1,8 +1,8 @@
 ---
-- name: set centos_ver8 fact
+- name: set rhel_ver8 fact
   set_fact:
-    centos_ver8: "{{ true if '8' in ansible_distribution_major_version else false }}"
-  when: 'ansible_distribution == "CentOS"'
+    rhel_ver8: "{{ true if '8' in ansible_distribution_major_version else false }}"
+  when: 'ansible_distribution == "CentOS" or ansible_distribution == "RHEL" or ansible_distribution == "Rocky" or ansible_distribution == "AlmaLinux"'
 
 # We do this because ansible_inventory isn't quite the right thing to do as that is read from the
 # destination machine, and if it hasn't been configured yet, it won't be right.
@@ -183,7 +183,7 @@
     option: "{{ item.key }}"
     value: "{{ item.val }}"
   with_items:
-    - { key: "{{ 'RateLimitIntervalSec' if centos_ver8 else 'RateLimitInterval' }}", val: "0" }
+    - { key: "{{ 'RateLimitIntervalSec' if rhel_ver8 else 'RateLimitInterval' }}", val: "0" }
     - { key: "RateLimitBurst",       val: "0" }
     - { key: "RuntimeMaxUse",        val: "100M" }
     - { key: "Storage",              val: "volatile" }
