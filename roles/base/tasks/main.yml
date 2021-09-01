@@ -89,7 +89,7 @@
     update_cache: true
   ignore_errors: false
 
-- name: install base build packages CentOS
+- name: install base build packages for RHEL-like systems
   yum:
     name: ["wget", "openssh-clients", "chrony", "acpid", "nano", "nc", "bzip2",
            "yum-utils", "rsyslog", "tar", "unzip", "python3-policycoreutils", "fail2ban" ]
