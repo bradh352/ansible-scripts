@@ -1,4 +1,15 @@
 ---
+# semodule.yml
+# Helper script to check to see if an SELinux policy module is already installed
+# and if so, if the version is the same or different.  It will then take the
+# necessary action (install or upgrade).  It will only report changes when an
+# install or upgrade is performed, otherwise will report skipped or ok.
+#
+# Vars:
+#  - selinux_module_name: name of module as specified inside the .pp file
+#  - selinux_module_file: file name (.pp) to copy and compare/install/upgrade
+
+
 # NOTE: for some reason this command no longer returns a version, and there's no way to get one in Centos 8
 #  https://access.redhat.com/solutions/2760071
 #  https://bugzilla.redhat.com/show_bug.cgi?id=1392573

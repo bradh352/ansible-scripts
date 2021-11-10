@@ -19,19 +19,13 @@
     - "80/tcp"
     - "443/tcp"
 
-- name: See if welcome.conf consists of only comments or blank lines
-  command:
-    cmd: 'grep -E -q -v "(^#.*|^$)" /etc/httpd/conf.d/welcome.conf'
-  register: welcome_uncommented
-  changed_when: false
-  failed_when: false
-
-- name: Make sure all lines in welcome.conf are commented out
-  command:
-    cmd: 'sed -E -i -e "s/^([^#].+)$/#\1/" /etc/httpd/conf.d/welcome.conf'
-    warn: false
-  when: welcome_uncommented.rc == 0
-  notify: httpd_restart
+- include_tasks: "{{ playbook_dir }}/common/tasks/commentfile.yml"
+  loop_control:
+    loop_var: commentfile
+  with_items:
+    - { path: "/etc/httpd/conf.d/welcome.conf",   notify: "httpd_restart" }
+    - { path: "/etc/httpd/conf.d/userdir.conf",   notify: "httpd_restart" }
+    - { path: "/etc/httpd/conf.d/autoindex.conf", notify: "httpd_restart" }
 
 - name: set proper ssl options
   template:
