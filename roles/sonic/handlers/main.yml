@@ -4,3 +4,5 @@
 
 - name: sonic_bgp_update
   command: "docker restart bgp"
+# This might be ligher weight:
+# docker exec -it bgp "supervisorctl -c /etc/supervisor/supervisord.conf restart bgpd"

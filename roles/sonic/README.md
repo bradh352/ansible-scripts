@@ -1,4 +1,4 @@
-= SONiC Ansible Configuration =
+# SONiC Ansible Configuration
 
 This is an ansible role to try to configure a fresh installation of SONiC, it
 is designed to work on any switch supported by SONiC.  SONiC supported
@@ -15,7 +15,7 @@ Features currently supported by this role are:
  * VLAN assignments
  * IP Address assignments
 
-== Variables used by this role ==
+## Variables used by this role
 
 * `sonic_bgp_ip`: IPv4 Address with subnet mask to use for running BGP.  This
   will set up a Loopback Interface with the address and also be configured as
@@ -52,9 +52,9 @@ Features currently supported by this role are:
     interface.  This enables IPv6 link-local address support. Default is
     `false`.
 
-== Useful SONiC commands ==
+## Useful SONiC commands
 
-=== Restore to factory-default configuration ===
+### Restore to factory-default configuration
 Generate a new configuration:
 ```
 sudo rm /etc/sonic/config_db.json
