@@ -52,6 +52,9 @@ Features currently supported by this role are:
     interface.  This enables IPv6 link-local address support. Default is
     `false`.
 
+***NOTE***: Typically variables will be placed in the host vars, its recommended
+to create a file like `host_vars/switch-fqdn.yml` that contains these settings.
+
 ## Useful SONiC commands
 
 ### Restore to factory-default configuration
