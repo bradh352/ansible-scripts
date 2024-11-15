@@ -1,0 +1,86 @@
+---
+
+- name: retrieve platform
+  shell: "show platform summary | grep 'Platform:' | cut -d : -f 2 | sed 's/ //g'"
+  register: shellcmd
+  failed_when: shellcmd.stdout | length == 0
+  changed_when: False
+
+- name: set platform fact
+  set_fact:
+    platform: "{{ shellcmd.stdout }}"
+
+- name: retrieve hwsku
+  shell: "show platform summary | grep 'HwSKU:' | cut -d : -f 2 | sed 's/ //g'"
+  register: shellcmd
+  failed_when: shellcmd.stdout | length == 0
+  changed_when: False
+
+- name: set hwsku fact
+  set_fact:
+    hwsku: "{{ shellcmd.stdout }}"
+
+- name: Parse port_config.ini
+  script: port_config_to_json.sh /usr/share/sonic/device/{{ platform }}/{{ hwsku }}/port_config.ini
+  register: port_config
+  failed_when: port_config.stdout | length == 0
+  changed_when: False
+
+- name: Load port config from JSON
+  set_fact:
+    ports: "{{ port_config.stdout|from_yaml }}"
+
+- name: Load current system config
+  slurp:
+    src: "/etc/sonic/config_db.json"
+  register: current_config_data
+
+- name: Parse current system config
+  set_fact:
+    current_config: "{{ current_config_data.content|b64decode|from_yaml }}"
+
+- name: Generate PORT
+  set_fact:
+    port: "{{ lookup('template', 'PORT.j2')|from_yaml }}"
+
+- name: Generate INTERFACE
+  set_fact:
+    interface: "{{ lookup('template', 'INTERFACE.j2')|from_yaml }}"
+
+- name: Generate LOOPBACK
+  set_fact:
+    loopback: "{{ lookup('template', 'LOOPBACK.j2')|from_yaml }}"
+
+- name: Generate VXLAN
+  set_fact:
+    vxlan: "{{ lookup('template', 'VXLAN.j2')|from_yaml }}"
+
+- name: Generate DEVICE_METADATA
+  set_fact:
+    device_metadata: "{{ lookup('template', 'DEVICE_METADATA.j2')|from_yaml }}"
+
+- name: Generate final config
+  set_fact:
+    config: |
+      {{ current_config
+          | combine(port, list_merge='replace')
+          | combine(interface, list_merge='replace')
+          | combine(loopback, list_merge='replace')
+          | combine(vxlan, list_merge='replace')
+          | combine(device_metadata, recursive=True)
+          | ansible.utils.remove_keys(target=['^BGP_NEIGHBOR$', '^BGP_PEER_RANGE$', '^BGP_GLOBALS_AF_NETWORK$', '^BGP_NEIGHBOR_AF$', '^BGP_GLOBALS$'], matching_parameter='regex')
+          | to_nice_json }}
+
+- name: Write configuration
+  copy:
+    content: "{{ config }}"
+    dest: /etc/sonic/config_db.json
+  notify: sonic_config_update
+
+- name: Write BGP configuration
+  template:
+    src: bgpd.conf.j2
+    dest: /etc/sonic/frr/bgpd.conf
+  notify: sonic_bgp_update
+
+

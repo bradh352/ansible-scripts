@@ -1,0 +1,28 @@
+{% macro commaAdd(var) %}
+{%-    if var %}
+,
+{%     endif %}
+{%     set var = true %}
+{% endmacro %}
+{
+  "INTERFACE": {
+{% set ns = namespace(has_iface=false) %}
+{% for port in ports %}
+{%   if sonic_interfaces[port.index].layer3|default(false) or (sonic_interfaces[port.index].ips is defined and sonic_interfaces[port.index].ips | count > 0) %}
+{%-    if ns.has_iface %}
+,
+{%     endif %}
+{%     set ns.has_iface = true %}
+  "{{ port.port }}": {
+      "ipv6_use_link_local_only": "{{ 'enable' if sonic_interfaces[port.index].layer3|default(false) else 'disable' }}"
+    }
+{%   endif %}
+
+{%   if sonic_interfaces[port.index].ips is defined and sonic_interfaces[port.index].ips | count > 0 %}
+{%     for ip in sonic_interfaces[port.index].ips %}
+    ,"{{ port.port }}|{{ ip }}": {}
+{%     endfor %}
+{%   endif %}
+{% endfor %}
+  }
+}

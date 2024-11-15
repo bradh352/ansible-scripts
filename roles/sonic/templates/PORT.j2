@@ -1,0 +1,18 @@
+{
+  "PORT": {
+{% for port in ports %}
+  "{{ port.port }}": {
+      "admin_status": "{{ sonic_interfaces[port.index].admin_status|default("down") }}",
+      "alias": "{{ port.alias }}",
+      "index": "{{ port.index }}",
+      "lanes": "{{ port.lanes }}",
+      "mtu": "{{ sonic_interfaces[port.index].mtu|default("9216") }}",
+      "speed": "{{ port.speed }}",
+      "description": "{{ sonic_interfaces[port.index].description|default("") }}"
+    }
+{%- if not loop.last %}
+,
+{% endif %}
+{% endfor %}
+  }
+}

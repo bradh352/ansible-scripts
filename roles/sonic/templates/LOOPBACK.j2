@@ -1,0 +1,8 @@
+{
+  "LOOPBACK_INTERFACE": {
+    "Loopback0": {},
+{% if sonic_bgp_ip is defined %}
+    "Loopback0|{{ sonic_bgp_ip }}": {},
+{% endif %}
+  }
+}

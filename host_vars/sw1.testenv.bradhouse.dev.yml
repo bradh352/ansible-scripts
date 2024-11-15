@@ -1,0 +1,60 @@
+---
+sonic_bgp_ip: "10.1.0.1/32"
+sonic_asn: "4210000001"
+sonic_interfaces:
+  "1": 
+    layer3: true
+    admin_status: "up"
+    description: "CloudStack Node 1"
+  "2":
+    layer3: true
+    admin_status: "up"
+    description: "CloudStack Node 2"
+  "3":
+    layer3: true
+    admin_status: "up"
+    description: "CloudStack Node 2"
+  "4":
+    layer3: true
+    admin_status: "up"
+    description: "CloudStack Node 2"
+  "5":
+    layer3: true
+    admin_status: "up"
+    description: "CloudStack Node 2"
+  "6":
+    layer3: true
+    admin_status: "up"
+    description: "CloudStack Node 2"
+  "7":
+    layer3: true
+    admin_status: "up"
+    description: "CloudStack Node 2"
+  "8":
+    layer3: true
+    admin_status: "up"
+    description: "CloudStack Node 2"
+  "9":
+    admin_status: "up"
+    description: "bootstrap port"
+    vlans:
+      - vlan: 2
+        mode: "untagged"
+  "46":
+    layer3: true
+    admin_status: "up"
+    description: "Management Switch"
+  "55":
+    layer3: true
+    admin_status: "up"
+    description: "ToRSwitch 2 port 55"
+  "56":
+    layer3: true
+    admin_status: "up"
+    description: "ToRSwitch 2 port 56"
+sonic_vlans:
+  "10":
+    vxlan: "10010"
+  "2":
+    ips: [ "1.2.3.4/24", "2620:3:4:5::6/64" ]
+    layer3: "yes"
