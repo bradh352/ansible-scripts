@@ -18,6 +18,14 @@ Features currently supported by this role are:
  * VLAN assignments
  * IP Address assignments
 
+We read in the configuration on the device, then modify it by overwriting
+various sections, and writing it back.  We then use the `config replace`
+command which merges our updates into the running config.  This is better than
+`config reload` which brings the entire switch down.
+
+We also manage the BGP configuration via the FRR config directly.  Though
+SONiC does have some built-in capabilities, it doesn't appear we can get it
+to write a BGP Unnumbered configuration with VXLAN EVPN support at this time.
 
 ## Variables used by this role
 

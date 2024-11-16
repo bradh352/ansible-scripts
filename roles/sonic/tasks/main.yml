@@ -39,27 +39,24 @@
   set_fact:
     current_config: "{{ current_config_data.content|b64decode|from_yaml }}"
 
-- name: Generate PORT
+# Split generating and parsing into 2 steps for better error handling
+- name: Generate custom configs
   set_fact:
-    port: "{{ lookup('template', 'PORT.j2')|from_yaml }}"
+    port_json: "{{ lookup('template', 'PORT.j2') }}"
+    interface_json: "{{ lookup('template', 'INTERFACE.j2') }}"
+    loopback_json: "{{ lookup('template', 'LOOPBACK.j2') }}"
+    vxlan_json: "{{ lookup('template', 'VXLAN.j2') }}"
+    device_metadata_json: "{{ lookup('template', 'DEVICE_METADATA.j2') }}"
 
-- name: Generate INTERFACE
+- name: Parse custom configs
   set_fact:
-    interface: "{{ lookup('template', 'INTERFACE.j2')|from_yaml }}"
+    port: "{{ port_json|from_yaml }}"
+    interface: "{{ interface_json|from_yaml }}"
+    loopback: "{{ loopback_json|from_yaml }}"
+    vxlan: "{{ vxlan_json|from_yaml }}"
+    device_metadata: "{{ device_metadata_json|from_yaml }}"
 
-- name: Generate LOOPBACK
-  set_fact:
-    loopback: "{{ lookup('template', 'LOOPBACK.j2')|from_yaml }}"
-
-- name: Generate VXLAN
-  set_fact:
-    vxlan: "{{ lookup('template', 'VXLAN.j2')|from_yaml }}"
-
-- name: Generate DEVICE_METADATA
-  set_fact:
-    device_metadata: "{{ lookup('template', 'DEVICE_METADATA.j2')|from_yaml }}"
-
-- name: Generate final config
+- name: Merge final config
   set_fact:
     config: |
       {{ current_config
