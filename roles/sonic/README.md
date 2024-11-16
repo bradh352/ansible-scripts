@@ -6,6 +6,20 @@ Author: Brad House<br/>
 License: MIT<br/>
 Original Repository: https://github.com/bradh352/ansible-scripts/tree/master/roles/sonic
 
+- [Overview](#overview)
+- [Tested On](#tested-on)
+- [Variables used by this role](#variables-used-by-this-role)
+  - [Example Config](#example-config)
+- [Useful SONiC commands / information](#useful-sonic-commands--information)
+  - [Default username and password](#default-username-and-password)
+  - [Restore to factory-default configuration](#restore-to-factory-default-configuration)
+  - [Bootstrap / Ansible](#bootstrap--ansible)
+  - [BGP](#bgp)
+    - [View Neighbors](#view-neighbors)
+    - [View IPv4 Routes](#view-ipv4-routes)
+    - [View EVPN routes](#view-evpn-routes)
+
+## Overview
 This is an ansible role to try to configure an installation of SONiC, it
 is designed to work on any switch supported by SONiC.  While it is recommended
 to use this against a fresh install, in theory it should be able to operate
@@ -16,7 +30,7 @@ configuration of the switch.  It is not meant to perform a manual update of a
 single setting, instead it reads in the variables set that represent the
 entirety of the switch configuration and applies the diff of the configuration
 from the current state.  It is expected most changes to the variables in this
-role which modify the swith configuration can be completed without any sort of
+role which modify the switch configuration can be completed without any sort of
 outage (other than the obvious reasons, like you disabled the port you're using
 to connect to the switch and configure it).
 
