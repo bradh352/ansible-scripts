@@ -7,9 +7,11 @@ License: MIT<br/>
 Original Repository: https://github.com/bradh352/ansible-scripts/tree/master/roles/sonic
 
 - [Overview](#overview)
+- [Implementation Details](#implementation-details)
 - [Tested On](#tested-on)
 - [Variables used by this role](#variables-used-by-this-role)
   - [Example Config](#example-config)
+  - [Spine vs Leaf](#spine-vs-leaf)
 - [Useful SONiC commands / information](#useful-sonic-commands--information)
   - [Default username and password](#default-username-and-password)
   - [Restore to factory-default configuration](#restore-to-factory-default-configuration)
@@ -20,19 +22,19 @@ Original Repository: https://github.com/bradh352/ansible-scripts/tree/master/rol
     - [View EVPN routes](#view-evpn-routes)
 
 ## Overview
-This is an ansible role to try to configure an installation of SONiC, it
+This is an ansible role to configure an installation of SONiC, it
 is designed to work on any switch supported by SONiC.  While it is recommended
 to use this against a fresh install, in theory it should be able to operate
 against an already configured installation.
 
 This role is designed to be idempotent and encapsulate the ***complete***
 configuration of the switch.  It is not meant to perform a manual update of a
-single setting, instead it reads in the variables set that represent the
+single setting, instead it reads in the variables which represent the
 entirety of the switch configuration and applies the diff of the configuration
-from the current state.  It is expected most changes to the variables in this
-role which modify the switch configuration can be completed without any sort of
-outage (other than the obvious reasons, like you disabled the port you're using
-to connect to the switch and configure it).
+from the current state.  It is expected most changes to the configuration
+variables in this role can be completed without any sort of outage (other than
+the obvious reasons, like you disabled the port you're using to connect to the
+switch and configure it).
 
 In some circumstances this may detect the configuration change is too large
 and require a reboot; this is true on a fresh installation, and likely if
@@ -46,11 +48,6 @@ The latest downloads are made available here (the prior link does list some
 downloads but may not be the best option):
 https://sonic.software/
 
-The documentation I used for generating the SONiC config is here:
-https://github.com/sonic-net/sonic-buildimage/blob/master/src/sonic-yang-models/doc/Configuration.md
-(however this document is incomplete and it is recommended to look at the
-actual yang models themselves for a complete listing of options).  In theory
-someone using this shouldn't need to reference these docs.
 
 Features currently supported by this role are:
  * BGP unnumbered
@@ -65,9 +62,19 @@ Features currently supported by this role are:
  * Configuring Authentication
    * Local Passwords / SSH Keys
    * RADIUS
+ * SpanningTree (which in theory is not needed in VXLAN environments)
+
+
+## Implementation Details
+
+The documentation used for generating the SONiC config is here:
+https://github.com/sonic-net/sonic-buildimage/blob/master/src/sonic-yang-models/doc/Configuration.md
+(however this document is incomplete and it is recommended to look at the
+actual yang models themselves for a complete listing of options).  In theory
+someone using this shouldn't need to reference these docs.
 
 This role reads in the configuration on the device, then modifies it by
-overwriting various sections, and writing it back.  We then use the
+overwriting various sections, and writing it back.  We then, internally, use the
 `config replace` command which merges our updates into the running config.  This
 was chosen over the `config reload` command, which instead of merging changes
 performs a hard reset of the entire configuration.
@@ -158,8 +165,9 @@ config if still confused.
     specify `nexthop`.
 
 
-***NOTE***: Typically variables will be placed in the host vars, its recommended
-to create a file like `host_vars/switch-fqdn.yml` that contains these settings.
+***NOTE***: Typically variables will be placed in the host vars, it is
+recommended to create a file like `host_vars/switch-fqdn.yml` that contains
+these settings.
 
 ### Example Config
 
@@ -210,6 +218,29 @@ sonic_routes:
   - prefix: "0.0.0.0/0"
     next_hop: "10.0.0.1/24"
 ```
+
+### Spine vs Leaf
+
+This role doesn't differentiate between Spine and Leaf deployments.  In general
+a Spine deployment will simply share the **same** ASN rather than using a
+unique ASN per node.  This does, however, require that every spine connects to
+every leaf which ensures at most a packet flows through 2 switches East-West.
+In a spine/leaf architecture, spines also do not iBGP peer with eachother like
+you would typically do when sharing the same ASN.
+
+That said, the described classic architecture (which is well accepted) seems
+to allow well-placed link failures to inhibit East-West traffic flows.
+
+Alternatively if you deploy Spines using the same methodology as leaves by
+using unique ASNs for all nodes, and also allow Spines to peer with eachother,
+this would seem to mitigate any such scenarios.  The documented downsides
+would be excess load due to route/FIB changes (which can be mitigated by
+capping the number of paths that can be installed) as well as the increased
+packet flows which **in theory** might be able to cascade into a larger outage.
+This may also cause unpredictable traffic patterns or hurt observability.
+
+As always, its up to the network admins to evaluate their specific situation,
+traffic flows, and risk associated with the chosen implementation method.
 
 ## Useful SONiC commands / information
 
