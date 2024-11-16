@@ -1,4 +1,4 @@
-# SONiC Ansible Configuration
+# [![SONiC](https://sonicfoundation.dev/wp-content/uploads/sites/21/2023/04/logo.svg)](https://sonicfoundation.dev/) Ansible Configuration
 
 This is an ansible role to try to configure an installation of SONiC, it
 is designed to work on any switch supported by SONiC.  While it is recommended
@@ -16,7 +16,7 @@ to connect to the switch and configure it).
 
 In some circumstances this may detect the configuration change is too large
 and require a reboot; this is true on a fresh installation, and likely if
-previously configured external to this role, but generally not expected to
+the switch was configured external to this role, but generally not expected to
 be needed if previously configured with this role.
 
 SONiC supported switches are listed here:
@@ -39,7 +39,7 @@ Features currently supported by this role are:
  * IP Address assignments
  * Static Routes
 
-***Not*** currently supported:
+***Not*** currently supported (but will likely be in the future):
  * PortChannel (LACP) - including MLAG/MCLAG
  * Configuring auxiliary services (e.g. NTP, SNMP)
  * Configuring Authentication
@@ -72,8 +72,8 @@ choice (though untested by me), but pricey even used.
 ## Variables used by this role
 
 ***Important***: please pay attention to whether a variable takes an array
-vs a dictionary.  A dictionary entry will NOT have a leading `-` and its
-members will be indented, while an array will have a leading `-` but its
+vs a dictionary.  A dictionary entry will **NOT** have a leading `-` and its
+members will be indented, while an array **will** have a leading `-` but its
 members will be at the same indention level.  For example, `sonic_interfaces`
 and `sonic_vlans` take dictionaries, but `sonic_routes` and the `vlans` member
 of `sonic_interfaces` takes an array.  Design decisions were made for ease of
