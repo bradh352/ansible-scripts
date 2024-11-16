@@ -25,7 +25,7 @@ is designed to work on any switch supported by SONiC.  While it is recommended
 to use this against a fresh install, in theory it should be able to operate
 against an already configured installation.
 
-This role is designed to be indempotent and encapsulate the ***complete***
+This role is designed to be idempotent and encapsulate the ***complete***
 configuration of the switch.  It is not meant to perform a manual update of a
 single setting, instead it reads in the variables set that represent the
 entirety of the switch configuration and applies the diff of the configuration
