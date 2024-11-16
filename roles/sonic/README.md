@@ -1,6 +1,6 @@
 [![SONiC](https://sonicfoundation.dev/wp-content/uploads/sites/21/2023/04/logo.svg)](https://sonicfoundation.dev/)
 
-# SONiC Ansible Configuration
+# SONiC Ansible Role
 
 This is an ansible role to try to configure an installation of SONiC, it
 is designed to work on any switch supported by SONiC.  While it is recommended
