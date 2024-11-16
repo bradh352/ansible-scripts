@@ -9,7 +9,10 @@ This role is designed to be indempotent and encapsulate the ***complete***
 configuration of the switch.  It is not meant to perform a manual update of a
 single setting, instead it reads in the variables set that represent the
 entirety of the switch configuration and applies the diff of the configuration
-from the current state.
+from the current state.  It is expected most changes to the variables in this
+role which modify the swith configuration can be completed without any sort of
+outage (other than the obvious reasons, like you disabled the port you're using
+to connect to the switch and configure it).
 
 In some circumstances this may detect the configuration change is too large
 and require a reboot, this is true on a fresh installation, and likely if
@@ -52,14 +55,27 @@ We also manage the BGP configuration via the FRR config directly.  Though
 SONiC does have some built-in capabilities, it doesn't appear we can get it
 to write a BGP Unnumbered configuration with VXLAN EVPN support at this time.
 
+## Tested On
+
+This has been tested on [Dell S5248F](https://www.dell.com/en-us/shop/ipovw/networking-s-series-25-100gbe)
+and [Dell S3248TE](https://www.dell.com/en-us/shop/ipovw/networking-n3200-series)
+switches, bought off ebay (~$1100USD and ~$700USD respectively) and loaded with
+the official SONiC image listed above (not Dell's Enterprise SONiC).  These
+switches both use the Broadcom Trident 3 switch ASIC.
+
+Stay away from Broadcom's Tomahawk line as it is designed for performance and
+not features, so things you'd expect with SONiC (like VXLAN) won't work.
+Mellanox/Nvidia Spectrum is an excellent choice (though untested by me), but
+pricey even used.
+
 ## Variables used by this role
 
 ***Important***: please pay attention to whether a variable takes an array
 vs a dictionary.  A dictionary entry will NOT have a leading `-` and its
 members will be indented, while an array will have a leading `-` but its
 members will be at the same indention level.  For example, `sonic_interfaces`
-and `sonic_vlans` take dictionaries, but `sonic_routes` takes an array.  See
-the example config if still confused.
+and `sonic_vlans` take dictionaries, but `sonic_routes` and the `vlans` member
+of `sonic_interfaces` takes an array.  See the example config if still confused.
 
 * `sonic_bgp_ip`: IPv4 Address with subnet mask to use for running BGP.  This
   will set up a Loopback Interface with the address and also be configured as
@@ -110,7 +126,7 @@ the example config if still confused.
      there is a 50 byte overhead so make sure the interface MTU is greater than
      this value.
 * `sonic_routes`: Array of dictionaries used to configure static routes.  The
-  The keys for the dictionary are:
+  keys for the dictionary are:
   * `prefix`: IPv4 or IPv6 prefix, Example: `192.168.1.0/24`.  For a default
      gateway use `0.0.0.0/0` for ipv4 and `::/0` for ipv6. Required.
   * `nexthop`: The ip address of the next hop.  If not specified, must specify
