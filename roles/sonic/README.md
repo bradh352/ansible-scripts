@@ -59,7 +59,7 @@ it is yet capable of supporting BGP Unnumbered with VXLAN EVPN support.
 ## Tested On
 
 This has been tested on [Dell S5248F](https://www.dell.com/en-us/shop/ipovw/networking-s-series-25-100gbe)
-and [Dell S3248TE](https://www.dell.com/en-us/shop/ipovw/networking-n3200-series)
+and [Dell N3248TE](https://www.dell.com/en-us/shop/ipovw/networking-n3200-series)
 switches, bought off ebay (~$1100USD and ~$700USD respectively) and loaded with
 the official SONiC image listed above (not Dell's Enterprise SONiC).  These
 switches both use the Broadcom Trident 3 switch ASIC.
