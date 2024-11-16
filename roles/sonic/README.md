@@ -254,6 +254,11 @@ initial username and password:
 ansible-playbook -v playbook.yml --limit sw1.testenv.bradhouse.dev -e ansible_user=admin -e ansible_password=YourPaSsWoRd -e ansible_host=192.168.1.196
 ```
 
+Typically after the initial run, the management port should be unplugged or
+disabled on the upstream switch and only used during recovery operations.  It
+is best practice for your switch configuration to create an IRB (VLAN) interface
+with IP address in your network's management vlan.
+
 ### BGP
 
 #### View Neighbors
