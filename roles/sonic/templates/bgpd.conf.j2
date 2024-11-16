@@ -9,7 +9,7 @@ agentx
 !
 !
 router bgp {{ sonic_asn }}
-  bgp router-id {{ sonic_bgp_ip }}
+  bgp router-id {{ sonic_bgp_ip|split('/')|first }}
   no bgp ebgp-requires-policy
 {% for port in ports %}
 {%  if sonic_interfaces[port.index].layer3|default(false) %}

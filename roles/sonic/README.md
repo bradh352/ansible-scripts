@@ -9,11 +9,15 @@ The latest downloads are made available here (the prior link does list some
 downloads but may not be the best option):
 https://sonic.software/
 
+The documentation for config generation is here:
+https://github.com/sonic-net/sonic-buildimage/blob/master/src/sonic-yang-models/doc/Configuration.md
+
 Features currently supported by this role are:
  * BGP unnumbered
  * VXLAN EVPN using BGP unnumbered
  * VLAN assignments
  * IP Address assignments
+
 
 ## Variables used by this role
 
@@ -36,8 +40,8 @@ Features currently supported by this role are:
     interface.  Cannot be used with `vlans` (you should probably create a vlan
     with an ip address list instead). Example:
     `[ "1.2.3.4/24", "2620:3:4:5::6/64" ]`
-  * `vlans`: Vlans to assign to an interface, the value is a dictionary with
-    these fields:
+  * `vlans`: Vlans to assign to an interface, the value is an array of
+     dictionaries with these keys:
     * `vlan`: Vlan id to use (1-4096), required.
     * `mode`: `tagged`/`untagged`. Only a single vlan may be marked as untagged
       for a single interface.
@@ -55,7 +59,14 @@ Features currently supported by this role are:
 ***NOTE***: Typically variables will be placed in the host vars, its recommended
 to create a file like `host_vars/switch-fqdn.yml` that contains these settings.
 
-## Useful SONiC commands
+## Useful SONiC commands / information
+
+### Default username and password
+Factory default configuration uses:
+* username: admin
+* password: `YourPaSsWoRd`
+
+`sudo` is passwordless.
 
 ### Restore to factory-default configuration
 Generate a new configuration:
@@ -74,3 +85,34 @@ better to:
 ```
 sudo reboot
 ```
+
+### Bootstrap / Ansible
+
+Can be run with something like:
+```
+ansible-playbook -vvv playbook.yml --limit sw1.testenv.bradhouse.dev -e ansible_password=YourPaSsWoRd
+```
+
+### BGP
+
+#### View Neighbors
+Summary:
+```
+vtysh -c "show ip bgp summary"
+```
+
+Detail:
+```
+vtysh -c show bgp neighbor
+```
+
+#### View IPv4 Routes
+```
+vtysh -c "show ip bgp"
+```
+
+#### View EVPN routes
+```
+vtysh -c "show bgp l2vpn evpn route"
+```
+
