@@ -41,7 +41,7 @@
 
 - name: Determine if configuration is too great for in-place update and may require a reboot
   set_fact:
-    require_reboot: "{{ true if current_config.DEVICE_METADATA.localhost.docker_routing_config_mode|default('') != 'split' or current_config.DEVICE_METADATA.localhost.hostname != inventory_hostname or current_config.DEVICE_METADATA.localhost.type != 'ToRRouter' else false }}"
+    require_reboot: "{{ true if current_config.DEVICE_METADATA.localhost.docker_routing_config_mode|default('') != 'split' or current_config.DEVICE_METADATA.localhost.hostname != inventory_hostname or current_config.DEVICE_METADATA.localhost.type != 'LeafRouter' else false }}"
 
 - debug:
     msg: "** REBOOT IS REQUIRED ** (will be performed automatically)"
@@ -114,7 +114,7 @@
     - { "key": "use_all_splithorizon_groups", "value": "1" }
     - { "key": "riot_enable", "value": "1" }
     - { "key": "sai_tunnel_support", "value": "1" }
-    - { "key": "riot_overlay_l3_intf_mem_size", "value": "4096" }
+    - { "key": "riot_overlay_l3_intf_mem_size", "value": "8192" }
     - { "key": "riot_overlay_l3_egress_mem_size", "value": "32768" }
     - { "key": "riot_overlay_ecmp_resilient_hash_size", "value": "16384" }
     - { "key": "flow_init_mode", "value": "1" }

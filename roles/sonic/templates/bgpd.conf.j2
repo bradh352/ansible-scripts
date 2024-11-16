@@ -11,32 +11,31 @@ agentx
 router bgp {{ sonic_asn }}
   bgp router-id {{ sonic_bgp_ip|split('/')|first }}
   no bgp ebgp-requires-policy
-{% for port in ports %}
-{%  if sonic_interfaces[port.index].layer3|default(false) %}
-  neighbor {{ port.port }} interface remote-as external
-{%  endif %}
-{% endfor %}
+  bgp bestpath as-path multipath-relax
+  maximum-paths 2
+  !
+  neighbor PEERS peer-group
+  neighbor PEERS remote-as external
+  neighbor PEERS timers 3 9
+  neighbor PEERS advertisement-interval 5
+  neighbor PEERS bfd
+  neighbor PEERS capability extended-nexthop
+  !
   address-family ipv4 unicast
-{% for port in ports %}
-{%  if sonic_interfaces[port.index].layer3|default(false) %}
-    neighbor {{ port.port }} activate
-{%  endif %}
-{% endfor %}
+    neighbor PEERS activate
     redistribute connected
-  exit-address-family
+  !
   address-family ipv6 unicast
-{% for port in ports %}
-{%  if sonic_interfaces[port.index].layer3|default(false) %}
-    neighbor {{ port.port }} activate
-{%  endif %}
-{% endfor %}
+    neighbor PEERS activate
     redistribute connected
-  exit-address-family
+  !
   address-family l2vpn evpn
+    neighbor PEERS activate
+    advertise-all-vni
+  !
 {% for port in ports %}
 {%  if sonic_interfaces[port.index].layer3|default(false) %}
-    neighbor {{ port.port }} activate
+  neighbor {{ port.port }} interface peer-group PEERS
 {%  endif %}
 {% endfor %}
-    advertise-all-vni
-  exit-address-family
+!
