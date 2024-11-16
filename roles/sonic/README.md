@@ -2,7 +2,7 @@
 
 # SONiC Ansible Role
 
-Author: Brad House
+Author: Brad House<br/>
 Original Repository: https://github.com/bradh352/ansible-scripts/tree/master/roles/sonic
 
 This is an ansible role to try to configure an installation of SONiC, it
