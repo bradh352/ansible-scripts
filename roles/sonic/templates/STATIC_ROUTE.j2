@@ -1,0 +1,18 @@
+{
+{% if sonic_routes is defined and sonic_routes|count > 0 %}
+  "STATIC_ROUTE": {
+{%   for route in sonic_routes %}
+    "default|{{ route.prefix }}": {
+      "blackhole": "false",
+      "distance": "0",
+      "ifname": "{{ route.ifname|default("") }}",
+      "nexthop": "{{ route.nexthop|default("") }}",
+      "nexthop-vrf": ""
+    }
+{%-     if loop.last %}
+,
+{%      endif %}
+{%   endfor %}
+  }
+{% endif %}
+}

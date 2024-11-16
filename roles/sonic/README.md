@@ -17,6 +17,14 @@ Features currently supported by this role are:
  * VXLAN EVPN using BGP unnumbered
  * VLAN assignments
  * IP Address assignments
+ * Static Routes
+
+***Not*** currently supported:
+ * PortChannel (LACP) - including MLAG/MCLAG
+ * Configuring auxiliary services (e.g. NTP, SNMP)
+ * Configuring Authentication
+   * Local Passwords / SSH Keys
+   * RADIUS
 
 We read in the configuration on the device, then modify it by overwriting
 various sections, and writing it back.  We then use the `config replace`
@@ -70,9 +78,67 @@ to write a BGP Unnumbered configuration with VXLAN EVPN support at this time.
   * `layer3`: `true`/`false`. Whether this interface will be used as a layer3
     interface.  This enables IPv6 link-local address support. Default is
     `false`.
+* `sonic_routes`: Array of dictionaries used to configure static routes.  The
+  The keys for the dictionary are:
+  * `prefix`: IPv4 or IPv6 prefix, Example: `192.168.1.0/24`.  For a default
+     gateway use `0.0.0.0/0` for ipv4 and `::/0` for ipv6. Required.
+  * `nexthop`: The ip address of the next hop.  If not specified, must specify
+    `ifname`.
+  * `ifname`: The interface name for the next hop.  If not specified, must
+    specify `nexthop`.
+
 
 ***NOTE***: Typically variables will be placed in the host vars, its recommended
 to create a file like `host_vars/switch-fqdn.yml` that contains these settings.
+
+### Example Config
+
+```
+sonic_bgp_ip: "172.16.0.1/32"
+sonic_asn: "4210000001"
+sonic_interfaces:
+  "1":
+    layer3: true
+    admin_status: "up"
+    description: "CloudStack Node 1"
+  "9":
+    admin_status: "up"
+    description: "upstream port for internet access"
+    vlans:
+      - vlan: 2
+        mode: "untagged"
+  "10":
+    description: "some machine on an access port in vlan 10"
+    admin_status: "up"
+    vlans:
+      - vlan: 10
+        mode: "untagged"
+  "11":
+    description: "Some machine on vlan 2 and 10"
+    admin_status: "up"
+    vlans:
+      - vlan: 2
+        mode: "tagged"
+      - vlan: 10
+        mode: "tagged"
+  "55":
+    layer3: true
+    admin_status: "up"
+    description: "ToRSwitch 2 port 55"
+  "56":
+    layer3: true
+    admin_status: "up"
+    description: "ToRSwitch 2 port 56"
+sonic_vlans:
+  "2":
+    ips: [ "10.0.0.71/24" ]
+    vxlan: "10002"
+    layer3: true
+  "10":
+sonic_routes:
+  - prefix: "0.0.0.0/0"
+    next_hop: "10.0.0.1/24"
+```
 
 ## Useful SONiC commands / information
 

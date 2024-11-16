@@ -264,4 +264,8 @@ sonic_vlans:
   "2":
     ips: [ "10.0.0.70/24", "192.168.1.55/24" ]
     vxlan: "10002"
-    layer3: "yes"
+    layer3: true
+
+sonic_routes:
+  - prefix: "0.0.0.0/0"
+    next_hop: "192.168.1.1/24"

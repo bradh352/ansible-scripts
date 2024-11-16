@@ -46,6 +46,7 @@
     interface_json: "{{ lookup('template', 'INTERFACE.j2') }}"
     loopback_json: "{{ lookup('template', 'LOOPBACK.j2') }}"
     vxlan_json: "{{ lookup('template', 'VXLAN.j2') }}"
+    static_route_json: "{{ lookup('template', 'STATIC_ROUTE.j2') }}"
     device_metadata_json: "{{ lookup('template', 'DEVICE_METADATA.j2') }}"
 
 - name: Parse custom configs
@@ -54,18 +55,22 @@
     interface: "{{ interface_json|from_yaml }}"
     loopback: "{{ loopback_json|from_yaml }}"
     vxlan: "{{ vxlan_json|from_yaml }}"
+    static_route: "{{ static_route_json|from_yaml }}"
     device_metadata: "{{ device_metadata_json|from_yaml }}"
 
+# NOTE we have to remove the STATIC_ROUTE table as it says it won't allow an empty table.
 - name: Merge final config
   set_fact:
     config: |
       {{ current_config
+          | ansible.utils.remove_keys(target=['^BGP_NEIGHBOR$', '^BGP_PEER_RANGE$', '^BGP_GLOBALS_AF_NETWORK$', '^BGP_NEIGHBOR_AF$', '^BGP_GLOBALS$'], matching_parameter='regex')
+          | ansible.utils.remove_keys(target=['^STATIC_ROUTE$'], matching_parameter='regex')
           | combine(port, list_merge='replace')
           | combine(interface, list_merge='replace')
           | combine(loopback, list_merge='replace')
           | combine(vxlan, list_merge='replace')
+          | combine(static_route, list_merge='replace')
           | combine(device_metadata, recursive=True)
-          | ansible.utils.remove_keys(target=['^BGP_NEIGHBOR$', '^BGP_PEER_RANGE$', '^BGP_GLOBALS_AF_NETWORK$', '^BGP_NEIGHBOR_AF$', '^BGP_GLOBALS$'], matching_parameter='regex')
           | to_nice_json }}
 
 - name: Write configuration

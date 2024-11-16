@@ -56,4 +56,4 @@ sonic_vlans:
   "2":
     ips: [ "10.0.0.72/24" ]
     vxlan: "10002"
-    layer3: "yes"
+    layer3: true
