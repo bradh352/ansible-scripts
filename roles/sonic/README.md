@@ -54,6 +54,13 @@ to write a BGP Unnumbered configuration with VXLAN EVPN support at this time.
 
 ## Variables used by this role
 
+***Important***: please pay attention to whether a variable takes an array
+vs a dictionary.  A dictionary entry will NOT have a leading `-` and its
+members will be indented, while an array will have a leading `-` but its
+members will be at the same indention level.  For example, `sonic_interfaces`
+and `sonic_vlans` take dictionaries, but `sonic_routes` takes an array.  See
+the example config if still confused.
+
 * `sonic_bgp_ip`: IPv4 Address with subnet mask to use for running BGP.  This
   will set up a Loopback Interface with the address and also be configured as
   the router id and VXLAN vtep source IP address.  Example: `10.1.0.1/32`
@@ -81,12 +88,14 @@ to write a BGP Unnumbered configuration with VXLAN EVPN support at this time.
     interface.  Cannot be used with `vlans` (you should probably create a vlan
     with an ip address list instead). Example:
     `[ "1.2.3.4/24", "2620:3:4:5::6/64" ]`
-  * `vlans`: Vlans to assign to an interface, the value is an array of
-     dictionaries with these keys:
+  * `vlans`: Vlans to assign to an interface. The vlan must have been already
+    created using the `sonic_vlans` configuration. The value is an array of
+    dictionaries with these keys:
     * `vlan`: Vlan id to use (1-4096), required.
     * `mode`: `tagged`/`untagged`. Only a single vlan may be marked as untagged
       for a single interface.
-* `sonic_vlans`: Dictionary of the VLAN/VXLAN configuration. The key is the
+* `sonic_vlans`: Dictionary of the VLAN/VXLAN configuration. For each vlan
+  specified in an interface, an entry must exist here.  The key is the
   VLAN id.  The value is also a dictionary with these keys:
   * `vxlan`: If mapping a VXLAN to a VLAN, this is the VXLAN id. Valid range
     is 1-16777214.  This is necessary if you want to be able to forward a
