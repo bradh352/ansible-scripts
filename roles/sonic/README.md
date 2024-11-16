@@ -269,7 +269,7 @@ vtysh -c "show ip bgp summary"
 
 Detail:
 ```
-vtysh -c show bgp neighbor
+vtysh -c "show bgp neighbor"
 ```
 
 #### View IPv4 Routes
