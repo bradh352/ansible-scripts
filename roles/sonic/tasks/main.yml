@@ -81,3 +81,30 @@
   notify: sonic_bgp_update
 
 
+# Fix VXLAN support for Broadcom Trident3 platforms as per
+#  https://github.com/sonic-net/sonic-buildimage/issues/8371
+- name: Find trident3 broadcom configuration
+  find:
+    paths: /usr/share/sonic/device/{{ platform }}/{{ hwsku }}/
+    patterns: 'td3-*.bcm'
+  register: td3bcm
+  changed_when: false
+  failed_when: false
+
+- name: Add Broadcom VXLAN fix
+  when: not td3bcm.failed and td3bcm.matched > 0
+  lineinfile:
+    path: "{{ td3bcm.files[0].path }}"
+    line: "{{ item.key }}={{ item.value }}"
+    regexp: "^{{ item.key }}=.*"
+    state: present
+  with_items:
+    - { "key": "use_all_splithorizon_groups", "value": "1" }
+    - { "key": "riot_enable", "value": "1" }
+    - { "key": "sai_tunnel_support", "value": "1" }
+    - { "key": "riot_overlay_l3_intf_mem_size", "value": "4096" }
+    - { "key": "riot_overlay_l3_egress_mem_size", "value": "32768" }
+    - { "key": "riot_overlay_ecmp_resilient_hash_size", "value": "16384" }
+    - { "key": "flow_init_mode", "value": "1" }
+  notify: sonic_reboot
+

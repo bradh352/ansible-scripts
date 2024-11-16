@@ -2,17 +2,20 @@
   "PORT": {
 {% for port in ports %}
   "{{ port.port }}": {
-      "admin_status": "{{ sonic_interfaces[port.index].admin_status|default("down") }}",
-      "alias": "{{ port.alias }}",
-      "index": "{{ port.index }}",
-      "lanes": "{{ port.lanes }}",
+{%   if sonic_interfaces[port.index].description is defined %}
+      "description": "{{ sonic_interfaces[port.index].description }}",
+{%   endif %}
       "mtu": "{{ sonic_interfaces[port.index].mtu|default("9216") }}",
       "speed": "{{ sonic_interfaces[port.index].mtu|default(port.speed) }}",
       "autoneg": "{{ sonic_interfaces[port.index].autoneg|default("on") }}",
 {%   if sonic_interfaces[port.index].autoneg|default("on") and sonic_interfaces[port.index].adv_speeds is defined %}
       "adv_speeds": "{{ sonic_interfaces[port.index].adv_speeds }}",
 {%   endif %}
-      "description": "{{ sonic_interfaces[port.index].description|default("") }}"
+      "admin_status": "{{ sonic_interfaces[port.index].admin_status|default("down") }}",
+      "alias": "{{ port.alias }}",
+      "index": "{{ port.index }}",
+      "lanes": "{{ port.lanes }}",
+      "mode": "{{ "access" if (sonic_interfaces[port.index].vlans|default([])|count == 1 and sonic_interfaces[port.index].vlans[0].mode|default("tagged") == "untagged") else ("trunk" if sonic_interfaces[port.index].vlans|default([])|count > 0 else "routed") }}"
     }
 {%- if not loop.last %}
 ,
