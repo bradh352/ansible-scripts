@@ -1,16 +1,33 @@
 # SONiC Ansible Configuration
 
-This is an ansible role to try to configure a fresh installation of SONiC, it
-is designed to work on any switch supported by SONiC.  SONiC supported
-switches are listed here:
+This is an ansible role to try to configure an installation of SONiC, it
+is designed to work on any switch supported by SONiC.  While it is recommended
+to use this against a fresh install, in theory it should be able to operate
+against an already configured installation.
+
+This role is designed to be indempotent and encapsulate the ***complete***
+configuration of the switch.  It is not meant to perform a manual update of a
+single setting, instead it reads in the variables set that represent the
+entirety of the switch configuration and applies the diff of the configuration
+from the current state.
+
+In some circumstances this may detect the configuration change is too large
+and require a reboot, this is true on a fresh installation, and likely if
+previously configured external to this role, but generally not expected to
+be needed if previously configured with this role.
+
+SONiC supported switches are listed here:
 https://sonic-net.github.io/SONiC/Supported-Devices-and-Platforms.html
 
 The latest downloads are made available here (the prior link does list some
 downloads but may not be the best option):
 https://sonic.software/
 
-The documentation for config generation is here:
+The documentation I used for generating the SONiC config is here:
 https://github.com/sonic-net/sonic-buildimage/blob/master/src/sonic-yang-models/doc/Configuration.md
+(however this document is incomplete and it is recommended to look at the
+actual yang models themselves for a complete listing of options).  In theory
+someone using this shouldn't need to reference these docs.
 
 Features currently supported by this role are:
  * BGP unnumbered

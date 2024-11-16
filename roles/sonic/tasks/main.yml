@@ -39,6 +39,14 @@
   set_fact:
     current_config: "{{ current_config_data.content|b64decode|from_yaml }}"
 
+- name: Determine if configuration is too great for in-place update and may require a reboot
+  set_fact:
+    require_reboot: "{{ true if current_config.DEVICE_METADATA.localhost.docker_routing_config_mode|default('') != 'split' or current_config.DEVICE_METADATA.localhost.hostname != inventory_hostname or current_config.DEVICE_METADATA.localhost.type != 'ToRRouter' else false }}"
+
+- debug:
+    msg: "** REBOOT IS REQUIRED ** (will be performed automatically)"
+  when: require_reboot
+
 # Split generating and parsing into 2 steps for better error handling
 - name: Generate custom configs
   set_fact:
@@ -77,14 +85,13 @@
   copy:
     content: "{{ config }}"
     dest: /etc/sonic/config_db.json
-  notify: sonic_config_update
+  notify: "{{ 'sonic_reboot' if require_reboot else 'sonic_config_update' }}"
 
 - name: Write BGP configuration
   template:
     src: bgpd.conf.j2
     dest: /etc/sonic/frr/bgpd.conf
-  notify: sonic_bgp_update
-
+  notify: "{{ 'sonic_reboot' if require_reboot else 'sonic_bgp_update' }}"
 
 # Fix VXLAN support for Broadcom Trident3 platforms as per
 #  https://github.com/sonic-net/sonic-buildimage/issues/8371
