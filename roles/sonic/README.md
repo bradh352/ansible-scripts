@@ -65,9 +65,9 @@ the official SONiC image listed above (not Dell's Enterprise SONiC).  These
 switches both use the Broadcom Trident 3 switch ASIC.
 
 Stay away from Broadcom's Tomahawk line as it is designed for performance and
-not features, so things you'd expect with SONiC (like VXLAN) won't work.
-Mellanox/Nvidia Spectrum is an excellent choice (though untested by me), but
-pricey even used.
+not features, so things you'd expect with SONiC (like VXLAN) won't work. Trident2
+switches also lack VXLAN support. Mellanox/Nvidia Spectrum is an excellent
+choice (though untested by me), but pricey even used.
 
 ## Variables used by this role
 
