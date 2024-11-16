@@ -2,6 +2,9 @@
 
 # SONiC Ansible Role
 
+Author: Brad House
+Original Repository: https://github.com/bradh352/ansible-scripts/tree/master/roles/sonic
+
 This is an ansible role to try to configure an installation of SONiC, it
 is designed to work on any switch supported by SONiC.  While it is recommended
 to use this against a fresh install, in theory it should be able to operate
