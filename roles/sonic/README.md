@@ -42,6 +42,13 @@ to write a BGP Unnumbered configuration with VXLAN EVPN support at this time.
     BGP on the interface. Default is `false`.
   * `admin_status`: `up`/`down`. Whether the interface is administratively
     enabled.  Default is `down`.
+  * `autoneg`: `on`/`off`. Whether the interface should enable autonegotiation.
+    Defaults to `on`.
+  * `adv_speeds`: Comma delimited list of speeds in Megabits per second to
+    advertise if autonegotiation is enabled. Example: `10000,1000,100`.  By
+    default it will use whatever the interface is capable of.
+  * `speed`: Interface speed in Megabits per second. Defaults to the maximum
+    port speed. Example: `25000` (25G)
   * `description`: User-provided description of the interface for convenience.
     Typically describes what is plugged into the port.  Default is "".
   * `ips`: Array of ipv4 and/or ipv6 addresses with subnet mask to assign to the
