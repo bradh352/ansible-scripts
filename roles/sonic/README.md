@@ -76,7 +76,9 @@ vs a dictionary.  A dictionary entry will NOT have a leading `-` and its
 members will be indented, while an array will have a leading `-` but its
 members will be at the same indention level.  For example, `sonic_interfaces`
 and `sonic_vlans` take dictionaries, but `sonic_routes` and the `vlans` member
-of `sonic_interfaces` takes an array.  See the example config if still confused.
+of `sonic_interfaces` takes an array.  Design decisions were made for ease of
+processing the variables based on how SONiC is configured. See the example
+config if still confused.
 
 * `sonic_bgp_ip`: IPv4 Address with subnet mask to use for running BGP.  This
   will set up a Loopback Interface with the address and also be configured as
@@ -179,7 +181,8 @@ sonic_interfaces:
     description: "ToRSwitch 2 port 56"
 sonic_vlans:
   "2":
-    ips: [ "10.0.0.71/24" ]
+    ips:
+      - "10.0.0.71/24"
     vxlan: "10002"
     layer3: true
   "10":
