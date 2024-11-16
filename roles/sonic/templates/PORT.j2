@@ -6,7 +6,7 @@
       "description": "{{ sonic_interfaces[port.index].description }}",
 {%   endif %}
       "mtu": "{{ sonic_interfaces[port.index].mtu|default("9216") }}",
-      "speed": "{{ sonic_interfaces[port.index].mtu|default(port.speed) }}",
+      "speed": "{{ sonic_interfaces[port.index].speed|default(port.speed) }}",
       "autoneg": "{{ sonic_interfaces[port.index].autoneg|default("on") }}",
 {%   if sonic_interfaces[port.index].autoneg|default("on") and sonic_interfaces[port.index].adv_speeds is defined %}
       "adv_speeds": "{{ sonic_interfaces[port.index].adv_speeds }}",

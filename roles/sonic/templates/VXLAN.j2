@@ -8,7 +8,8 @@
   "VLAN": {
 {% for key, vlan in sonic_vlans.items() %}
     "Vlan{{ key }}": {
-      "vlanid": "{{ key }}"
+      "vlanid": "{{ key }}",
+      "mtu": "{{ vlan.mtu if vlan.mtu is defined else ("1500" if vlan.ips|default([])|count > 0 or vlan.layer3|default(false) else "9100") }}"
     }
 {%-  if not loop.last %}
 ,

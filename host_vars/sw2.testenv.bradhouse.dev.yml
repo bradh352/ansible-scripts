@@ -57,3 +57,4 @@ sonic_vlans:
     ips: [ "10.0.0.72/24" ]
     vxlan: "10002"
     layer3: true
+    mtu: 1500

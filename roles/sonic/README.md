@@ -59,6 +59,7 @@ to write a BGP Unnumbered configuration with VXLAN EVPN support at this time.
     port speed. Example: `25000` (25G)
   * `description`: User-provided description of the interface for convenience.
     Typically describes what is plugged into the port.  Default is "".
+  * `mtu`: The MTU of the interface. Defaults to `9216` if not provided.
   * `ips`: Array of ipv4 and/or ipv6 addresses with subnet mask to assign to the
     interface.  Cannot be used with `vlans` (you should probably create a vlan
     with an ip address list instead). Example:
@@ -78,6 +79,10 @@ to write a BGP Unnumbered configuration with VXLAN EVPN support at this time.
   * `layer3`: `true`/`false`. Whether this interface will be used as a layer3
     interface.  This enables IPv6 link-local address support. Default is
     `false`.
+  * `mtu`: MTU to use for vlan.  Defaults to `1500` for routed vlans (is
+     layer3 or has ips), and `9100` for non-routed.  Remember when using VXLANs
+     there is a 50 byte overhead so make sure the interface MTU is greater than
+     this value.
 * `sonic_routes`: Array of dictionaries used to configure static routes.  The
   The keys for the dictionary are:
   * `prefix`: IPv4 or IPv6 prefix, Example: `192.168.1.0/24`.  For a default
