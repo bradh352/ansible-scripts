@@ -15,7 +15,7 @@ outage (other than the obvious reasons, like you disabled the port you're using
 to connect to the switch and configure it).
 
 In some circumstances this may detect the configuration change is too large
-and require a reboot, this is true on a fresh installation, and likely if
+and require a reboot; this is true on a fresh installation, and likely if
 previously configured external to this role, but generally not expected to
 be needed if previously configured with this role.
 
@@ -46,14 +46,15 @@ Features currently supported by this role are:
    * Local Passwords / SSH Keys
    * RADIUS
 
-We read in the configuration on the device, then modify it by overwriting
-various sections, and writing it back.  We then use the `config replace`
-command which merges our updates into the running config.  This is better than
-`config reload` which brings the entire switch down.
+This role reads in the configuration on the device, then modifies it by
+overwriting various sections, and writing it back.  We then use the
+`config replace` command which merges our updates into the running config.  This
+was chosen over the `config reload` command, which instead of merging changes
+performs a hard reset of the entire configuration.
 
-We also manage the BGP configuration via the FRR config directly.  Though
-SONiC does have some built-in capabilities, it doesn't appear we can get it
-to write a BGP Unnumbered configuration with VXLAN EVPN support at this time.
+This role manages the BGP configuration via the FRR config directly.  Though
+SONiC does have some built-in capabilities for managing BGP, it doesn't appear
+it is yet capable of supporting BGP Unnumbered with VXLAN EVPN support.
 
 ## Tested On
 
