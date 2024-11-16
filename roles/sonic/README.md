@@ -231,7 +231,7 @@ you would typically do when sharing the same ASN.
 That said, the described classic architecture (which is well accepted) seems
 to allow well-placed link failures to inhibit East-West traffic flows.
 
-Alternatively if you deploy Spines using the same methodology as leaves by
+Alternatively if you deploy Spines using the same methodology as a leaf by
 using unique ASNs for all nodes, and also allow Spines to peer with eachother,
 this would seem to mitigate any such scenarios.  The documented downsides
 would be excess load due to route/FIB changes (which can be mitigated by
