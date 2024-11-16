@@ -61,7 +61,7 @@ Features currently supported by this role are:
 
 ***Not*** currently supported (but will likely be in the future):
  * PortChannel (LACP) - including MLAG/MCLAG
- * Configuring auxiliary services (e.g. NTP, SNMP)
+ * Configuring auxiliary services (e.g. NTP, SNMP, Syslog)
  * Configuring Authentication
    * Local Passwords / SSH Keys
    * RADIUS
@@ -240,9 +240,18 @@ sudo reboot
 
 ### Bootstrap / Ansible
 
-Can be run with something like:
+When bootstrapping a switch, plug the dedicated MGMT port (typically `eth0`)
+into a network that will assign it a DHCP address.  Use the console port to log
+into the switch to determine the ip address (`ip address show dev eth0`).
+
+Make sure you've added a host in your Ansible inventory and set the appropriate
+host vars representing the switch configuration.
+
+Assuming the inventory name is `sw1.testenv.bradhouse.dev`, you can pass
+parameters on the command line to connect to this temporary ip address with
+initial username and password:
 ```
-ansible-playbook -vvv playbook.yml --limit sw1.testenv.bradhouse.dev -e ansible_password=YourPaSsWoRd
+ansible-playbook -v playbook.yml --limit sw1.testenv.bradhouse.dev -e ansible_user=admin -e ansible_password=YourPaSsWoRd -e ansible_host=192.168.1.196
 ```
 
 ### BGP
