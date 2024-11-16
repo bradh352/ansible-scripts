@@ -224,7 +224,7 @@ sonic_routes:
 This role doesn't differentiate between Spine and Leaf deployments.  In general
 a Spine deployment will simply share the **same** ASN rather than using a
 unique ASN per node.  This does, however, require that every spine connects to
-every leaf which ensures at most a packet flows through 2 switches East-West.
+every leaf which ensures a packet at most flows through two switches East-West.
 In a spine/leaf architecture, spines also do not iBGP peer with eachother like
 you would typically do when sharing the same ASN.
 
