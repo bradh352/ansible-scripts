@@ -5,13 +5,29 @@ enable password zebra
 log syslog informational
 log facility local4
 !
-agentx
+!
+! Export any IPs in Loopback0 as these are our VTEPs
+route-map EXPORT permit 1
+match interface Loopback0
+!
+! Redistribute prefixes learned via BGP
+route-map EXPORT permit 2
+  match large-community {{ sonic_asn }}:10:0
+!
+! Tag route learned through BGP
+route-map IMPORT permit 1
+  set large-community {{ sonic_asn }}:10:0
+!
+! Permit everything
+route-map PERMIT permit 1
 !
 !
 router bgp {{ sonic_asn }}
   bgp router-id {{ sonic_bgp_ip|split('/')|first }}
-  no bgp ebgp-requires-policy
+  bgp ebgp-requires-policy
+  ! Enable ECMP on multiple eBGP paths
   bgp bestpath as-path multipath-relax
+  ! Don't install more than 2 paths for ECMP
   maximum-paths 2
   !
   neighbor PEERS peer-group
@@ -20,17 +36,23 @@ router bgp {{ sonic_asn }}
   neighbor PEERS advertisement-interval 5
   neighbor PEERS bfd
   neighbor PEERS capability extended-nexthop
-  !
+
   address-family ipv4 unicast
     neighbor PEERS activate
+    neighbor PEERS route-map IMPORT in
+    neighbor PEERS route-map EXPORT out
     redistribute connected
   !
   address-family ipv6 unicast
     neighbor PEERS activate
+    neighbor PEERS route-map IMPORT in
+    neighbor PEERS route-map EXPORT out
     redistribute connected
   !
   address-family l2vpn evpn
     neighbor PEERS activate
+    neighbor PEERS route-map PERMIT in
+    neighbor PEERS route-map PERMIT out
     advertise-all-vni
   !
 {% for port in ports %}

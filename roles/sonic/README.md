@@ -20,6 +20,7 @@ Original Repository: https://github.com/bradh352/ansible-scripts/tree/master/rol
     - [View Neighbors](#view-neighbors)
     - [View IPv4 Routes](#view-ipv4-routes)
     - [View EVPN routes](#view-evpn-routes)
+    - [Debugging](#debugging)
 
 ## Overview
 This is an ansible role to configure an installation of SONiC, it
@@ -308,8 +309,24 @@ vtysh -c "show bgp neighbor"
 vtysh -c "show ip bgp"
 ```
 
+#### Show advertised routes
+```
+vtysh -c "show ip bgp neighbors Ethernet54 advertised-routes"
+```
+
 #### View EVPN routes
 ```
 vtysh -c "show bgp l2vpn evpn route"
+```
+
+#### Debugging
+Log into BGP container:
+```
+sudo docker exec -it bgp /bin/bash
+```
+
+Check configuration:
+```
+/usr/lib/frr/bgpd -C
 ```
 
