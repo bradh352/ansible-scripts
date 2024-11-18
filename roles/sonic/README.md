@@ -51,6 +51,9 @@ The latest downloads are made available here (the prior link does list some
 downloads but may not be the best option):
 https://sonic.software/
 
+***NOTE***: I ended up having to pull in some patches to get VXLAN fully
+functional in 202405 and build my own release.  I will probably post that.
+See [Issues](#issues).
 
 Features currently supported by this role are:
  * BGP unnumbered
@@ -61,6 +64,7 @@ Features currently supported by this role are:
 
 ***Not*** currently supported (but will likely be in the future):
  * PortChannel (LACP) - including MLAG/MCLAG
+ * Port Break-out
  * Configuring auxiliary services (e.g. NTP, SNMP, Syslog)
  * Configuring Authentication
    * Local Passwords / SSH Keys
@@ -278,11 +282,11 @@ sonic-installer install https://...
 ```
 
 ### Issues
-https://github.com/sonic-net/sonic-buildimage/issues/10004#issuecomment-1067624905
-https://github.com/sonic-net/sonic-buildimage/issues/8371
-https://github.com/sonic-net/sonic-buildimage/issues/10050#issuecomment-1063384809
-https://github.com/kamelnetworks/sonic-swss/commit/080ce083b135a45fcc8cfa5c7de1e6e7a3c2f386
-https://github.com/sonic-net/sonic-swss/pull/2080
+* https://github.com/sonic-net/sonic-buildimage/issues/10004#issuecomment-1067624905
+* https://github.com/sonic-net/sonic-buildimage/issues/8371
+* https://github.com/sonic-net/sonic-buildimage/issues/10050#issuecomment-1063384809
+* https://github.com/kamelnetworks/sonic-swss/commit/080ce083b135a45fcc8cfa5c7de1e6e7a3c2f386
+* https://github.com/sonic-net/sonic-swss/pull/2080
 
 ### Bootstrap / Ansible
 

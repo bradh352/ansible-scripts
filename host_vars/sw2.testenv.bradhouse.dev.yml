@@ -34,9 +34,11 @@ sonic_interfaces:
     layer3: true
     admin_status: "up"
     description: "CloudStack Node 2"
-  "9":
+  "11":
     admin_status: "up"
     description: "bootstrap port"
+    autoneg: "off"
+    speed: "10000"
     vlans:
       - vlan: 2
         mode: "untagged"

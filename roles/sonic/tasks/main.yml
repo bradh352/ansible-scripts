@@ -30,6 +30,10 @@
   set_fact:
     ports: "{{ port_config.stdout|from_yaml }}"
 
+- name: Make sure current running config is written to file
+  shell: "config save -y"
+  changed_when: false
+
 - name: Load current system config
   slurp:
     src: "/etc/sonic/config_db.json"
@@ -71,7 +75,7 @@
   set_fact:
     config: |
       {{ current_config
-          | ansible.utils.remove_keys(target=['^BGP_NEIGHBOR$', '^BGP_PEER_RANGE$', '^BGP_GLOBALS_AF_NETWORK$', '^BGP_NEIGHBOR_AF$', '^BGP_GLOBALS$'], matching_parameter='regex')
+          | ansible.utils.remove_keys(target=['^BGP_NEIGHBOR$', '^BGP_PEER_RANGE$', '^BGP_GLOBALS_AF_NETWORK$', '^BGP_NEIGHBOR_AF$', '^BGP_GLOBALS$', '^DEVICE_NEIGHBOR$'], matching_parameter='regex')
           | ansible.utils.remove_keys(target=['^STATIC_ROUTE$'], matching_parameter='regex')
           | combine(port, list_merge='replace')
           | combine(interface, list_merge='replace')
