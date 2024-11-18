@@ -282,11 +282,11 @@ sonic-installer install https://...
 ```
 
 ### Issues
-* https://github.com/sonic-net/sonic-buildimage/issues/10004#issuecomment-1067624905
-* https://github.com/sonic-net/sonic-buildimage/issues/8371
-* https://github.com/sonic-net/sonic-buildimage/issues/10050#issuecomment-1063384809
-* https://github.com/kamelnetworks/sonic-swss/commit/080ce083b135a45fcc8cfa5c7de1e6e7a3c2f386
-* https://github.com/sonic-net/sonic-swss/pull/2080
+* VXLAN issues due to TTL, and invalid reported oper_status: https://github.com/sonic-net/sonic-swss/pull/3216/files
+* Annoying error message that doesn't seem to cause harm but hurts debugging: https://github.com/sonic-net/sonic-buildimage/issues/10004#issuecomment-1067624905
+* VXLAN tunnel support not enabled by default on Dell Switches: https://github.com/sonic-net/sonic-buildimage/issues/8371
+  * Workaround in ansible role
+  * Fixed in master as of Oct 4, 2024 (even though commit message doesn't mention it): https://github.com/sonic-net/sonic-buildimage/commit/456671cae8addd845b8d8336cfbda8809cd5c8cc
 
 ### Bootstrap / Ansible
 
