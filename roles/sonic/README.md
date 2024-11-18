@@ -17,6 +17,7 @@ Original Repository: https://github.com/bradh352/ansible-scripts/tree/master/rol
   - [Restore to factory-default configuration](#restore-to-factory-default-configuration)
   - [Installing a different SONiC Image via SONiC](#installing-a-different-sonic-image-via-sonic)
   - [Bootstrap / Ansible](#bootstrap--ansible)
+  - [VXLAN verification](#vxlan-verification)
   - [BGP](#bgp)
     - [View Neighbors](#view-neighbors)
     - [View IPv4 Routes](#view-ipv4-routes)
@@ -304,7 +305,17 @@ disabled on the upstream switch and only used during recovery operations.  It
 is best practice for your switch configuration to create an IRB (VLAN) interface
 with IP address in your network's management vlan.
 
-### VXLAN investigation
+### VXLAN verification
+In this example we have 2 switches with VTEP (vxlan evpn endpoint) ipv4
+addresses of 172.16.0.1/32 (local) and 172.16.0.2/32 (remote) that are using
+BGP unnumbered to exchange routes.  This means that all we need to know is about
+our local ip and it will auto-discover and exchange routes and vxlan vteps
+without configuring each one.  We also created a Vlan2 mapped to vxlan
+VNI 10002 on both switches and assigned ipv4 addresses of 10.0.0.71 (local)
+and 10.0.0.72 (remote).  The end goal is to be able to ping 10.0.0.72 from
+10.0.0.71 traversing the vxlan evpn tunnel.
+
+### Make sure we configured the VXLAN and VLAN mapping correctly
 ```
 # show vxlan interface
 VTEP Information:
@@ -332,6 +343,8 @@ vtep                 172.16.0.1                     map_10002_Vlan2    10002 -> 
 ```
   * I'm assuming destination IP is blank since we're doing EVPN and there would be multiple endpoints
 
+
+### Verify it learned about our peer
 ```
 # show vxlan remotevtep
 +------------+------------+-------------------+--------------+
@@ -343,47 +356,27 @@ Total count : 1
 ```
  * oper_down is wrong here, there's a PR for that: https://github.com/sonic-net/sonic-swss/pull/2080
 
-```
-# ip address show dev Vlan2
-9: Vlan2@Bridge: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 9100 qdisc noqueue state UP group default qlen 1000
-    link/ether 26:44:26:54:43:d9 brd ff:ff:ff:ff:ff:ff
-    inet 10.0.0.71/24 brd 10.0.0.255 scope global Vlan2
-       valid_lft forever preferred_lft forever
-    inet6 fe80::2444:26ff:fe54:43d9/64 scope link
-       valid_lft forever preferred_lft forever
-```
 
 ```
-# ping 10.0.0.72
-PING 10.0.0.72 (10.0.0.72) 56(84) bytes of data.
-64 bytes from 10.0.0.72: icmp_seq=1 ttl=64 time=0.337 ms
-64 bytes from 10.0.0.72: icmp_seq=2 ttl=64 time=0.278 ms
-64 bytes from 10.0.0.72: icmp_seq=3 ttl=64 time=0.325 ms
-64 bytes from 10.0.0.72: icmp_seq=4 ttl=64 time=0.319 ms
-^C
---- 10.0.0.72 ping statistics ---
-4 packets transmitted, 4 received, 0% packet loss, time 3072ms
-rtt min/avg/max/mdev = 0.278/0.314/0.337/0.022 ms
-
+# vtysh -c "show evpn vni detail"
+VNI: 10002
+ Type: L2
+ Tenant VRF: default
+ VxLAN interface: vtep-2
+ VxLAN ifIndex: 10
+ SVI interface: Vlan2
+ SVI ifIndex: 9
+ Local VTEP IP: 172.16.0.1
+ Mcast group: 0.0.0.0
+ Remote VTEPs for this VNI:
+  172.16.0.2 flood: HER
+ Number of MACs (local and remote) known for this VNI: 2
+ Number of ARPs (IPv4 and IPv6, local and remote) known for this VNI: 4
+ Advertise-gw-macip: No
+ Advertise-svi-macip: No
 ```
 
-```
-# show mac
-No.    Vlan    MacAddress    Port    Type
------  ------  ------------  ------  ------
-Total number of entries 0
-```
- * I'd think this should show stuff
-
-```
-# show vxlan remotemac all
-+--------+-------------------+--------------+-------+---------+
-| VLAN   | MAC               | RemoteVTEP   |   VNI | Type    |
-+========+===================+==============+=======+=========+
-| Vlan2  | e2:13:0d:e6:a0:bb | 172.16.0.2   | 10002 | dynamic |
-+--------+-------------------+--------------+-------+---------+
-Total count : 1
-```
+### Verify if it learned EVPN type-2 (IP/MAC)
 
 ```
 # vtysh -c "show bgp l2vpn evpn"
@@ -420,52 +413,17 @@ Route Distinguisher: 172.16.0.2:2
 
 Displayed 6 out of 6 total prefixes
 ```
- * Note the 10.0.0.71 / 10.0.0.72
+ * Note the 10.0.0.71 / 10.0.0.72, and type-2 routes
+
 
 ```
-# vtysh -c "show evpn vni detail"
-VNI: 10002
- Type: L2
- Tenant VRF: default
- VxLAN interface: vtep-2
- VxLAN ifIndex: 10
- SVI interface: Vlan2
- SVI ifIndex: 9
- Local VTEP IP: 172.16.0.1
- Mcast group: 0.0.0.0
- Remote VTEPs for this VNI:
-  172.16.0.2 flood: HER
- Number of MACs (local and remote) known for this VNI: 2
- Number of ARPs (IPv4 and IPv6, local and remote) known for this VNI: 4
- Advertise-gw-macip: No
- Advertise-svi-macip: No
-```
-
-```
-# bridge fdb show br Bridge
-33:33:00:00:00:01 dev Bridge self permanent
-33:33:00:00:00:02 dev Bridge self permanent
-01:00:5e:00:00:6a dev Bridge self permanent
-33:33:00:00:00:6a dev Bridge self permanent
-01:00:5e:00:00:01 dev Bridge self permanent
-33:33:ff:09:f4:e0 dev Bridge self permanent
-33:33:ff:00:00:00 dev Bridge self permanent
-01:80:c2:00:00:21 dev Bridge self permanent
-33:33:ff:54:43:d9 dev Bridge self permanent
-26:44:26:54:43:d9 dev Bridge vlan 2 master Bridge permanent
-26:44:26:54:43:d9 dev Bridge master Bridge permanent
-52:8d:e1:bb:bf:45 dev dummy vlan 1 master Bridge permanent
-52:8d:e1:bb:bf:45 dev dummy master Bridge permanent
-33:33:00:00:00:01 dev dummy self permanent
-e2:13:0d:e6:a0:bb dev vtep-2 vlan 2 extern_learn master Bridge
-00:00:00:00:00:00 dev vtep-2 dst 172.16.0.2 self permanent
-e2:13:0d:e6:a0:bb dev vtep-2 dst 172.16.0.2 self extern_learn
-33:33:00:00:00:01 dev Ethernet8 self permanent
-33:33:00:00:00:02 dev Ethernet8 self permanent
-01:00:5e:00:00:01 dev Ethernet8 self permanent
-01:80:c2:00:00:0e dev Ethernet8 self permanent
-01:80:c2:00:00:03 dev Ethernet8 self permanent
-01:80:c2:00:00:00 dev Ethernet8 self permanent
+# show vxlan remotemac all
++--------+-------------------+--------------+-------+---------+
+| VLAN   | MAC               | RemoteVTEP   |   VNI | Type    |
++========+===================+==============+=======+=========+
+| Vlan2  | e2:13:0d:e6:a0:bb | 172.16.0.2   | 10002 | dynamic |
++--------+-------------------+--------------+-------+---------+
+Total count : 1
 ```
 
 ```
@@ -481,6 +439,36 @@ fe80::e013:dff:fee6:a0bb dev Ethernet54 lladdr e2:13:0d:e6:a0:bb router REACHABL
 fe80::e013:dff:fee6:a0bb dev Vlan2 lladdr e2:13:0d:e6:a0:bb extern_learn NOARP proto zebra
 fe80::1a5a:58ff:fe2a:e820 dev eth0 lladdr 18:5a:58:2a:e8:20 router REACHABLE
 ```
+ * See the remote 10.0.0.72 here
+
+
+### See if it works
+```
+# ip address show dev Vlan2
+9: Vlan2@Bridge: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 9100 qdisc noqueue state UP group default qlen 1000
+    link/ether 26:44:26:54:43:d9 brd ff:ff:ff:ff:ff:ff
+    inet 10.0.0.71/24 brd 10.0.0.255 scope global Vlan2
+       valid_lft forever preferred_lft forever
+    inet6 fe80::2444:26ff:fe54:43d9/64 scope link
+       valid_lft forever preferred_lft forever
+```
+
+```
+# ping 10.0.0.72
+PING 10.0.0.72 (10.0.0.72) 56(84) bytes of data.
+64 bytes from 10.0.0.72: icmp_seq=1 ttl=64 time=0.337 ms
+64 bytes from 10.0.0.72: icmp_seq=2 ttl=64 time=0.278 ms
+64 bytes from 10.0.0.72: icmp_seq=3 ttl=64 time=0.325 ms
+64 bytes from 10.0.0.72: icmp_seq=4 ttl=64 time=0.319 ms
+^C
+--- 10.0.0.72 ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3072ms
+rtt min/avg/max/mdev = 0.278/0.314/0.337/0.022 ms
+
+```
+
+Success!
+
 ### BGP
 
 #### View Neighbors
