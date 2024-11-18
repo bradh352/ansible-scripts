@@ -281,7 +281,7 @@ https://github.com/sonic-net/sonic-buildimage/issues/10004#issuecomment-10676249
 https://github.com/sonic-net/sonic-buildimage/issues/8371
 https://github.com/sonic-net/sonic-buildimage/issues/10050#issuecomment-1063384809
 https://github.com/kamelnetworks/sonic-swss/commit/080ce083b135a45fcc8cfa5c7de1e6e7a3c2f386
-
+https://github.com/sonic-net/sonic-swss/pull/2080
 
 ### Bootstrap / Ansible
 
@@ -306,46 +306,181 @@ with IP address in your network's management vlan.
 
 ### VXLAN investigation
 ```
-show vxlan interface
+# show vxlan interface
+VTEP Information:
+
+  VTEP Name : vtep, SIP  : 172.16.0.1
+  NVO Name  : nvo,  VTEP : vtep
+  Source interface  : Loopback0
 ```
 
 ```
-show vxlan vlanvnimap
+# show vxlan vlanvnimap
++--------+-------+
+| VLAN   |   VNI |
++========+=======+
+| Vlan2  | 10002 |
++--------+-------+
+Total count : 1
 ```
 
 ```
-show vxlan tunnel
+# show vxlan tunnel
+vxlan tunnel name    source ip    destination ip    tunnel map name    tunnel map mapping(vni -> vlan)
+-------------------  -----------  ----------------  -----------------  ---------------------------------
+vtep                 172.16.0.1                     map_10002_Vlan2    10002 -> Vlan2
+```
+  * I'm assuming destination IP is blank since we're doing EVPN and there would be multiple endpoints
+
+```
+# show vxlan remotevtep
++------------+------------+-------------------+--------------+
+| SIP        | DIP        | Creation Source   | OperStatus   |
++============+============+===================+==============+
+| 172.16.0.1 | 172.16.0.2 | EVPN              | oper_down    |
++------------+------------+-------------------+--------------+
+Total count : 1
+```
+ * oper_down is wrong here, there's a PR for that: https://github.com/sonic-net/sonic-swss/pull/2080
+
+```
+# ip address show dev Vlan2
+9: Vlan2@Bridge: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 9100 qdisc noqueue state UP group default qlen 1000
+    link/ether 26:44:26:54:43:d9 brd ff:ff:ff:ff:ff:ff
+    inet 10.0.0.71/24 brd 10.0.0.255 scope global Vlan2
+       valid_lft forever preferred_lft forever
+    inet6 fe80::2444:26ff:fe54:43d9/64 scope link
+       valid_lft forever preferred_lft forever
 ```
 
 ```
-show vxlan remotevtep
+# ping 10.0.0.72
+PING 10.0.0.72 (10.0.0.72) 56(84) bytes of data.
+64 bytes from 10.0.0.72: icmp_seq=1 ttl=64 time=0.337 ms
+64 bytes from 10.0.0.72: icmp_seq=2 ttl=64 time=0.278 ms
+64 bytes from 10.0.0.72: icmp_seq=3 ttl=64 time=0.325 ms
+64 bytes from 10.0.0.72: icmp_seq=4 ttl=64 time=0.319 ms
+^C
+--- 10.0.0.72 ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3072ms
+rtt min/avg/max/mdev = 0.278/0.314/0.337/0.022 ms
+
 ```
 
 ```
-show mac
+# show mac
+No.    Vlan    MacAddress    Port    Type
+-----  ------  ------------  ------  ------
+Total number of entries 0
+```
+ * I'd think this should show stuff
+
+```
+# show vxlan remotemac all
++--------+-------------------+--------------+-------+---------+
+| VLAN   | MAC               | RemoteVTEP   |   VNI | Type    |
++========+===================+==============+=======+=========+
+| Vlan2  | e2:13:0d:e6:a0:bb | 172.16.0.2   | 10002 | dynamic |
++--------+-------------------+--------------+-------+---------+
+Total count : 1
 ```
 
 ```
-show vxlan remotemac all
+# vtysh -c "show bgp l2vpn evpn"
+BGP table version is 3, local router ID is 172.16.0.1
+Status codes: s suppressed, d damped, h history, * valid, > best, i - internal
+Origin codes: i - IGP, e - EGP, ? - incomplete
+EVPN type-1 prefix: [1]:[EthTag]:[ESI]:[IPlen]:[VTEP-IP]:[Frag-id]
+EVPN type-2 prefix: [2]:[EthTag]:[MAClen]:[MAC]:[IPlen]:[IP]
+EVPN type-3 prefix: [3]:[EthTag]:[IPlen]:[OrigIP]
+EVPN type-4 prefix: [4]:[ESI]:[IPlen]:[OrigIP]
+EVPN type-5 prefix: [5]:[EthTag]:[IPlen]:[IP]
+
+   Network          Next Hop            Metric LocPrf Weight Path
+Route Distinguisher: 172.16.0.1:2
+ *> [2]:[0]:[48]:[26:44:26:54:43:d9]:[32]:[10.0.0.71]
+                    172.16.0.1                         32768 i
+                    ET:8 RT:32897:10002
+ *> [2]:[0]:[48]:[26:44:26:54:43:d9]:[128]:[fe80::2444:26ff:fe54:43d9]
+                    172.16.0.1                         32768 i
+                    ET:8 RT:32897:10002
+ *> [3]:[0]:[32]:[172.16.0.1]
+                    172.16.0.1                         32768 i
+                    ET:8 RT:32897:10002
+Route Distinguisher: 172.16.0.2:2
+ *> [2]:[0]:[48]:[e2:13:0d:e6:a0:bb]:[32]:[10.0.0.72]
+                    172.16.0.2                             0 4210000002 i
+                    RT:32898:10002 ET:8
+ *> [2]:[0]:[48]:[e2:13:0d:e6:a0:bb]:[128]:[fe80::e013:dff:fee6:a0bb]
+                    172.16.0.2                             0 4210000002 i
+                    RT:32898:10002 ET:8
+ *> [3]:[0]:[32]:[172.16.0.2]
+                    172.16.0.2                             0 4210000002 i
+                    RT:32898:10002 ET:8
+
+Displayed 6 out of 6 total prefixes
+```
+ * Note the 10.0.0.71 / 10.0.0.72
+
+```
+# vtysh -c "show evpn vni detail"
+VNI: 10002
+ Type: L2
+ Tenant VRF: default
+ VxLAN interface: vtep-2
+ VxLAN ifIndex: 10
+ SVI interface: Vlan2
+ SVI ifIndex: 9
+ Local VTEP IP: 172.16.0.1
+ Mcast group: 0.0.0.0
+ Remote VTEPs for this VNI:
+  172.16.0.2 flood: HER
+ Number of MACs (local and remote) known for this VNI: 2
+ Number of ARPs (IPv4 and IPv6, local and remote) known for this VNI: 4
+ Advertise-gw-macip: No
+ Advertise-svi-macip: No
 ```
 
 ```
-vtysh -c "show bgp l2vpn evpn"
+# bridge fdb show br Bridge
+33:33:00:00:00:01 dev Bridge self permanent
+33:33:00:00:00:02 dev Bridge self permanent
+01:00:5e:00:00:6a dev Bridge self permanent
+33:33:00:00:00:6a dev Bridge self permanent
+01:00:5e:00:00:01 dev Bridge self permanent
+33:33:ff:09:f4:e0 dev Bridge self permanent
+33:33:ff:00:00:00 dev Bridge self permanent
+01:80:c2:00:00:21 dev Bridge self permanent
+33:33:ff:54:43:d9 dev Bridge self permanent
+26:44:26:54:43:d9 dev Bridge vlan 2 master Bridge permanent
+26:44:26:54:43:d9 dev Bridge master Bridge permanent
+52:8d:e1:bb:bf:45 dev dummy vlan 1 master Bridge permanent
+52:8d:e1:bb:bf:45 dev dummy master Bridge permanent
+33:33:00:00:00:01 dev dummy self permanent
+e2:13:0d:e6:a0:bb dev vtep-2 vlan 2 extern_learn master Bridge
+00:00:00:00:00:00 dev vtep-2 dst 172.16.0.2 self permanent
+e2:13:0d:e6:a0:bb dev vtep-2 dst 172.16.0.2 self extern_learn
+33:33:00:00:00:01 dev Ethernet8 self permanent
+33:33:00:00:00:02 dev Ethernet8 self permanent
+01:00:5e:00:00:01 dev Ethernet8 self permanent
+01:80:c2:00:00:0e dev Ethernet8 self permanent
+01:80:c2:00:00:03 dev Ethernet8 self permanent
+01:80:c2:00:00:00 dev Ethernet8 self permanent
 ```
 
 ```
-vtysh -c "show evpn vni detail"
+# ip neigh
+192.168.1.1 dev eth0 lladdr e0:63:da:2f:a6:38 REACHABLE
+10.0.0.72 dev Vlan2 lladdr e2:13:0d:e6:a0:bb extern_learn NOARP proto zebra
+192.168.1.198 dev eth0 FAILED
+169.254.0.1 dev Ethernet54 lladdr e2:13:0d:e6:a0:bb PERMANENT proto zebra
+192.168.1.212 dev eth0 lladdr aa:e7:61:a6:c6:b6 REACHABLE
+192.168.1.232 dev eth0 lladdr 74:86:e2:43:28:05 REACHABLE
+fe80::e263:daff:fe2f:a638 dev eth0 lladdr e0:63:da:2f:a6:38 router STALE
+fe80::e013:dff:fee6:a0bb dev Ethernet54 lladdr e2:13:0d:e6:a0:bb router REACHABLE
+fe80::e013:dff:fee6:a0bb dev Vlan2 lladdr e2:13:0d:e6:a0:bb extern_learn NOARP proto zebra
+fe80::1a5a:58ff:fe2a:e820 dev eth0 lladdr 18:5a:58:2a:e8:20 router REACHABLE
 ```
-
-```
-vtysh -c "show bgp evpn"
-```
-
-
-```
-bridge fdb show br Bridge
-```
-
 ### BGP
 
 #### View Neighbors
