@@ -15,6 +15,7 @@ Original Repository: https://github.com/bradh352/ansible-scripts/tree/master/rol
 - [Useful SONiC commands / information](#useful-sonic-commands--information)
   - [Default username and password](#default-username-and-password)
   - [Restore to factory-default configuration](#restore-to-factory-default-configuration)
+  - [Installing a different SONiC Image via SONiC](#installing-a-different-sonic-image-via-sonic)
   - [Bootstrap / Ansible](#bootstrap--ansible)
   - [BGP](#bgp)
     - [View Neighbors](#view-neighbors)
@@ -270,6 +271,18 @@ better to:
 sudo reboot
 ```
 
+### Installing a different SONiC Image via SONiC
+```
+sonic-installer install https://...
+```
+
+### Issues
+https://github.com/sonic-net/sonic-buildimage/issues/10004#issuecomment-1067624905
+https://github.com/sonic-net/sonic-buildimage/issues/8371
+https://github.com/sonic-net/sonic-buildimage/issues/10050#issuecomment-1063384809
+https://github.com/kamelnetworks/sonic-swss/commit/080ce083b135a45fcc8cfa5c7de1e6e7a3c2f386
+
+
 ### Bootstrap / Ansible
 
 When bootstrapping a switch, plug the dedicated MGMT port (typically `eth0`)
@@ -290,6 +303,48 @@ Typically after the initial run, the management port should be unplugged or
 disabled on the upstream switch and only used during recovery operations.  It
 is best practice for your switch configuration to create an IRB (VLAN) interface
 with IP address in your network's management vlan.
+
+### VXLAN investigation
+```
+show vxlan interface
+```
+
+```
+show vxlan vlanvnimap
+```
+
+```
+show vxlan tunnel
+```
+
+```
+show vxlan remotevtep
+```
+
+```
+show mac
+```
+
+```
+show vxlan remotemac all
+```
+
+```
+vtysh -c "show bgp l2vpn evpn"
+```
+
+```
+vtysh -c "show evpn vni detail"
+```
+
+```
+vtysh -c "show bgp evpn"
+```
+
+
+```
+bridge fdb show br Bridge
+```
 
 ### BGP
 

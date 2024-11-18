@@ -118,5 +118,6 @@
     - { "key": "riot_overlay_l3_egress_mem_size", "value": "32768" }
     - { "key": "riot_overlay_ecmp_resilient_hash_size", "value": "16384" }
     - { "key": "flow_init_mode", "value": "1" }
+    - { "key": "l3_ecmp_levels", "value": "2" }
   notify: sonic_reboot
 

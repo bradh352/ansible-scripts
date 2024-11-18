@@ -54,6 +54,7 @@ router bgp {{ sonic_asn }}
     neighbor PEERS route-map PERMIT in
     neighbor PEERS route-map PERMIT out
     advertise-all-vni
+    advertise-svi-ip
   !
 {% for port in ports %}
 {%  if sonic_interfaces[port.index].layer3|default(false) %}
