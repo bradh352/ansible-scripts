@@ -30,6 +30,16 @@
   set_fact:
     ports: "{{ port_config.stdout|from_yaml }}"
 
+- name: Try to determine port connection type
+  script: port_connectors.sh
+  register: port_connectors
+  failed_when: port_connectors.stdout | length == 0
+  changed_when: False
+
+- name: Load port connectors from JSON
+  set_fact:
+    port_connectors: "{{ port_connectors.stdout|from_yaml }}"
+
 - name: Make sure current running config is written to file
   shell: "config save -y"
   changed_when: false
@@ -89,7 +99,12 @@
   copy:
     content: "{{ config }}"
     dest: /etc/sonic/config_db.json
-  notify: "{{ 'sonic_reboot' if require_reboot else 'sonic_config_update' }}"
+# Normally writes in a different order which is fine since order doesn't matter
+# for dictionaries, so we only need to mark as changed when we already know a
+# reboot is required to possibly trigger that.  We will catch everything else
+# when we commit the change.
+  changed_when: require_reboot
+  notify: "{{ 'sonic_reboot' }}"
 
 - name: Write BGP configuration
   template:
@@ -124,4 +139,11 @@
     - { "key": "flow_init_mode", "value": "1" }
     - { "key": "l3_ecmp_levels", "value": "2" }
   notify: sonic_reboot
+
+# Do a graceful load of the new configuration if we aren't already rebooting.
+- name: sonic_config_update
+  command: "config replace --format CONFIGDB --verbose /etc/sonic/config_db.json"
+  when: not require_reboot
+  register: config_update
+  changed_when: "{{ 'Generated patch: []' not in config_update.stdout }}"
 

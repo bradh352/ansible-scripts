@@ -128,15 +128,19 @@ config if still confused.
   * `admin_status`: `up`/`down`. Whether the interface is administratively
     enabled.  Default is `down`.
   * `autoneg`: `on`/`off`. Whether the interface should enable autonegotiation.
-    Defaults to `on`.
+    Defaults to `on` if there is no SFP and the system max port speed is 10000
+    or less, or if we determine the port is RJ45.  Otherwise `off`.
   * `adv_speeds`: Comma delimited list of speeds in Megabits per second to
     advertise if autonegotiation is enabled. Example: `10000,1000,100`.  By
     default it will use whatever the interface is capable of.
   * `speed`: Interface speed in Megabits per second. Defaults to the maximum
-    port speed. Example: `25000` (25G)
+    port speed. Most SFP modules won't come up if the speed is wrong.
+    Example: `25000` (25G)
   * `description`: User-provided description of the interface for convenience.
     Typically describes what is plugged into the port.  Default is "".
   * `mtu`: The MTU of the interface. Defaults to `9216` if not provided.
+  * `fec`: Forward error correction.  `rs`,`fc`,`none`. Defaults to `none` if
+    port speed is less than 25000 or autonegotiation is on otherwise `rs`.
   * `ips`: Array of ipv4 and/or ipv6 addresses with subnet mask to assign to the
     interface.  Cannot be used with `vlans` (you should probably create a vlan
     with an ip address list instead). Example:
@@ -282,11 +286,12 @@ sonic-installer install https://...
 ```
 
 ### Issues
-* VXLAN issues due to TTL, and invalid reported oper_status: https://github.com/sonic-net/sonic-swss/pull/3216/files
+* VXLAN issues due to TTL, and invalid reported oper_status: https://github.com/sonic-net/sonic-swss/pull/3216
 * Annoying error message that doesn't seem to cause harm but hurts debugging: https://github.com/sonic-net/sonic-buildimage/issues/10004#issuecomment-1067624905
 * VXLAN tunnel support not enabled by default on Dell Switches: https://github.com/sonic-net/sonic-buildimage/issues/8371
   * Workaround in ansible role
   * Fixed in master as of Oct 4, 2024 (even though commit message doesn't mention it): https://github.com/sonic-net/sonic-buildimage/commit/456671cae8addd845b8d8336cfbda8809cd5c8cc
+* When building 202405 a patch is needed due to ipmitool versions not being in debian anymore.  Not needed on master and just a build-time issue. https://patch-diff.githubusercontent.com/raw/sonic-net/sonic-buildimage/pull/20791.patch
 
 ### Bootstrap / Ansible
 

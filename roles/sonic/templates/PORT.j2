@@ -6,12 +6,22 @@
       "description": "{{ sonic_interfaces[port.index].description }}",
 {%   endif %}
       "mtu": "{{ sonic_interfaces[port.index].mtu|default("9216") }}",
-      "speed": "{{ sonic_interfaces[port.index].speed|default(port.speed) }}",
-      "autoneg": "{{ sonic_interfaces[port.index].autoneg|default("on") }}",
-{%   if sonic_interfaces[port.index].autoneg|default("on") and sonic_interfaces[port.index].adv_speeds is defined %}
+{%   set speed = sonic_interfaces[port.index].speed|default(port.speed)|int %}
+      "speed": "{{ speed }}",
+{%   set autoneg = 'off' %}
+{%   if sonic_interfaces[port.index].autoneg is defined %}
+{%     set autoneg = sonic_interfaces[port.index].autoneg %}
+{%   elif port_connectors[port.port] == "RJ45" %}
+{%     set autoneg = 'on' %}
+{%   elif port_connectors[port.port] == "unknown" and port.speed|int <= 10000 %}
+{%     set autoneg = 'on' %}
+{%   endif %}
+      "autoneg": "{{ autoneg }}",
+{%   if autoneg and sonic_interfaces[port.index].adv_speeds is defined %}
       "adv_speeds": "{{ sonic_interfaces[port.index].adv_speeds }}",
 {%   endif %}
       "admin_status": "{{ sonic_interfaces[port.index].admin_status|default("down") }}",
+      "fec": "{{ sonic_interfaces[port.index].fec|default('none' if speed <= 10000 and autoneg == "off" else 'rs') }}",
       "alias": "{{ port.alias }}",
       "index": "{{ port.index }}",
       "lanes": "{{ port.lanes }}",

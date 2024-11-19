@@ -1,7 +1,4 @@
 ---
-- name: sonic_config_update
-  command: "config replace --format CONFIGDB --verbose /etc/sonic/config_db.json"
-
 - name: sonic_bgp_update
   command: 'docker exec bgp /usr/local/bin/supervisorctl -c /etc/supervisor/supervisord.conf restart bgpd'
 #  command: "docker restart bgp"
