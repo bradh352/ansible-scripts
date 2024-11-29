@@ -8,6 +8,10 @@
 {%     endif %}
 {%     set ns.has_iface = true %}
   "{{ port.port }}": {
+{# Need a unique mac address per routed interface, otherwise all interfaces use #}
+{# the system MAC, so if dual connected to the same system, this will cause #}
+{# collisions #}
+      "mac_addr": "{{ sonic_interfaces[port.index].mac_addr|default('02' | community.general.random_mac(seed=inventory_hostname ~ "_" ~ port.index|string)) }}",
       "ipv6_use_link_local_only": "{{ 'enable' if sonic_interfaces[port.index].layer3|default(false) else 'disable' }}"
     }
 {%   endif %}

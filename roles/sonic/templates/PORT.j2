@@ -25,7 +25,8 @@
       "alias": "{{ port.alias }}",
       "index": "{{ port.index }}",
       "lanes": "{{ port.lanes }}",
-      "mode": "{{ "access" if (sonic_interfaces[port.index].vlans|default([])|count == 1 and sonic_interfaces[port.index].vlans[0].mode|default("tagged") == "untagged") else ("trunk" if sonic_interfaces[port.index].vlans|default([])|count > 0 else "routed") }}"
+{%   set mode = "access" if (sonic_interfaces[port.index].vlans|default([])|count == 1 and sonic_interfaces[port.index].vlans[0].mode|default("tagged") == "untagged") else ("trunk" if sonic_interfaces[port.index].vlans|default([])|count > 0 else "routed") %}
+      "mode": "{{ mode }}"
     }
 {%- if not loop.last %}
 ,

@@ -139,8 +139,12 @@ config if still confused.
   * `description`: User-provided description of the interface for convenience.
     Typically describes what is plugged into the port.  Default is "".
   * `mtu`: The MTU of the interface. Defaults to `9216` if not provided.
-  * `fec`: Forward error correction.  `rs`,`fc`,`none`. Defaults to `none` if
-    port speed is less than 25000 or autonegotiation is on otherwise `rs`.
+  * `fec`: Forward error correction.  `rs`,`fc`,`auto`,`none`. Defaults to
+    `none` if port speed is less than 25000 or autonegotiation is on otherwise
+    `rs`.
+  * `mac_addr`: MAC address of the interface.  Only relevant for routed
+    interfaces (e.g. those with `ips` or `layer3` set).  If not specified, will
+    generate a random mac for the interface.
   * `ips`: Array of ipv4 and/or ipv6 addresses with subnet mask to assign to the
     interface.  Cannot be used with `vlans` (you should probably create a vlan
     with an ip address list instead). Example:
