@@ -1,10 +1,13 @@
-{% macro commaAdd(var) %}
-{%-    if var %}
-,
-{%     endif %}
-{%     set var = true %}
-{% endmacro %}
 {
+{% set vlanconf = namespace(has_vxlan_map=false,has_vlan_iface=false) %}
+{% for key, vlan in sonic_vlans.items() %}
+{%   if vlan.vxlan is defined %}
+{%     set vlanconf.has_vxlan_map = true %}
+{%   endif %}
+{%   if vlan.layer3|default(false) or (vlan.ips is defined and vlan.ips | count > 0) %}
+{%     set vlanconf.has_vlan_iface = true %}
+{%   endif %}
+{% endfor %}
   "VLAN": {
 {% for key, vlan in sonic_vlans.items() %}
     "Vlan{{ key }}": {
@@ -26,49 +29,56 @@
       "src_ip": "{{ sonic_bgp_ip|split('/')|first }}"
     }
   },
+
+{% if vlanconf.has_vxlan_map %}
   "VXLAN_TUNNEL_MAP": {
-{% set ns = namespace(has_vxlan=false) %}
-{% for key, vlan in sonic_vlans.items() %}
-{%   if vlan.vxlan is defined %}
-{%-    if ns.has_vxlan %}
+{%   set ns = namespace(has_vxlan=false) %}
+{%   for key, vlan in sonic_vlans.items() %}
+{%     if vlan.vxlan is defined %}
+{%-      if ns.has_vxlan %}
 ,
-{%     endif %}
-{%     set ns.has_vxlan = true %}
+{%       endif %}
+{%       set ns.has_vxlan = true %}
     "vtep|map_{{ vlan.vxlan }}_Vlan{{ key }}": {
       "vlan": "Vlan{{ key }}",
       "vni": "{{ vlan.vxlan }}"
     }
-{%   endif %}
-{% endfor %}
-  },
-  "VLAN_INTERFACE": {
-{% set ns = namespace(has_vxlan_iface=false) %}
-{% for key, vlan in sonic_vlans.items() %}
-
-{%   if vlan.layer3|default(false) or (vlan.ips is defined and vlan.ips | count > 0) %}
-{%-    if ns.has_vxlan_iface %}
-,
 {%     endif %}
-{%     set ns.has_vxlan_iface = true %}
+{%   endfor %}
+  },
+{% endif %}
+
+{% if vlanconf.has_vlan_iface %}
+  "VLAN_INTERFACE": {
+{%   set ns = namespace(has_vxlan_iface=false) %}
+{%   for key, vlan in sonic_vlans.items() %}
+
+{%     if vlan.layer3|default(false) or (vlan.ips is defined and vlan.ips | count > 0) %}
+{%-      if ns.has_vxlan_iface %}
+,
+{%       endif %}
+{%       set ns.has_vxlan_iface = true %}
     "Vlan{{ key }}": {
       "ipv6_use_link_local_only": "{{ "enable" if vlan.layer3|default(false) else "disable" }}"
     }
-{%   endif %}
-
-{%   if vlan.ips is defined and vlan.ips | count > 0 %}
-{%-    if ns.has_vxlan_iface %}
-,
 {%     endif %}
-{%     set ns.has_vxlan_iface = true %}
-{%     for ip in vlan.ips %}
-    "Vlan{{ key }}|{{ ip }}": {}
-{%-      if not loop.last %}
+
+{%     if vlan.ips is defined and vlan.ips | count > 0 %}
+{%-      if ns.has_vxlan_iface %}
 ,
 {%       endif %}
-{%     endfor %}
-{%   endif %}
-{% endfor %}
+{%       set ns.has_vxlan_iface = true %}
+{%       for ip in vlan.ips %}
+    "Vlan{{ key }}|{{ ip }}": {}
+{%-        if not loop.last %}
+,
+{%         endif %}
+{%       endfor %}
+{%     endif %}
+{%   endfor %}
   },
+{% endif %}
+
   "VLAN_MEMBER": {
 {% set ns = namespace(has_vlan_mem=false) %}
 {% for key, vlan in sonic_vlans.items() %}

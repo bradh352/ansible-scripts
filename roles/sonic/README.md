@@ -138,7 +138,9 @@ config if still confused.
     Example: `25000` (25G)
   * `description`: User-provided description of the interface for convenience.
     Typically describes what is plugged into the port.  Default is "".
-  * `mtu`: The MTU of the interface. Defaults to `9216` if not provided.
+  * `mtu`: The MTU of the interface. If not provided, defaults to `9216` on
+    routed ports (typically used as underlay), and `9100` on trunk and access
+    ports.
   * `fec`: Forward error correction.  `rs`,`fc`,`auto`,`none`. Defaults to
     `none` if port speed is less than 25000 or autonegotiation is on otherwise
     `rs`.

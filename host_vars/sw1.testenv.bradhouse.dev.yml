@@ -34,6 +34,15 @@ sonic_interfaces:
     layer3: true
     admin_status: "up"
     description: "CloudStack Node 8"
+  "10":
+    admin_status: "up"
+    description: "RJ45 bootstrap port"
+    autoneg: "on"
+    adv_speeds: "10000,1000,100"
+    speed: "10000"
+    vlans:
+      - vlan: 2
+        mode: "untagged"
   "11":
     admin_status: "up"
     description: "bootstrap port"
@@ -56,8 +65,8 @@ sonic_interfaces:
     description: "ToRSwitch 2 port 56"
 sonic_vlans:
   "2":
-    ips: [ "10.0.0.71/24" ]
     vxlan: "10002"
-    layer3: true
-    mtu: 1500
+#    ips: [ "10.0.0.71/24" ]
+#    layer3: true
+#    mtu: 1500
 

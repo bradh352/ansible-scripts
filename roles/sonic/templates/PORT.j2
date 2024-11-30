@@ -5,7 +5,8 @@
 {%   if sonic_interfaces[port.index].description is defined %}
       "description": "{{ sonic_interfaces[port.index].description }}",
 {%   endif %}
-      "mtu": "{{ sonic_interfaces[port.index].mtu|default("9216") }}",
+{%   set mode = "access" if (sonic_interfaces[port.index].vlans|default([])|count == 1 and sonic_interfaces[port.index].vlans[0].mode|default("tagged") == "untagged") else ("trunk" if sonic_interfaces[port.index].vlans|default([])|count > 0 else "routed") %}
+      "mtu": "{{ sonic_interfaces[port.index].mtu|default("9216" if mode == "routed" else "9100") }}",
 {%   set speed = sonic_interfaces[port.index].speed|default(port.speed)|int %}
       "speed": "{{ speed }}",
 {%   set autoneg = 'off' %}
@@ -25,7 +26,6 @@
       "alias": "{{ port.alias }}",
       "index": "{{ port.index }}",
       "lanes": "{{ port.lanes }}",
-{%   set mode = "access" if (sonic_interfaces[port.index].vlans|default([])|count == 1 and sonic_interfaces[port.index].vlans[0].mode|default("tagged") == "untagged") else ("trunk" if sonic_interfaces[port.index].vlans|default([])|count > 0 else "routed") %}
       "mode": "{{ mode }}"
     }
 {%- if not loop.last %}
