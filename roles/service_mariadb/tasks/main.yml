@@ -1,7 +1,7 @@
 ---
 - name: Install MariaDB AppStream
   dnf:
-    name: "@mariadb:10.3"
+    name: "@mariadb:10.11"
     state: installed
 
 - name: Install MariaDB Server
@@ -41,11 +41,13 @@
     state: started
 
 - name: Set root password for MariaDB for localhost
-  mysql_user:
+  community.mysql.mysql_user:
     login_user: root
     login_password: "{{ vault_root_password }}"
     check_implicit_admin: true
-    user: root
+    column_case_sensitive: false
+    login_unix_socket: /var/lib/mysql/mysql.sock
+    name: root
     password: "{{ vault_root_password }}"
     host: "{{ item }}"
   with_items:
@@ -54,19 +56,23 @@
     - ::1
 
 - name: Remove root password for MariaDB for non-localhost users
-  mysql_user:
+  community.mysql.mysql_user:
+    login_unix_socket: /var/lib/mysql/mysql.sock
     login_user: root
     login_password: "{{ vault_root_password }}"
     check_implicit_admin: true
-    user: root
-    host: "{{ fqdn }}"
+    column_case_sensitive: false
+    name: root
+    host: "{{ inventory_hostname }}"
     state: absent
 
 - name: Remove all anonymous users from MariaDB
-  mysql_user:
+  community.mysql.mysql_user:
+    login_unix_socket: /var/lib/mysql/mysql.sock
     login_user: root
     login_password: "{{ vault_root_password }}"
     check_implicit_admin: true
+    column_case_sensitive: false
     name: ''
     host_all: yes
     state: absent
