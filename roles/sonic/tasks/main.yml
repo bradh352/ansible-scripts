@@ -62,37 +62,52 @@
   when: require_reboot
 
 # Split generating into a step per section for easier debugging
-- name: Generate port config
+- name: "Generate config: PORT"
   set_fact:
     port_json: "{{ lookup('template', 'PORT.j2') }}"
 
-- name: Generate interface config
+- name: "Generate config: INTERFACE"
   set_fact:
     interface_json: "{{ lookup('template', 'INTERFACE.j2') }}"
 
-- name: Generate loopback config
+- name: "Generate config: LOOPBACK"
   set_fact:
     loopback_json: "{{ lookup('template', 'LOOPBACK.j2') }}"
 
-- name: Generate vlan/vxlan config
+- name: "Generate config: VLAN/VXLAN"
   set_fact:
     vxlan_json: "{{ lookup('template', 'VXLAN.j2') }}"
 
-- name: Generate static route config
+- name: "Generate config: STATIC_ROUTE"
   set_fact:
     static_route_json: "{{ lookup('template', 'STATIC_ROUTE.j2') }}"
 
-- name: Generate device metadata route config
+- name: "Generate config: DEVICE_METADATA"
   set_fact:
     device_metadata_json: "{{ lookup('template', 'DEVICE_METADATA.j2') }}"
 
-- name: Parse custom configs
+- name: "Parse config: PORT"
   set_fact:
     port: "{{ port_json|from_yaml }}"
+
+- name: "Parse config: INTERFACE"
+  set_fact:
     interface: "{{ interface_json|from_yaml }}"
+
+- name: "Parse config: LOOPBACK"
+  set_fact:
     loopback: "{{ loopback_json|from_yaml }}"
+
+- name: "Parse config: VLAN/VXLAN"
+  set_fact:
     vxlan: "{{ vxlan_json|from_yaml }}"
+
+- name: "Parse config: STATIC_ROUTE"
+  set_fact:
     static_route: "{{ static_route_json|from_yaml }}"
+
+- name: "Parse config: DEVICE_METADATA"
+  set_fact:
     device_metadata: "{{ device_metadata_json|from_yaml }}"
 
 # NOTE we have to remove the STATIC_ROUTE table as it says it won't allow an empty table.
@@ -101,7 +116,7 @@
     config: |
       {{ current_config
           | ansible.utils.remove_keys(target=['^BGP_NEIGHBOR$', '^BGP_PEER_RANGE$', '^BGP_GLOBALS_AF_NETWORK$', '^BGP_NEIGHBOR_AF$', '^BGP_GLOBALS$', '^DEVICE_NEIGHBOR$'], matching_parameter='regex')
-          | ansible.utils.remove_keys(target=['^STATIC_ROUTE$'], matching_parameter='regex')
+          | ansible.utils.remove_keys(target=['^VLAN$', '^VLAN_MEMBER$', '^VLAN_INTERFACE$', '^VXLAN_TUNNEL_MAP$', '^STATIC_ROUTE$'], matching_parameter='regex')
           | combine(port, list_merge='replace')
           | combine(interface, list_merge='replace')
           | combine(loopback, list_merge='replace')
@@ -160,5 +175,5 @@
   command: "config replace --format CONFIGDB --verbose /etc/sonic/config_db.json"
   when: not require_reboot
   register: config_update
-  changed_when: "{{ 'Generated patch: []' not in config_update.stdout }}"
+  changed_when: '"Generated patch: []" not in config_update.stdout'
 

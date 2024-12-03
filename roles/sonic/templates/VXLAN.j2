@@ -8,17 +8,7 @@
 {%     set vlanconf.has_vlan_iface = true %}
 {%   endif %}
 {% endfor %}
-  "VLAN": {
-{% for key, vlan in sonic_vlans.items() %}
-    "Vlan{{ key }}": {
-      "vlanid": "{{ key }}",
-      "mtu": "{{ vlan.mtu if vlan.mtu is defined else ("1500" if vlan.ips|default([])|count > 0 or vlan.layer3|default(false) else "9100") }}"
-    }
-{%-  if not loop.last %}
-,
-{%   endif %}
-{% endfor %}
-  },
+
   "VXLAN_EVPN_NVO": {
     "nvo": {
       "source_vtep": "vtep"
@@ -28,9 +18,25 @@
     "vtep": {
       "src_ip": "{{ sonic_bgp_ip|split('/')|first }}"
     }
-  },
+  }
 
-{% if vlanconf.has_vxlan_map %}
+{%- if sonic_vlans is defined and sonic_vlans|count > 0 %}
+  ,
+  "VLAN": {
+{%   for key, vlan in sonic_vlans.items() %}
+    "Vlan{{ key }}": {
+      "vlanid": "{{ key }}",
+      "mtu": "{{ vlan.mtu if vlan.mtu is defined else ("1500" if vlan.ips|default([])|count > 0 or vlan.layer3|default(false) else "9100") }}"
+    }
+{%-    if not loop.last %}
+,
+{%     endif %}
+{%   endfor %}
+  }
+{% endif %}
+
+{%- if vlanconf.has_vxlan_map %}
+  ,
   "VXLAN_TUNNEL_MAP": {
 {%   set ns = namespace(has_vxlan=false) %}
 {%   for key, vlan in sonic_vlans.items() %}
@@ -45,10 +51,11 @@
     }
 {%     endif %}
 {%   endfor %}
-  },
+  }
 {% endif %}
 
-{% if vlanconf.has_vlan_iface %}
+{%- if vlanconf.has_vlan_iface %}
+  ,
   "VLAN_INTERFACE": {
 {%   set ns = namespace(has_vxlan_iface=false) %}
 {%   for key, vlan in sonic_vlans.items() %}
@@ -76,27 +83,30 @@
 {%       endfor %}
 {%     endif %}
 {%   endfor %}
-  },
+  }
 {% endif %}
 
+{%- if sonic_vlans is defined and sonic_vlans|count > 0 %}
+  ,
   "VLAN_MEMBER": {
-{% set ns = namespace(has_vlan_mem=false) %}
-{% for key, vlan in sonic_vlans.items() %}
-{%   for port in ports %}
-{%     for ifacevlan in sonic_interfaces[port.index].vlans|default([]) %}
-{%       if ifacevlan.vlan|int == key|int %}
-{%-        if ns.has_vlan_mem %}
+{%   set ns = namespace(has_vlan_mem=false) %}
+{%   for key, vlan in sonic_vlans.items() %}
+{%     for port in ports %}
+{%       for ifacevlan in sonic_interfaces[port.index].vlans|default([]) %}
+{%         if ifacevlan.vlan|int == key|int %}
+{%-          if ns.has_vlan_mem %}
 ,
-{%         endif %}
-{%         set ns.has_vlan_mem = true %}
+{%           endif %}
+{%           set ns.has_vlan_mem = true %}
     "Vlan{{ key }}|{{ port.port }}": {
       "tagging_mode": "{{ ifacevlan.mode|default("tagged") }}"
     }
-{%       endif %}
+{%         endif %}
+{%       endfor %}
 {%     endfor %}
 {%   endfor %}
-{% endfor %}
   }
+{% endif %}
 }
 
 

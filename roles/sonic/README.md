@@ -126,7 +126,8 @@ config if still confused.
     interface.  This enables IPv6 link-local address support and also activates
     BGP on the interface. Default is `false`.
   * `admin_status`: `up`/`down`. Whether the interface is administratively
-    enabled.  Default is `down`.
+    enabled.  Default is `up` if the interface is defined in this dictionary,
+    otherwise `down`.
   * `autoneg`: `on`/`off`. Whether the interface should enable autonegotiation.
     Defaults to `on` if there is no SFP and the system max port speed is 10000
     or less, or if we determine the port is RJ45.  Otherwise `off`.

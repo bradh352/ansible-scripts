@@ -4,38 +4,29 @@ sonic_asn: "4210000002"
 sonic_interfaces:
   "1": 
     layer3: true
-    admin_status: "up"
     description: "CloudStack Node 1"
   "2":
     layer3: true
-    admin_status: "up"
     description: "CloudStack Node 2"
   "3":
     layer3: true
-    admin_status: "up"
     description: "CloudStack Node 3"
   "4":
     layer3: true
-    admin_status: "up"
     description: "CloudStack Node 4"
   "5":
     layer3: true
-    admin_status: "up"
     description: "CloudStack Node 5"
   "6":
     layer3: true
-    admin_status: "up"
     description: "CloudStack Node 6"
   "7":
     layer3: true
-    admin_status: "up"
     description: "CloudStack Node 7"
   "8":
     layer3: true
-    admin_status: "up"
     description: "CloudStack Node 8"
-  "10":
-    admin_status: "up"
+  "9":
     description: "RJ45 bootstrap port"
     autoneg: "on"
     adv_speeds: "10000,1000,100"
@@ -44,7 +35,6 @@ sonic_interfaces:
       - vlan: 2
         mode: "untagged"
   "11":
-    admin_status: "up"
     description: "bootstrap port"
     autoneg: "off"
     speed: "10000"
@@ -53,15 +43,12 @@ sonic_interfaces:
         mode: "untagged"
   "46":
     layer3: true
-    admin_status: "up"
     description: "Management Switch"
   "55":
     layer3: true
-    admin_status: "up"
     description: "ToRSwitch 1 port 55"
   "56":
     layer3: true
-    admin_status: "up"
     description: "ToRSwitch 1 port 56"
 sonic_vlans:
   "2":
