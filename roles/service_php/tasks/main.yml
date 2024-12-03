@@ -1,7 +1,7 @@
 ---
-- name: install php 7.4 stream
+- name: install php 8.2 stream
   dnf:
-    name: '@php:7.4'
+    name: '@php:8.2'
     state: present
   notify:
     - phpfpm_restart

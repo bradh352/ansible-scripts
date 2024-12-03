@@ -15,6 +15,10 @@
     delegate_to: localhost
 
 - hosts: all
+  module_defaults:
+    ansible.builtin.setup:
+      gather_subset: all
+      gather_timeout: 10
   become: yes
   tasks:
   - name: Run roles for hosts

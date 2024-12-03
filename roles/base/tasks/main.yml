@@ -1,15 +1,14 @@
 ---
-- name: set rhel_ver8 fact
+- name: set rhel_ver8plus fact
   set_fact:
-    rhel_ver8: "{{ true if '8' in ansible_distribution_major_version else false }}"
+    rhel_ver8plus: "{{ true if 8 >= ansible_distribution_major_version|int else false }}"
   when: 'ansible_distribution == "CentOS" or ansible_distribution == "RHEL" or ansible_distribution == "Rocky" or ansible_distribution == "AlmaLinux"'
 
 # We do this because ansible_inventory isn't quite the right thing to do as that is read from the
 # destination machine, and if it hasn't been configured yet, it won't be right.
 - name: set host names
   set_fact:
-    short_host: "{{ ansible_host.split('.')[0] }}"
-    fqdn: "{{ ansible_host }}"  # We do this because ansible_host isn't available in some circumstances.
+    short_host: "{{ inventory_hostname.split('.')[0] }}"
 
 - name: configure hosts for hostname
   template:
@@ -78,25 +77,25 @@
     line: "{{ superuser_pubkey }}"
 
 - name: ensure EPEL is installed
-  yum:
+  dnf:
     name: "epel-release"
     state: latest
 
 - name: upgrade all packages to the latest versions
-  yum:
+  dnf:
     name: "*"
     state: latest
     update_cache: true
   ignore_errors: false
 
 - name: install base build packages for RHEL-like systems
-  yum:
+  dnf:
     name: ["wget", "openssh-clients", "chrony", "acpid", "nano", "nc", "bzip2",
-           "yum-utils", "rsyslog", "tar", "unzip", "python3-policycoreutils", "fail2ban" ]
+           "dnf-utils", "rsyslog", "tar", "unzip", "python3-policycoreutils", "fail2ban" ]
     state: installed
 
 - name: ensure firewalld is installed
-  yum:
+  dnf:
     name: firewalld
     state: installed
 
@@ -183,7 +182,7 @@
     option: "{{ item.key }}"
     value: "{{ item.val }}"
   with_items:
-    - { key: "{{ 'RateLimitIntervalSec' if rhel_ver8 else 'RateLimitInterval' }}", val: "0" }
+    - { key: "{{ 'RateLimitIntervalSec' if rhel_ver8plus else 'RateLimitInterval' }}", val: "0" }
     - { key: "RateLimitBurst",       val: "0" }
     - { key: "RuntimeMaxUse",        val: "100M" }
     - { key: "Storage",              val: "volatile" }
@@ -262,7 +261,7 @@
     backrefs: true
 
 - name: install exim package
-  yum:
+  dnf:
     name: exim
 
 - name: configure exim
@@ -293,7 +292,7 @@
 
 # Automatic updates
 - name: "Automatic updates: {{ 'yes' if base_autoupdate else 'no' }}"
-  yum:
+  dnf:
     name: dnf-automatic
     state: "{{ 'installed' if base_autoupdate else 'absent' }}"
 
@@ -342,7 +341,7 @@
     mode: 0600
 
 - name: "CIS: remove unneeded or insecure software packages"
-  yum:
+  dnf:
     name: [ "setroubleshoot", "mcstrans", "telnet-server", "telnet", "rsh-server", "rsh",
             "ypbind", "ypserv", "tftp", "talk", "talk-server", "vsftpd" ]
     state: absent

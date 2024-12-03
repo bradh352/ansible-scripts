@@ -9,6 +9,9 @@
 #  Run  wp gdrive auth  and enter in the id and secret, and go to the web page provided.
 #  A code will be returned on the web page you need to enter back into the auth command.
 
+- set_fact:
+    gdrive_version: 3.9.1
+
 - name: Check to see if WordPress is already installed
   stat:
     path: "{{ wordpress_install_path }}/wp-admin"
@@ -69,11 +72,12 @@
     state: present
 
 - name: create db user for wordpress
-  mysql_user:
+  community.mysql.mysql_user:
     login_user: root
     login_password: "{{ vault_root_password }}"
     check_implicit_admin: true
-    user: "{{ wordpress_db_user }}"
+    name: "{{ wordpress_db_user }}"
+    column_case_sensitive: false
     password: "{{ wordpress_db_pass }}"
     host: "{{ item }}"
     priv: "{{ wordpress_db_name }}.*:ALL"
@@ -205,32 +209,6 @@
     PHP_INI_SCAN_DIR: /etc/php-cli.d/
   when: "'WP-CLI is at the latest version' not in wpcli_checkupdate.stdout"
 
-- name: "wp-cli: check to see if wp-cli-gdrive-command is installed"
-  command:
-    argv:
-      - "/usr/local/bin/wp"
-      - "package"
-      - "list"
-      - "--skip-plugins"
-      - "--skip-themes"
-  environment:
-    PHP_INI_SCAN_DIR: /etc/php-cli.d/
-  changed_when: false
-  register: wpcli_gdrive
-
-- name: "wp-cli: install wp-cli-gdrive-command"
-  command:
-    argv:
-      - "/usr/local/bin/wp"
-      - "package"
-      - "install"
-      - "wp-packagist/wp-cli-gdrive-command"
-      - "--skip-plugins"
-      - "--skip-themes"
-  environment:
-    PHP_INI_SCAN_DIR: /etc/php-cli.d/
-  when: "'gdrive' not in wpcli_gdrive.stdout"
-
 - name: "wp-cli: update all wp-cli packages"
   command:
     argv:
@@ -243,6 +221,42 @@
     PHP_INI_SCAN_DIR: /etc/php-cli.d/
   register: wpcliupdate
   changed_when: "'Nothing to install or update' not in wpcliupdate.stdout"
+
+- name: "gdrive: Check Installation"
+  stat:
+    path: /usr/local/bin/gdrive-{{ gdrive_version }}
+  register: gdrive
+
+- name: "gdrive: Download"
+  delegate_to: localhost
+  become: no
+  get_url:
+    url: https://github.com/glotlabs/gdrive/releases/download/{{ gdrive_version }}/gdrive_linux-x64.tar.gz
+    dest: /tmp/gdrive_linux-x64.tar.gz
+  when: not gdrive.stat.exists
+  run_once: true
+
+- name: "gdrive: Extract"
+  unarchive:
+    src: /tmp/gdrive_linux-x64.tar.gz
+    copy: yes
+    dest: "/usr/local/bin/"
+  when: not gdrive.stat.exists
+
+- name: "gdrive: Install"
+  shell: |
+    mv /usr/local/bin/gdrive /usr/local/bin/gdrive-{{ gdrive_version }} && \
+    chmod 755 /usr/local/bin/gdrive-{{ gdrive_version }}
+  when: not gdrive.stat.exists
+
+- name: "gdrive: cleanup download"
+  delegate_to: localhost
+  become: no
+  file:
+    path: /tmp/gdrive_linux-x64.tar.gz
+    state: absent
+  when: not gdrive.stat.exists
+  run_once: true
 
 - name: "Install wordpress update script for {{ wordpress_domain }}"
   template:
@@ -260,10 +274,26 @@
     group: root
     mode: 0644
 
+- name: "Install gdrive helper script"
+  template:
+    src: gdrive.sh
+    dest: "/usr/local/bin/gdrive.sh"
+    owner: root
+    group: root
+    mode: 0750
+
 - name: "Install wordpress backup script for {{ wordpress_domain }}"
   template:
     src: wp-backup.sh
     dest: "/usr/local/bin/wp-backup-{{ wordpress_domain }}.sh"
+    owner: root
+    group: root
+    mode: 0750
+
+- name: "Install wordpress restore script for {{ wordpress_domain }}"
+  template:
+    src: wp-restore.sh
+    dest: "/usr/local/bin/wp-restore-{{ wordpress_domain }}.sh"
     owner: root
     group: root
     mode: 0750

@@ -35,6 +35,5 @@
 - name: "commentfile: Comment out all lines in {{ commentfile.path }}"
   command:
     cmd: 'sed -E -i -e "s/^([^#].+)$/#\1/" {{ commentfile.path }}'
-    warn: false
   when: commentfile_uncommented.rc == 0
   notify: "{{ commentfile.notify }}"

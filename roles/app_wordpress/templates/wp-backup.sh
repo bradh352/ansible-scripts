@@ -3,6 +3,8 @@
 # If any command in a chained pipe returns failure, count it as a failure
 set -o pipefail
 
+. /usr/local/bin/gdrive.sh
+
 LOCAL_TEMP="/tmp/wpbackup"
 REMOTE_PREFIX="WordpressBackups"
 LOCAL_SITEPATH="{{ wordpress_install_path }}"
@@ -47,15 +49,16 @@ fi
 cd "${LOCAL_SITEPATH}" || die "failed to cd to ${LOCAL_SITEPATH}"
 
 # make sure the remote path exists
-(${WP} gdrive mkdir "${REMOTE_PREFIX}" --no-color --quiet) 2>&1 | log_pipe || die "failed to create remote google drive path ${REMOTE_PREFIX}"
+if ! gdrive_directory_exists "${REMOTE_PREFIX}" ; then
+	gdrive_directory_create "${REMOTE_PREFIX}" 2>&1 | log_pipe || die "failed to create remote google drive path ${REMOTE_PREFIX}"
+fi
 
 log " * Retrieving remote file list"
 
 # check remote backup folder exists on gdrive
 #   Its formatted as a table, so we have to do quite a bit of manipulation
 #   All files we care about are prefixed with "wpbackup-"
-REMOTE_FILE_LIST=`${WP} gdrive ls "${REMOTE_PREFIX}" --no-color 2>/dev/null | cut -d'|' -f 2 | grep -v '+$' | sed -e 's/ *$//' -e 's/^ //' -e '1d' | grep -i '^wpbackup-'`
-
+REMOTE_FILE_LIST=`gdrive_ls "${REMOTE_PREFIX}" 2>/dev/null | grep -i '^wpbackup-'`
 
 # clear all files that are older than we want to keep
 while read -r file ; do
@@ -67,7 +70,7 @@ while read -r file ; do
 	# Delete files less than oldest allowed date
 	if [[ "${name}" < "wpbackup-${DATE_OLDEST}" ]] ; then
 		log " * Deleting ${REMOTE_PREFIX}/${file}"
-		(${WP} gdrive rm "${REMOTE_PREFIX}/${file}" --force --quiet --no-color) 2>&1 | log_pipe || die "failed to delete remote google drive file ${REMOTE_PREFIX}/${file}"
+		(gdrive_rm "${REMOTE_PREFIX}/${file}") 2>&1 | log_pipe || die "failed to delete remote google drive file ${REMOTE_PREFIX}/${file}"
 	fi
 done < <(echo "$REMOTE_FILE_LIST")
 
@@ -88,8 +91,8 @@ rm -f "${LOCAL_TEMP}/${BACKUP_NAME}.sql.gz"
 log " * Uploading backups"
 # Can't upload from an absolute path, so cd to where the files are
 cd "${LOCAL_TEMP}" || die "failed to cd to ${LOCAL_TEMP}"
-($WP gdrive upload "${BACKUP_NAME}.tar.gz" "${REMOTE_PREFIX}" --quiet --no-color) 2>&1 | log_pipe || die "failed to upload wp-content backup data to google drive"
-($WP gdrive upload "${BACKUP_NAME}.sql.gz" "${REMOTE_PREFIX}" --quiet --no-color) 2>&1 | log_pipe || die "failed to upload sql backup data to google drive"
+(gdrive_upload "${BACKUP_NAME}.tar.gz" "${REMOTE_PREFIX}") 2>&1 | log_pipe || die "failed to upload wp-content backup data to google drive"
+(gdrive_upload "${BACKUP_NAME}.sql.gz" "${REMOTE_PREFIX}") 2>&1 | log_pipe || die "failed to upload sql backup data to google drive"
 
 # Cleanup
 rm -f "${LOCAL_TEMP}/${BACKUP_NAME}.tar.gz"

@@ -25,7 +25,7 @@
     state: restarted
 
 - name: set_hostname
-  command: "hostnamectl set-hostname {{ fqdn }}"
+  command: "hostnamectl set-hostname {{ inventory_hostname }}"
 
 - name: fail2ban_restart
   service:

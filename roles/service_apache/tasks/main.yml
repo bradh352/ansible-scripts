@@ -1,11 +1,11 @@
 ---
 - name: install apache/mod_ssl
-  yum:
+  dnf:
     name: [ "httpd", "mod_ssl", "mod_http2" ]
     state: latest
 
 - name: Install ACME/mod_md for letsencrypt support
-  yum:
+  dnf:
     name: [ "mod_md" ]
     state: "{{ 'installed' if apache_letsencrypt else 'absent' }}"
 
