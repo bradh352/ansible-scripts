@@ -22,6 +22,10 @@ route-map IMPORT permit 1
 route-map PERMIT permit 1
 !
 !
+{% if (sonic_asn is defined and sonic_bgp_ip is not defined) or (sonic_asn is not defined and sonic_bgp_ip is defined) %}
+{{ notdefined | mandatory(msg='if sonic_asn or sonic_bgp_ip are defined, both must be.') }}
+{% endif %}
+{% if sonic_asn is defined and sonic_bgp_ip is defined %}
 router bgp {{ sonic_asn }}
   bgp router-id {{ sonic_bgp_ip|split('/')|first }}
   bgp ebgp-requires-policy
@@ -56,9 +60,10 @@ router bgp {{ sonic_asn }}
     advertise-all-vni
     advertise-svi-ip
   !
-{% for port in ports %}
-{%  if sonic_interfaces[port.index].layer3|default(false) %}
+{%   for port in ports %}
+{%     if sonic_interfaces[port.index].layer3|default(false) %}
   neighbor {{ port.port }} interface peer-group PEERS
-{%  endif %}
-{% endfor %}
+{%     endif %}
+{%    endfor %}
 !
+{% endif %}

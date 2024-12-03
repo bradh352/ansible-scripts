@@ -9,19 +9,7 @@
 {%   endif %}
 {% endfor %}
 
-  "VXLAN_EVPN_NVO": {
-    "nvo": {
-      "source_vtep": "vtep"
-    }
-  },
-  "VXLAN_TUNNEL": {
-    "vtep": {
-      "src_ip": "{{ sonic_bgp_ip|split('/')|first }}"
-    }
-  }
-
 {%- if sonic_vlans is defined and sonic_vlans|count > 0 %}
-  ,
   "VLAN": {
 {%   for key, vlan in sonic_vlans.items() %}
     "Vlan{{ key }}": {
@@ -32,6 +20,21 @@
 ,
 {%     endif %}
 {%   endfor %}
+  }
+{% endif %}
+
+{%- if sonic_bgp_ip is defined %}
+  ,
+  "VXLAN_EVPN_NVO": {
+    "nvo": {
+      "source_vtep": "vtep"
+    }
+  }
+  ,
+  "VXLAN_TUNNEL": {
+    "vtep": {
+      "src_ip": "{{ sonic_bgp_ip|split('/')|first }}"
+    }
   }
 {% endif %}
 

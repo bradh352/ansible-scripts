@@ -1,269 +1,214 @@
 ---
-sonic_bgp_ip: "172.16.0.0/32"
-sonic_asn: "4210000000"
+# Basic switch, not participating in VXLAN
+#sonic_bgp_ip: "172.16.0.0/32"
+#sonic_asn: "4210000000"
+
 sonic_interfaces:
   "1": 
-    admin_status: "up"
     description: "Microcloud Node 1 IMPI"
     vlans:
       - vlan: 2
         mode: "untagged"
   "2":
-    admin_status: "up"
     description: "Microcloud Node 2 IMPI"
     vlans:
       - vlan: 2
         mode: "untagged"
   "3":
-    admin_status: "up"
     description: "Microcloud Node 3 IMPI"
     vlans:
       - vlan: 2
         mode: "untagged"
   "4":
-    admin_status: "up"
     description: "Microcloud Node 4 IMPI"
     vlans:
       - vlan: 2
         mode: "untagged"
   "5":
-    admin_status: "up"
     description: "Microcloud Node 5 IMPI"
     vlans:
       - vlan: 2
         mode: "untagged"
   "6":
-    admin_status: "up"
     description: "Microcloud Node 6 IMPI"
     vlans:
       - vlan: 2
         mode: "untagged"
   "7":
-    admin_status: "up"
     description: "Microcloud Node 7 IMPI"
     vlans:
       - vlan: 2
         mode: "untagged"
   "8":
-    admin_status: "up"
     description: "Microcloud Node 8 IMPI"
     vlans:
       - vlan: 2
         mode: "untagged"
   "9":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "10":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "11":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "12":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "13":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "14":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "15":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "16":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "17":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "18":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "19":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "20":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "21":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "22":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "23":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "24":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "25":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "26":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "27":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "28":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "29":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "30":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "31":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "32":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "33":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "34":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "35":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "36":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "37":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "38":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "39":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "40":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "41":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "42":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "43":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "44":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "45":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "46":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "47":
-    admin_status: "up"
     vlans:
       - vlan: 2
         mode: "untagged"
   "48":
-    admin_status: "up"
     description: "uplink"
     vlans:
       - vlan: 2
         mode: "untagged"
-  "49":
-    layer3: true
-    admin_status: "up"
-    description: "ToRSwitch 1 port 46"
-  "50":
-    layer3: true
-    admin_status: "up"
-    description: "ToRSwitch 2 port 46"
 
 sonic_vlans:
   "2":
-    ips: [ "10.0.0.70/24", "192.168.1.55/24" ]
-    vxlan: "10002"
+    ips: [ "192.168.1.55/24" ]
     mtu: 1500
     layer3: true
 

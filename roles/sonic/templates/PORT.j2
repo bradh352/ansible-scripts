@@ -1,3 +1,18 @@
+{# validate all port indexes listed are valid on system #}
+{% for idx, iface in sonic_interfaces.items() %}
+{%   if idx|int(-1) == -1 %}
+{{ notdefiend | mandatory(msg='sonic_interfaces index ' ~ idx|string ~ ' must be numeric') }}
+{%   endif %}
+{%   set ns = namespace(has_iface_idx=false) %}
+{%   for port in ports %}
+{%     if port.index|int == idx|int %}
+{%       set ns.has_iface_idx=true %}
+{%     endif %}
+{%   endfor %}
+{%   if not ns.has_iface_idx %}
+{{ notdefined | mandatory(msg='sonic_interfaces index ' ~ idx|string ~ ' is an invalid port') }}
+{%   endif %}
+{% endfor %}
 {
   "PORT": {
 {% for port in ports %}
