@@ -121,7 +121,7 @@ gdrive_upload()
 		ARG="--parent $DIRID"
 	fi
 
-	${GDRIVE} files upload "${ARG}" "${1}"
+	${GDRIVE} files upload ${ARG} "${1}"
 	return $?
 }
 
