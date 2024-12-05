@@ -29,6 +29,7 @@ route-map PERMIT permit 1
 router bgp {{ sonic_asn }}
   bgp router-id {{ sonic_bgp_ip|split('/')|first }}
   bgp ebgp-requires-policy
+  bgp log-neighbor-changes
   ! Enable ECMP on multiple eBGP paths
   bgp bestpath as-path multipath-relax
   ! Don't install more than 2 paths for ECMP
@@ -40,6 +41,7 @@ router bgp {{ sonic_asn }}
   neighbor PEERS advertisement-interval 5
   neighbor PEERS bfd
   neighbor PEERS capability extended-nexthop
+  neighbor PEERS ebgp-multihop 255
 
   address-family ipv4 unicast
     neighbor PEERS activate
@@ -57,6 +59,7 @@ router bgp {{ sonic_asn }}
     neighbor PEERS activate
     neighbor PEERS route-map PERMIT in
     neighbor PEERS route-map PERMIT out
+    neighbor PEERS attribute-unchanged next-hop
     advertise-all-vni
     advertise-svi-ip
   !

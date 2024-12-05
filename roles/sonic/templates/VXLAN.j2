@@ -33,7 +33,7 @@
   ,
   "VXLAN_TUNNEL": {
     "vtep": {
-      "src_ip": "{{ sonic_bgp_ip|split('/')|first }}"
+      "src_ip": "{{ sonic_vtep_src|default(sonic_bgp_ip)|split('/')|first }}"
     }
   }
 {% endif %}

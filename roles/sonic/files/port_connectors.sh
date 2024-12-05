@@ -29,7 +29,7 @@ while read line ; do
   if [ "$key" == "Connector" ] ; then
     conn="$val"
   fi
-done < <(sfputil show eeprom | grep -e '^Ethernet' -e '^ *Connector' | sed -e 's/^ *//g')
+done < <(sfpshow eeprom | grep -e '^Ethernet' -e '^ *Connector' | sed -e 's/^ *//g')
 
 output_eth
 
