@@ -135,7 +135,6 @@
       - '^BGP_PEER_RANGE$'
       - '^BGP_GLOBALS_AF_NETWORK$'
       - '^BGP_NEIGHBOR_AF$'
-      - '^BGP_DEVICE_GLOBAL$'
       - '^BGP_PEER_GROUP$'
       - '^BGP_PEER_GROUP_AF$'
       - '^BGP_GLOBALS$'

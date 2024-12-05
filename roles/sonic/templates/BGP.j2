@@ -35,34 +35,20 @@
     },
     "BGP_PEER_GROUP_AF": {
         "default|PEERS|ipv4_unicast": {
-            "admin_status": "true",
-            "route_map_in": [
-                "ALLOW"
-            ],
-            "route_map_out": [
-                "ALLOW"
-            ]
+            "admin_status": "up",
+            "route_map_in": [ "ALLOW" ],
+            "route_map_out": [ "ALLOW" ]
         },
         "default|PEERS|ipv6_unicast": {
-            "admin_status": "true",
-            "route_map_in": [
-                "ALLOW"
-            ],
-            "route_map_out": [
-                "ALLOW"
-            ]
+            "admin_status": "up",
+            "route_map_in": [ "ALLOW" ],
+            "route_map_out": [ "ALLOW" ]
         },
         "default|PEERS|l2vpn_evpn": {
-            "admin_status": "true",
-            "route_map_in": [
-                "ALLOW"
-            ],
-            "route_map_out": [
-                "ALLOW"
-            ],
-            "unchanged_nexthop": "true",
-            "advertise-all-vni": "true",
-            "advertise-svi-ip": "true"
+            "admin_status": "up",
+            "route_map_in": [ "ALLOW" ],
+            "route_map_out": [ "ALLOW" ],
+            "unchanged_nexthop": "true"
         }
     },
 
@@ -104,6 +90,9 @@
         }
 {%     endfor %}
 {%   endif %}
+    },
+    "ROUTE_MAP_SET": {
+        "name": "ALLOW"
     },
     "ROUTE_MAP": {
         "ALLOW|1": {
