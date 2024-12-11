@@ -16,8 +16,10 @@ default_storage_engine         = innodb
 binlog_format                  = ROW
 binlog_row_event_max_size      = 2M
 binlog_cache_size              = 2M
+binlog_annotate_row_events     = OFF
+log_bin_compress               = ON
 # Expire off bin logs we no longer need for slaves
-expire_logs_days               = 7
+expire_logs_days               = 3
 
 innodb_adaptive_hash_index_parts = 8
 innodb_buffer_pool_instances   = 16
