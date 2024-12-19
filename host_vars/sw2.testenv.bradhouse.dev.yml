@@ -47,9 +47,9 @@ sonic_portchannel:
       - vlan: 2
         mode: "untagged"
 
-#sonic_routes:
-#  - prefix: "0.0.0.0/0"
-#    nexthop: "10.1.1.1/24"
+sonic_routes:
+  - prefix: "8.8.4.4/32"
+    nexthop: "10.1.1.1"
 
 # Experimental
 sonic_bgp_external: false

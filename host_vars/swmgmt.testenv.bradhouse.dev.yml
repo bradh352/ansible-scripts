@@ -1,7 +1,7 @@
 ---
 # Basic switch, not participating in VXLAN
-# sonic_bgp_ip: "172.16.0.0/32"
-# sonic_asn: "4210000000"
+sonic_bgp_ip: "172.16.0.0/32"
+sonic_asn: "4210000000"
 
 sonic_interfaces:
   "1": 
@@ -214,7 +214,7 @@ sonic_vlans:
 
 sonic_routes:
   - prefix: "0.0.0.0/0"
-    nexthop: "192.168.1.1/24"
+    nexthop: "192.168.1.1"
 
 # Experimental
 sonic_bgp_external: false

@@ -200,7 +200,9 @@
 - name: Find trident3 broadcom configuration
   find:
     paths: /usr/share/sonic/device/{{ platform }}/{{ hwsku }}/
-    patterns: 'td3-*.bcm'
+    patterns:
+      - 'td3-*.bcm'
+      - 'hx5-*.bcm'
   register: td3bcm
   changed_when: false
   failed_when: false
