@@ -2,6 +2,14 @@
 sonic_bgp_ip: "172.16.0.1/32"
 sonic_asn: "4210000001"
 sonic_interfaces:
+  "1":
+    description: "PortChannel1 mgmt"
+  "2":
+    description: "PortChannel1 mgmt"
+  "3":
+    description: "PortChannel2 loop"
+  "4":
+    description: "PortChannel2 loop"
   "11":
     description: "bootstrap"
     autoneg: "off"
@@ -25,9 +33,31 @@ sonic_interfaces:
 sonic_vlans:
   "2":
     vxlan: "10002"
-    ips: [ "10.0.0.71/24" ]
-    layer3: true
+#    mtu: 1500
+#    ips: [ "10.0.0.71/24" ]
+#    layer3: true
+
+sonic_portchannel:
+  "1":
+    description: "management interface"
+    interfaces:
+      - "1"
+      - "2"
     mtu: 1500
+    layer3: true
+    ips: [ "10.0.0.11/24" ]
+  "2":
+    description: "redundant access port for management interface loop"
+    interfaces:
+      - "3"
+      - "4"
+    vlans:
+      - vlan: 2
+        mode: "untagged"
+
+#sonic_routes:
+#  - prefix: "8.8.4.4/32"
+#    nexthop: "10.1.1.1/24"
 
 # Experimental
 sonic_bgp_external: false

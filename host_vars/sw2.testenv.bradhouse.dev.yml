@@ -25,9 +25,31 @@ sonic_interfaces:
 sonic_vlans:
   "2":
     vxlan: "10002"
-    ips: [ "10.0.0.72/24" ]
-    layer3: true
+#    ips: [ "10.0.0.72/24" ]
+#    layer3: true
+#    mtu: 1500
+
+sonic_portchannel:
+  "1":
+    description: "management interface"
+    interfaces:
+      - "1"
+      - "2"
     mtu: 1500
+    layer3: true
+    ips: [ "10.0.0.12/24" ]
+  "2":
+    description: "redundant access port for management interface loop"
+    interfaces:
+      - "3"
+      - "4"
+    vlans:
+      - vlan: 2
+        mode: "untagged"
+
+#sonic_routes:
+#  - prefix: "0.0.0.0/0"
+#    nexthop: "10.1.1.1/24"
 
 # Experimental
 sonic_bgp_external: false

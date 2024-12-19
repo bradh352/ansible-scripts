@@ -51,9 +51,8 @@ The latest downloads are made available here (the prior link does list some
 downloads but may not be the best option):
 https://sonic.software/
 
-***NOTE***: I ended up having to pull in some patches to get VXLAN fully
-functional in 202405 and build my own release.  I will probably post that.
-See [Issues](#issues).
+***NOTE***: Stock SONiC has bugs.  I'm currently maintaining a fork with
+some backports [here](https://github.com/bradh352/sonic-buildimage)
 
 Features currently supported by this role are:
  * BGP unnumbered
@@ -63,7 +62,7 @@ Features currently supported by this role are:
  * Static Routes
 
 ***Not*** currently supported (but will likely be in the future):
- * PortChannel (LACP) - including MLAG/MCLAG
+ * MLAG/MCLAG
  * Port Break-out
  * Configuring auxiliary services (e.g. NTP, SNMP, Syslog)
  * Configuring Authentication
@@ -95,8 +94,9 @@ it is yet capable of supporting BGP Unnumbered with VXLAN EVPN support.
 This has been tested on [Dell S5248F](https://www.dell.com/en-us/shop/ipovw/networking-s-series-25-100gbe)
 and [Dell N3248TE](https://www.dell.com/en-us/shop/ipovw/networking-n3200-series)
 switches, bought off ebay (~$1100USD and ~$700USD respectively) and loaded with
-the official SONiC image listed above (not Dell's Enterprise SONiC).  These
-switches both use the Broadcom Trident 3 switch ASIC.
+the SONiC image fork I'm maintaining.  I'd imagine Dell's Enterprise SONiC is
+a better offering than the community one at this time.  These switches both use
+the Broadcom Trident 3 switch ASIC.
 
 Stay away from Broadcom's Tomahawk line as it is designed for performance and
 not features, so things you'd expect with SONiC (like VXLAN) won't work. Trident2
@@ -122,9 +122,6 @@ config if still confused.
 * `sonic_interfaces`: Dictionary of the interface configurations.  The key
   is the interface index (as enumerated on the front panel of the switch).  The
   value is also a dictionary with these keys:
-  * `layer3`: `true`/`false`. Whether this interface will be used as a layer3
-    interface.  This enables IPv6 link-local address support and also activates
-    BGP on the interface. Default is `false`.
   * `admin_status`: `up`/`down`. Whether the interface is administratively
     enabled.  Default is `up` if the interface is defined in this dictionary,
     otherwise `down`.
@@ -139,15 +136,18 @@ config if still confused.
     Example: `25000` (25G)
   * `description`: User-provided description of the interface for convenience.
     Typically describes what is plugged into the port.  Default is "".
-  * `mtu`: The MTU of the interface. If not provided, defaults to `9216` on
-    routed ports (typically used as underlay), and `9100` on trunk and access
-    ports.
   * `fec`: Forward error correction.  `rs`,`fc`,`auto`,`none`. Defaults to
     `none` if port speed is less than 25000 or autonegotiation is on otherwise
     `rs`.
+  * `layer3`: `true`/`false`. Whether this interface will be used as a layer3
+    interface.  This enables IPv6 link-local address support and also activates
+    BGP on the interface. Default is `false`.
   * `mac_addr`: MAC address of the interface.  Only relevant for routed
     interfaces (e.g. those with `ips` or `layer3` set).  If not specified, will
     generate a random mac for the interface.
+  * `mtu`: The MTU of the interface. If not provided, defaults to `9216` on
+    routed ports (typically used as underlay), and `9100` on trunk and access
+    ports.
   * `ips`: Array of ipv4 and/or ipv6 addresses with subnet mask to assign to the
     interface.  Cannot be used with `vlans` (you should probably create a vlan
     with an ip address list instead). Example:
@@ -173,6 +173,20 @@ config if still confused.
      layer3 or has ips), and `9100` for non-routed.  Remember when using VXLANs
      there is a 50 byte overhead so make sure the interface MTU is greater than
      this value.
+* `sonic_portchannel`: Dictionary of the portchannel configurations.  The key
+  is the portchannel id.  This is a number between 1 and 9999.  The value is
+  also a dictionary with these keys (most are duplicative from
+  `sonic_interfaces`):
+  * `interfaces`: Array of interface indexes (as enumerated on the front panel
+    of the switch, same as `sonic_interfaces` members).  Any specified interface
+    must not have `layer3`, `vlans`, `macaddr`, or `ips` set.
+  * `description`: see definition in `sonc_interfaces`.
+  * `layer3`: see definition in `sonc_interfaces`.
+  * `mtu`: see definition in `sonc_interfaces`.
+  * `admin_status`: see definition in `sonic_interfaces`.
+  * `mac_addr`: see definition in `sonic_interfaces`.
+  * `ips`: see definition in `sonic_interfaces`.
+  * `vlans`: see definition in `sonic_interfaces`.
 * `sonic_routes`: Array of dictionaries used to configure static routes.  The
   keys for the dictionary are:
   * `prefix`: IPv4 or IPv6 prefix, Example: `192.168.1.0/24`.  For a default

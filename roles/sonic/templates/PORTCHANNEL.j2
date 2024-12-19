@@ -1,0 +1,83 @@
+{
+{% if sonic_portchannel|default([])|count > 0 %}
+
+  "PORTCHANNEL": {
+{%   for key, channel in sonic_portchannel.items() %}
+    "PortChannel{{ "%04d" | format(key|int) }}" : {
+{%     set mode = "access" if (channel.vlans|default([])|count == 1 and channel.vlans[0].mode|default("tagged") == "untagged") else ("trunk" if channel.vlans|default([])|count > 0 else "routed") %}
+      "admin_status": "{{ channel.admin_status|default("up") }}",
+      "min_links": "{{ channel.min_links|default("1") }}",
+      "mode": "{{ mode }}",
+{%     if channel.description is defined %}
+      "description": "{{ channel.description }}",
+{%     endif %}
+      "mtu": "{{ channel.mtu|default("9216" if mode == "routed" else "9100") }}",
+      "lacp_key": "auto"
+    }
+{%-    if not loop.last %}
+    ,
+{%     endif %}
+{%   endfor %}
+  },
+
+  "PORTCHANNEL_MEMBER": {
+{%   set ns = namespace(is_first=true,port_found=false) %}
+{%   for key, channel in sonic_portchannel.items() %}
+{%     if channel.interfaces|default([])|count == 0 %}
+{{ notdefined | mandatory(msg='sonic_portchannel index ' ~ key|string ~ ' missing interfaces') }}
+{%     endif %}
+{%     for interface in channel.interfaces %}
+{%       if sonic_interfaces[interface] is defined and (sonic_interfaces[interface].layer3|default(false) or sonic_interfaces[interface].ips|default([])|count > 0 or sonic_interfaces[interface].ips|default([])|count > 0) %}
+{{ notdefined | mandatory(msg='sonic_portchannel index ' ~ key|string ~ ' member interface ' ~ interface ~ 'cannot be assigned layer3, ips, or vlans') }}
+{%       endif %}
+{%-      if not ns.is_first %}
+      ,
+{%       endif %}
+{%       set ns.is_first=false %}
+{%       set ns.port_found=false %}
+{%       for port in ports %}
+{%         if port.index|int == interface|int %}
+{%           set ns.port_found=true %}
+    "PortChannel{{ "%04d" | format(key|int) }}|{{ port.port }}": {}
+{%         endif %}
+{%       endfor %}
+{%       if not ns.port_found %}
+{{ notdefined | mandatory(msg='sonic_portchannel index ' ~ key|string ~ ' interface ' ~ interface|string ~ ' not found') }}
+{%       endif %}
+{%     endfor %}
+{%   endfor %}
+  }
+
+{%   set ns = namespace(iface_exists=false) %}
+{%   for key, channel in sonic_portchannel.items() %}
+{%     if channel.layer3|default(false) or (channel.ips is defined and channel.ips | count > 0) %}
+{%       set ns.iface_exists=true %}
+{%     endif %}
+{%   endfor %}
+{%   if ns.iface_exists %}
+  ,
+  "PORTCHANNEL_INTERFACE": {
+{%     set ns = namespace(has_iface=false) %}
+{%     for key, channel in sonic_portchannel.items() %}
+{%       if channel.layer3|default(false) or (channel.ips is defined and channel.ips | count > 0) %}
+{%-        if ns.has_iface %}
+,
+{%         endif %}
+{%         set ns.has_iface = true %}
+    "PortChannel{{ "%04d" | format(key|int) }}": {
+      "mac_addr": "{{ channel.mac_addr|default('02' | community.general.random_mac(seed=inventory_hostname ~ "_PortChannel" ~ key|string)) }}",
+      "ipv6_use_link_local_only": "{{ 'enable' if channel.layer3|default(false) else 'disable' }}"
+    }
+{%       endif %}
+
+{%       if channel.ips is defined and channel.ips | count > 0 %}
+{%         for ip in channel.ips %}
+    , "PortChannel{{ "%04d" | format(key|int) }}|{{ ip }}": {}
+{%         endfor %}
+{%       endif %}
+{%     endfor %}
+  }
+{%   endif %}
+{% endif %}
+}
+

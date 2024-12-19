@@ -1,12 +1,19 @@
 {
-  "INTERFACE": {
-{% set ns = namespace(has_iface=false) %}
+{% set ns = namespace(iface_exists=false) %}
 {% for port in ports %}
 {%   if sonic_interfaces[port.index].layer3|default(false) or (sonic_interfaces[port.index].ips is defined and sonic_interfaces[port.index].ips | count > 0) %}
-{%-    if ns.has_iface %}
+{%     set ns.iface_exists=true %}
+{%   endif %}
+{% endfor %}
+{% if ns.iface_exists %}
+  "INTERFACE": {
+{%   set ns = namespace(has_iface=false) %}
+{%   for port in ports %}
+{%     if sonic_interfaces[port.index].layer3|default(false) or (sonic_interfaces[port.index].ips is defined and sonic_interfaces[port.index].ips | count > 0) %}
+{%-      if ns.has_iface %}
 ,
-{%     endif %}
-{%     set ns.has_iface = true %}
+{%       endif %}
+{%       set ns.has_iface = true %}
   "{{ port.port }}": {
 {# Need a unique mac address per routed interface, otherwise all interfaces use #}
 {# the system MAC, so if dual connected to the same system, this will cause #}
@@ -14,13 +21,14 @@
       "mac_addr": "{{ sonic_interfaces[port.index].mac_addr|default('02' | community.general.random_mac(seed=inventory_hostname ~ "_" ~ port.index|string)) }}",
       "ipv6_use_link_local_only": "{{ 'enable' if sonic_interfaces[port.index].layer3|default(false) else 'disable' }}"
     }
-{%   endif %}
+{%     endif %}
 
-{%   if sonic_interfaces[port.index].ips is defined and sonic_interfaces[port.index].ips | count > 0 %}
-{%     for ip in sonic_interfaces[port.index].ips %}
+{%     if sonic_interfaces[port.index].ips is defined and sonic_interfaces[port.index].ips | count > 0 %}
+{%       for ip in sonic_interfaces[port.index].ips %}
     ,"{{ port.port }}|{{ ip }}": {}
-{%     endfor %}
-{%   endif %}
-{% endfor %}
+{%       endfor %}
+{%     endif %}
+{%   endfor %}
   }
+{% endif %}
 }

@@ -108,6 +108,20 @@
 {%       endfor %}
 {%     endfor %}
 {%   endfor %}
+
+{%   if sonic_portchannel is defined %}
+{%     for key, channel in sonic_portchannel.items() %}
+{%       for vlan in channel.vlans|default([]) %}
+{%-        if ns.has_vlan_mem %}
+,
+{%         endif %}
+{%         set ns.has_vlan_mem = true %}
+    "Vlan{{ vlan.vlan }}|PortChannel{{ "%04d" | format(key|int) }}": {
+      "tagging_mode": "{{ vlan.mode|default("tagged") }}"
+    }
+{%       endfor %}
+{%     endfor %}
+{%   endif %}
   }
 {% endif %}
 }

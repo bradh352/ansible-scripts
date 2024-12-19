@@ -37,7 +37,7 @@
       "adv_speeds": "{{ sonic_interfaces[port.index].adv_speeds }}",
 {%   endif %}
       "admin_status": "{{ sonic_interfaces[port.index].admin_status|default("up" if sonic_interfaces[port.index] is defined else "down") }}",
-      "fec": "{{ sonic_interfaces[port.index].fec|default('none' if (speed <= 10000 and autoneg == "off") or port_connectors[port.port]|default("") == "RJ45" or sonic_interfaces[port.index].admin_status|default("down") == "down" else 'rs') }}",
+      "fec": "{{ sonic_interfaces[port.index].fec|default('none' if sonic_interfaces[port.index] is not defined or (speed <= 10000 and autoneg == "off") or port_connectors[port.port]|default("") == "RJ45" or sonic_interfaces[port.index].admin_status|default("up") == "down" else 'rs') }}",
       "alias": "{{ port.alias }}",
       "index": "{{ port.index }}",
       "lanes": "{{ port.lanes }}"

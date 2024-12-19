@@ -88,6 +88,14 @@
   set_fact:
     interface: "{{ interface_json|from_yaml }}"
 
+- name: "Generate config: PORTCHANNEL"
+  set_fact:
+    portchannel_json: "{{ lookup('template', 'PORTCHANNEL.j2') }}"
+
+- name: "Parse config: PORTCHANNEL"
+  set_fact:
+    portchannel: "{{ portchannel_json|from_yaml }}"
+
 - name: "Generate config: LOOPBACK"
   set_fact:
     loopback_json: "{{ lookup('template', 'LOOPBACK.j2') }}"
@@ -146,8 +154,12 @@
       - '^VLAN$'
       - '^VLAN_MEMBER$'
       - '^VLAN_INTERFACE$'
+      - '^VRF$'
       - '^VXLAN_TUNNEL_MAP$'
       - '^STATIC_ROUTE$'
+      - '^PORTCHANNEL$'
+      - '^PORTCHANNEL_MEMBER$'
+      - '^PORTCHANNEL_INTERFACE$'
 
 # NOTE we have to remove the STATIC_ROUTE table as it says it won't allow an empty table.
 - name: Merge final config
@@ -157,6 +169,7 @@
           | ansible.utils.remove_keys(target=remove_keys, matching_parameter='regex')
           | combine(port, list_merge='replace')
           | combine(interface, list_merge='replace')
+          | combine(portchannel, list_merge='replace')
           | combine(loopback, list_merge='replace')
           | combine(vxlan, list_merge='replace')
           | combine(bgp, list_merge='replace')

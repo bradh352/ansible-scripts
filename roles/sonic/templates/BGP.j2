@@ -1,5 +1,8 @@
 {
-{% if not sonic_bgp_external|default(true) %}
+{% if (sonic_asn is defined and sonic_bgp_ip is not defined) or (sonic_asn is not defined and sonic_bgp_ip is defined) %}
+{{ notdefined | mandatory(msg='if sonic_asn or sonic_bgp_ip are defined, both must be.') }}
+{% endif %}
+{% if not sonic_bgp_external|default(true) and sonic_asn is defined %}
     "BGP_GLOBALS": {
         "default": {
             "local_asn": "{{ sonic_asn }}",
@@ -16,8 +19,7 @@
             "max_ebgp_paths": "2"
         },
         "default|l2vpn_evpn": {
-            "advertise-all-vni": "true",
-            "advertise-svi-ip": "true"
+            "advertise-all-vni": "true"
         }
     },
     "BGP_PEER_GROUP": {
@@ -52,35 +54,43 @@
         }
     },
 
+{%   set ns = namespace(has_dynamic_neighbor=false) %}
+{%   for port in ports %}
+{%     if sonic_interfaces[port.index].layer3|default(false) %}
+{%       set ns.has_dynamic_neighbor=true %}
+{%     endif %}
+{%   endfor %}
+
+{%   if ns.has_dynamic_neighbor or sonic_bgp_peers|default([])|count > 0 %}
     "BGP_NEIGHBOR": {
 {# ======== BGP Unnumbered ========= #}
-{%   if sonic_bgp_peers|default([])|count == 0 %}
-{%     set ns = namespace(has_neighbor=false) %}
-{%     for port in ports %}
-{%       if sonic_interfaces[port.index].layer3|default(false) %}
-{%-         if ns.has_neighbor %}
+{%     if sonic_bgp_peers|default([])|count == 0 %}
+{%       set ns = namespace(has_neighbor=false) %}
+{%       for port in ports %}
+{%         if sonic_interfaces[port.index].layer3|default(false) %}
+{%-           if ns.has_neighbor %}
         ,
-{%          endif %}
-{%          set ns.has_neighbor=true %}
+{%            endif %}
+{%            set ns.has_neighbor=true %}
         "default|{{ port.port }}": {
             "peer_group_name": "PEERS"
         }
-{%       endif %}
-{%     endfor %}
-{%   else %}
+{%         endif %}
+{%       endfor %}
+{%     else %}
 {# ======== Manually specified BGP peers ====== #}
-{%     for bgpneigh in sonic_bgp_peers %}
-{%-      if not loop.first %}
+{%       for bgpneigh in sonic_bgp_peers %}
+{%-        if not loop.first %}
           ,
-{%       endif %}
+{%         endif %}
         "default|{{ bgpneigh.ip }}": {
             "asn": "{{ bgpneigh.asn }}",
             "peer_group_name": "PEERS",
             "local_addr": "{{ bgpneigh.src_ip|split('/')|first }}",
             "name": "{{ bgpneigh.name }}"
         }
-{%     endfor %}
-{%-    for bgpneigh in sonic_vtep_peers %}
+{%       endfor %}
+{%-      for bgpneigh in sonic_vtep_peers %}
         ,
         "default|{{ bgpneigh.ip }}": {
             "asn": "{{ bgpneigh.asn }}",
@@ -88,9 +98,10 @@
             "local_addr": "{{ sonic_vtep_src|split('/')|first }}",
             "name": "{{ bgpneigh.name }}"
         }
-{%     endfor %}
-{%   endif %}
+{%       endfor %}
+{%     endif %}
     },
+{%   endif %}
     "ROUTE_MAP_SET": {
         "ALLOW": {}
     },

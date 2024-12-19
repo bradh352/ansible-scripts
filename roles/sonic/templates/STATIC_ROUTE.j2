@@ -2,14 +2,18 @@
 {% if sonic_routes is defined and sonic_routes|count > 0 %}
   "STATIC_ROUTE": {
 {%   for route in sonic_routes %}
+{%     if (route.ifname is defined and route.nexthop is defined) or (route.ifname is not defined and route.nexthop is not defined) %}
+       {{ notdefined | mandatory(msg='route ifname or nexthop must be defined and not both') }}
+{%     endif %}
     "default|{{ route.prefix }}": {
-      "blackhole": "false",
-      "distance": "0",
-      "ifname": "{{ route.ifname|default("") }}",
-      "nexthop": "{{ route.nexthop|default("") }}",
-      "nexthop-vrf": ""
+      {% if route.ifname is defined %}
+      "ifname": "{{ route.ifname }}",
+      {% endif %}
+      {% if route.nexthop is defined %}
+      "nexthop": "{{ route.nexthop }}"
+      {% endif %}
     }
-{%-     if loop.last %}
+{%-     if not loop.last %}
 ,
 {%      endif %}
 {%   endfor %}
