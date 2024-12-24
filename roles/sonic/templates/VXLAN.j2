@@ -69,6 +69,7 @@
 {%       endif %}
 {%       set ns.has_vxlan_iface = true %}
     "Vlan{{ key }}": {
+      "mac_addr": "{{ channel.mac_addr|default('02' | community.general.random_mac(seed=inventory_hostname ~ "_Vlan" ~ key|string)) }}",
       "ipv6_use_link_local_only": "{{ "enable" if vlan.layer3|default(false) else "disable" }}"
     }
 {%     endif %}

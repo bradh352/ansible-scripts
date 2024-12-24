@@ -2,6 +2,14 @@
 sonic_bgp_ip: "172.16.0.2/32"
 sonic_asn: "4210000002"
 sonic_interfaces:
+  "1":
+    description: "PortChannel1 mgmt"
+  "2":
+    description: "PortChannel1 mgmt"
+  "3":
+    description: "PortChannel2 loop"
+  "4":
+    description: "PortChannel2 loop"
   "11":
     description: "bootstrap"
     autoneg: "off"

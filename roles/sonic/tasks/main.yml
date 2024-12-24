@@ -141,25 +141,27 @@
     remove_keys:
       - '^BGP_NEIGHBOR$'
       - '^BGP_PEER_RANGE$'
+      - '^BGP_GLOBALS$'
+      - '^BGP_GLOBALS_AF$'
       - '^BGP_GLOBALS_AF_NETWORK$'
+      - '^BGP_GLOBALS_EVPN_VNI$'
       - '^BGP_NEIGHBOR_AF$'
       - '^BGP_PEER_GROUP$'
       - '^BGP_PEER_GROUP_AF$'
-      - '^BGP_GLOBALS$'
-      - '^BGP_GLOBALS_AF$'
-      - '^BGP_GLOBALS_EVPN_VNI$'
       - '^DEVICE_NEIGHBOR$'
+      - '^INTERFACE$'
+      - '^LOOPBACK_INTERFACE$'
+      - '^PORTCHANNEL$'
+      - '^PORTCHANNEL_MEMBER$'
+      - '^PORTCHANNEL_INTERFACE$'
       - '^ROUTE_MAP$'
       - '^ROUTE_REDISTRIBUTE$'
+      - '^STATIC_ROUTE$'
       - '^VLAN$'
       - '^VLAN_MEMBER$'
       - '^VLAN_INTERFACE$'
       - '^VRF$'
       - '^VXLAN_TUNNEL_MAP$'
-      - '^STATIC_ROUTE$'
-      - '^PORTCHANNEL$'
-      - '^PORTCHANNEL_MEMBER$'
-      - '^PORTCHANNEL_INTERFACE$'
 
 # NOTE we have to remove the STATIC_ROUTE table as it says it won't allow an empty table.
 - name: Merge final config
@@ -202,7 +204,6 @@
     paths: /usr/share/sonic/device/{{ platform }}/{{ hwsku }}/
     patterns:
       - 'td3-*.bcm'
-      - 'hx5-*.bcm'
   register: td3bcm
   changed_when: false
   failed_when: false

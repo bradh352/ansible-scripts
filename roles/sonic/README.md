@@ -180,9 +180,9 @@ config if still confused.
   * `interfaces`: Array of interface indexes (as enumerated on the front panel
     of the switch, same as `sonic_interfaces` members).  Any specified interface
     must not have `layer3`, `vlans`, `macaddr`, or `ips` set.
-  * `description`: see definition in `sonc_interfaces`.
-  * `layer3`: see definition in `sonc_interfaces`.
-  * `mtu`: see definition in `sonc_interfaces`.
+  * `description`: see definition in `sonic_interfaces`.
+  * `layer3`: see definition in `sonic_interfaces`.
+  * `mtu`: see definition in `sonic_interfaces`.
   * `admin_status`: see definition in `sonic_interfaces`.
   * `mac_addr`: see definition in `sonic_interfaces`.
   * `ips`: see definition in `sonic_interfaces`.

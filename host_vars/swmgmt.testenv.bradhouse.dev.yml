@@ -1,7 +1,7 @@
 ---
 # Basic switch, not participating in VXLAN
-sonic_bgp_ip: "172.16.0.0/32"
-sonic_asn: "4210000000"
+# sonic_bgp_ip: "172.16.0.0/32"
+# sonic_asn: "4210000000"
 
 sonic_interfaces:
   "1": 
@@ -210,7 +210,7 @@ sonic_vlans:
   "2":
     ips: [ "192.168.1.55/24" ]
     mtu: 1500
-    layer3: true
+    layer3: false
 
 sonic_routes:
   - prefix: "0.0.0.0/0"
