@@ -1,8 +1,8 @@
 {
+{% if sonic_vxlan_vtep_ip is defined %}
   "LOOPBACK_INTERFACE": {
     "Loopback0": {},
-{% if sonic_bgp_ip is defined %}
-    "Loopback0|{{ sonic_vtep_src|default(sonic_bgp_ip) }}": {},
-{% endif %}
+    "Loopback0|{{ sonic_vxlan_vtep_ip }}": {},
   }
+{% endif %}
 }

@@ -114,9 +114,10 @@ of `sonic_interfaces` takes an array.  Design decisions were made for ease of
 processing the variables based on how SONiC is configured. See the example
 config if still confused.
 
-* `sonic_bgp_ip`: IPv4 Address with subnet mask to use for running BGP.  This
-  will set up a Loopback Interface with the address and also be configured as
-  the router id and VXLAN vtep source IP address.  Example: `10.1.0.1/32`
+* `sonic_vxlan_vtep_ip`: IPv4 Address with subnet mask to use for running BGP
+  for the VXLAN VTEP.  This will set up a Loopback Interface with the address
+  and also be configured as the router id and VXLAN vtep source IP address.
+  Example: `10.1.0.1/32`
 * `sonic_asn`: Autonomous system number to use.  Should be unique per host and
   should be allocated in the private use range. Example: `4210000001`
 * `sonic_interfaces`: Dictionary of the interface configurations.  The key
@@ -142,6 +143,7 @@ config if still confused.
   * `layer3`: `true`/`false`. Whether this interface will be used as a layer3
     interface.  This enables IPv6 link-local address support and also activates
     BGP on the interface. Default is `false`.
+  * `vrf`: Name of the VRF to assign the interface to. Always starts with `Vrf`.
   * `mac_addr`: MAC address of the interface.  Only relevant for routed
     interfaces (e.g. those with `ips` or `layer3` set).  If not specified, will
     generate a random mac for the interface.
@@ -173,6 +175,7 @@ config if still confused.
      layer3 or has ips), and `9100` for non-routed.  Remember when using VXLANs
      there is a 50 byte overhead so make sure the interface MTU is greater than
      this value.
+  * `vrf`: Name of the VRF to assign the interface to. Always starts with `Vrf`.
 * `sonic_portchannel`: Dictionary of the portchannel configurations.  The key
   is the portchannel id.  This is a number between 1 and 9999.  The value is
   also a dictionary with these keys (most are duplicative from
@@ -187,6 +190,7 @@ config if still confused.
   * `mac_addr`: see definition in `sonic_interfaces`.
   * `ips`: see definition in `sonic_interfaces`.
   * `vlans`: see definition in `sonic_interfaces`.
+  * `vrf`: see definition in `sonic_interfaces`.
 * `sonic_routes`: Array of dictionaries used to configure static routes.  The
   keys for the dictionary are:
   * `prefix`: IPv4 or IPv6 prefix, Example: `192.168.1.0/24`.  For a default

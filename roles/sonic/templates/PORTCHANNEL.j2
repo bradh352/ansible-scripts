@@ -65,6 +65,9 @@
 {%         endif %}
 {%         set ns.has_iface = true %}
     "PortChannel{{ "%04d" | format(key|int) }}": {
+{%         if channel.vrf is defined %}
+      "vrf_name": "{{ channel.vrf }}",
+{%         endif %}
       "mac_addr": "{{ channel.mac_addr|default('02' | community.general.random_mac(seed=inventory_hostname ~ "_PortChannel" ~ key|string)) }}",
       "ipv6_use_link_local_only": "{{ 'enable' if channel.layer3|default(false) else 'disable' }}"
     }

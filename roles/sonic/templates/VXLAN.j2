@@ -23,7 +23,7 @@
   }
 {% endif %}
 
-{%- if sonic_bgp_ip is defined %}
+{%- if sonic_vxlan_vtep_ip is defined %}
   ,
   "VXLAN_EVPN_NVO": {
     "nvo": {
@@ -33,7 +33,7 @@
   ,
   "VXLAN_TUNNEL": {
     "vtep": {
-      "src_ip": "{{ sonic_vtep_src|default(sonic_bgp_ip)|split('/')|first }}"
+      "src_ip": "{{ sonic_vxlan_vtep_ip|split('/')|first }}"
     }
   }
 {% endif %}
@@ -69,7 +69,10 @@
 {%       endif %}
 {%       set ns.has_vxlan_iface = true %}
     "Vlan{{ key }}": {
-      "mac_addr": "{{ channel.mac_addr|default('02' | community.general.random_mac(seed=inventory_hostname ~ "_Vlan" ~ key|string)) }}",
+{%       if vlan.vrf is defined %}
+      "vrf_name": "{{ vlan.vrf }}",
+{%       endif %}
+      "mac_addr": "{{ vlan.mac_addr|default('02' | community.general.random_mac(seed=inventory_hostname ~ "_Vlan" ~ key|string)) }}",
       "ipv6_use_link_local_only": "{{ "enable" if vlan.layer3|default(false) else "disable" }}"
     }
 {%     endif %}

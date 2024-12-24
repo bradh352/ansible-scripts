@@ -1,13 +1,13 @@
 {
-{% if (sonic_asn is defined and sonic_bgp_ip is not defined) or (sonic_asn is not defined and sonic_bgp_ip is defined) %}
-{{ notdefined | mandatory(msg='if sonic_asn or sonic_bgp_ip are defined, both must be.') }}
+{% if (sonic_asn is defined and sonic_vxlan_vtep_ip is not defined) or (sonic_asn is not defined and sonic_vxlan_vtep_ip is defined) %}
+{{ notdefined | mandatory(msg='if sonic_asn or sonic_vxlan_vtep_ip are defined, both must be.') }}
 {% endif %}
 {% if not sonic_bgp_external|default(true) and sonic_asn is defined %}
     "BGP_GLOBALS": {
         "default": {
             "local_asn": "{{ sonic_asn }}",
             "log_nbr_state_changes": "true",
-            "router_id": "{{ sonic_bgp_ip|split('/')|first }}",
+            "router_id": "{{ sonic_vxlan_vtep_ip|split('/')|first }}",
             "load_balance_mp_relax": "true"
         }
     },
@@ -24,9 +24,7 @@
     },
     "BGP_PEER_GROUP": {
         "default|PEERS": {
-{%   if sonic_bgp_peers|default([])|count == 0 %}
             "peer_type": "external",
-{%   endif %}
             "keepalive": "3",
             "holdtime": "9",
             "min_adv_interval": "5",
@@ -60,7 +58,7 @@
 {%     endif %}
 {%   endfor %}
 
-{%   if ns.has_dynamic_neighbor or sonic_bgp_peers|default([])|count > 0 %}
+{%   if ns.has_dynamic_neighbor %}
     "BGP_NEIGHBOR": {
 {# ======== BGP Unnumbered ========= #}
 {%     if sonic_bgp_peers|default([])|count == 0 %}
@@ -75,28 +73,6 @@
             "peer_group_name": "PEERS"
         }
 {%         endif %}
-{%       endfor %}
-{%     else %}
-{# ======== Manually specified BGP peers ====== #}
-{%       for bgpneigh in sonic_bgp_peers %}
-{%-        if not loop.first %}
-          ,
-{%         endif %}
-        "default|{{ bgpneigh.ip }}": {
-            "asn": "{{ bgpneigh.asn }}",
-            "peer_group_name": "PEERS",
-            "local_addr": "{{ bgpneigh.src_ip|split('/')|first }}",
-            "name": "{{ bgpneigh.name }}"
-        }
-{%       endfor %}
-{%-      for bgpneigh in sonic_vtep_peers %}
-        ,
-        "default|{{ bgpneigh.ip }}": {
-            "asn": "{{ bgpneigh.asn }}",
-            "peer_group_name": "PEERS",
-            "local_addr": "{{ sonic_vtep_src|split('/')|first }}",
-            "name": "{{ bgpneigh.name }}"
-        }
 {%       endfor %}
 {%     endif %}
     },

@@ -6,11 +6,11 @@ log syslog informational
 log facility local4
 !
 !
-{% if (sonic_asn is defined and sonic_bgp_ip is not defined) or (sonic_asn is not defined and sonic_bgp_ip is defined) %}
-{{ notdefined | mandatory(msg='if sonic_asn or sonic_bgp_ip are defined, both must be.') }}
+{% if (sonic_asn is defined and sonic_vxlan_vtep_ip is not defined) or (sonic_asn is not defined and sonic_vxlan_vtep_ip is defined) %}
+{{ notdefined | mandatory(msg='if sonic_asn or sonic_vxlan_vtep_ip are defined, both must be.') }}
 {% endif %}
 
-{% if sonic_asn is defined and sonic_bgp_ip is defined %}
+{% if sonic_asn is defined and sonic_vxlan_vtep_ip is defined %}
 !
 ! Export any IPs in Loopback0 as these are our VTEPs
 route-map EXPORT permit 1
@@ -29,7 +29,7 @@ route-map PERMIT permit 1
 !
 !
 router bgp {{ sonic_asn }}
-  bgp router-id {{ sonic_bgp_ip|split('/')|first }}
+  bgp router-id {{ sonic_vxlan_vtep_ip|split('/')|first }}
   bgp ebgp-requires-policy
   bgp log-neighbor-changes
   ! Enable ECMP on multiple eBGP paths

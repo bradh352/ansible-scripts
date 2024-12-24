@@ -15,6 +15,9 @@
 {%       endif %}
 {%       set ns.has_iface = true %}
   "{{ port.port }}": {
+{%       if sonic_interfaces[port.index].vrf is defined %}
+      "vrf_name": "{{ sonic_interfaces[port.index].vrf }}",
+{%       endif %}
 {# Need a unique mac address per routed interface, otherwise all interfaces use #}
 {# the system MAC, so if dual connected to the same system, this will cause #}
 {# collisions #}
