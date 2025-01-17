@@ -46,6 +46,12 @@ be needed if previously configured with this role.
 
 SONiC supported switches are listed here:
 https://sonic-net.github.io/SONiC/Supported-Devices-and-Platforms.html
+However not all switches on that list support all features you may expect,
+nor are necessarily stable.  For instance, Broadcom Trident3-x3 (aka Helix5)
+switches are unstable and also do not support VXLAN (even though the ASIC
+supports the feature, Broadcom has decided not to include support in their
+community SAI release).  Also Broadcom Tomahawk ASICs prior to v4 do not support
+VXLAN, and Trident 2 switches and below also do not support VXLAN.
 
 The latest downloads are made available here (the prior link does list some
 downloads but may not be the best option):
@@ -60,6 +66,7 @@ Features currently supported by this role are:
  * VLAN assignments
  * IP Address assignments
  * Static Routes
+ * PortChannel
 
 ***Not*** currently supported (but will likely be in the future):
  * MLAG/MCLAG
@@ -92,16 +99,18 @@ it is yet capable of supporting BGP Unnumbered with VXLAN EVPN support.
 ## Tested On
 
 This has been tested on [Dell S5248F](https://www.dell.com/en-us/shop/ipovw/networking-s-series-25-100gbe)
-and [Dell N3248TE](https://www.dell.com/en-us/shop/ipovw/networking-n3200-series)
-switches, bought off ebay (~$1100USD and ~$700USD respectively) and loaded with
-the SONiC image fork I'm maintaining.  I'd imagine Dell's Enterprise SONiC is
-a better offering than the community one at this time.  These switches both use
-the Broadcom Trident 3 switch ASIC.
+and [Nvidia/Mellanox SN2201](https://resources.nvidia.com/en-us-accelerated-networking-resource-library/ethernet-switches-ne).
+Attempting testing on [Dell N3248TE](https://www.dell.com/en-us/shop/ipovw/networking-n3200-series) was
+ultimately unsuccessful due to the 2 issues mentioned above with Trident3-x3 systems.
 
-Stay away from Broadcom's Tomahawk line as it is designed for performance and
-not features, so things you'd expect with SONiC (like VXLAN) won't work. Trident2
-switches also lack VXLAN support. Mellanox/Nvidia Spectrum is an excellent
-choice (though untested by me), but pricey even used.
+These switches were bought off ebay, with the 2 Dell switches being ~$1100USD
+and ~$700USD respectively.  And the Mellanox switch going for considerably more
+at ~$2000USD.  They have been and loaded with the SONiC image fork I'm
+maintaining.
+
+I'd imagine Dell's Enterprise SONiC would work as advertised on the Trident3-x3
+based switch as it is explicitly developed by Dell and Broadcom and includes
+the Enterprise SAI.
 
 ## Variables used by this role
 
@@ -149,7 +158,8 @@ config if still confused.
     generate a random mac for the interface.
   * `mtu`: The MTU of the interface. If not provided, defaults to `9216` on
     routed ports (typically used as underlay), and `9100` on trunk and access
-    ports.
+    ports.  Must not be specified under `sonic_interfaces` if the port is a
+    member of a PortChannel.
   * `ips`: Array of ipv4 and/or ipv6 addresses with subnet mask to assign to the
     interface.  Cannot be used with `vlans` (you should probably create a vlan
     with an ip address list instead). Example:
@@ -310,13 +320,11 @@ sudo reboot
 sonic-installer install https://...
 ```
 
-### Issues
-* VXLAN issues due to TTL, and invalid reported oper_status: https://github.com/sonic-net/sonic-swss/pull/3216
-* Annoying error message that doesn't seem to cause harm but hurts debugging: https://github.com/sonic-net/sonic-buildimage/issues/10004#issuecomment-1067624905
-* VXLAN tunnel support not enabled by default on Dell Switches: https://github.com/sonic-net/sonic-buildimage/issues/8371
-  * Workaround in ansible role
-  * Fixed in master as of Oct 4, 2024 (even though commit message doesn't mention it): https://github.com/sonic-net/sonic-buildimage/commit/456671cae8addd845b8d8336cfbda8809cd5c8cc
-* When building 202405 a patch is needed due to ipmitool versions not being in debian anymore.  Not needed on master and just a build-time issue. https://patch-diff.githubusercontent.com/raw/sonic-net/sonic-buildimage/pull/20791.patch
+### Issues / Fixes
+* https://github.com/sonic-net/sonic-buildimage/issues?is%3Apr+author%3Abradh352
+* https://github.com/sonic-net/sonic-swss/issues?q=is%3Apr+author%3Abradh352
+* https://github.com/sonic-net/sonic-utilities/issues?q=is%3Apr+author%3Abradh352
+* https://github.com/sonic-net/sonic-platform-daemons/issues?q=is%3Apr+author%3Abradh352
 
 ### Bootstrap / Ansible
 

@@ -3,23 +3,72 @@ sonic_vxlan_vtep_ip: "172.16.0.1/32"
 sonic_asn: "4210000001"
 sonic_interfaces:
   "1":
-    description: "PortChannel1 mgmt"
+    layer3: true
+    description: "CloudStack1 port 1"
   "2":
-    description: "PortChannel1 mgmt"
+    layer3: true
+    description: "CloudStack2 port 1"
   "3":
-    description: "PortChannel2 loop"
+    layer3: true
+    description: "CloudStack3 port 1"
   "4":
-    description: "PortChannel2 loop"
-  "11":
-    description: "bootstrap"
+    layer3: true
+    description: "CloudStack4 port 1"
+  "5":
+    layer3: true
+    description: "CloudStack5 port 1"
+  "6":
+    layer3: true
+    description: "CloudStack6 port 1"
+  "7":
+    layer3: true
+    description: "CloudStack7 port 1"
+  "8":
+    layer3: true
+    description: "CloudStack8 port 1"
+  "17":
+    description: "PortChannel1 MGMT p1"
     autoneg: "off"
     fec: "none"
     speed: "10000"
+  "18":
+    description: "PortChannel1 MGMT p2"
+    autoneg: "off"
+    fec: "none"
+    speed: "10000"
+  "19":
+    description: "PortChannel2 MGMTLoop p1"
+    autoneg: "off"
+    fec: "none"
+    speed: "10000"
+  "20":
+    description: "PortChannel2 MGMTLoop p2"
+    autoneg: "off"
+    fec: "none"
+    speed: "10000"
+  "33":
+    description: "mgmtsw port 49"
+    autoneg: "off"
+    fec: "none"
+    speed: "10000"
+  "41":
+    description: "fakeinet ge-0/8"
+    autoneg: "off"
+    fec: "none"
+    speed: "1000"
     vlans:
       - vlan: 2
         mode: "untagged"
-  "13":
-    description: "srx2"
+  "47":
+    description: "fw1 ge-0/8"
+    autoneg: "off"
+    fec: "none"
+    speed: "1000"
+    vlans:
+      - vlan: 2
+        mode: "untagged"
+  "48":
+    description: "fw2 ge-0/8"
     autoneg: "off"
     fec: "none"
     speed: "1000"
@@ -28,30 +77,32 @@ sonic_interfaces:
         mode: "untagged"
   "55":
     layer3: true
-    description: "ToRSwitch 2 port 55"
-#    vrf: "VrfUnderlay"
+    description: "torsw2 port 55"
+  "56":
+    layer3: true
+    description: "torsw2 port 56"
 
 sonic_vlans:
   "2":
     vxlan: "10002"
-#    mtu: 1500
-#    ips: [ "10.0.0.71/24" ]
-#    layer3: true
+    mtu: 1500
+    ips: [ "10.0.0.71/24" ]
+    layer3: true
 
 sonic_portchannel:
   "1":
     description: "management interface"
     interfaces:
-      - "1"
-      - "2"
+      - "17"
+      - "18"
     mtu: 1500
     layer3: true
-    ips: [ "10.0.0.11/24" ]
+    ips: [ "10.1.0.11/24" ]
   "2":
     description: "redundant access port for management interface loop"
     interfaces:
-      - "3"
-      - "4"
+      - "19"
+      - "20"
     vlans:
       - vlan: 2
         mode: "untagged"
@@ -62,13 +113,4 @@ sonic_routes:
 
 # Experimental
 sonic_bgp_external: false
-#sonic_vtep_src: "172.16.0.1/32"
-#sonic_bgp_peers:
-#  - "ip": "172.16.99.2"
-#    "src_ip": "172.16.99.1"
-#    "asn": "4210000002"
-#    "name": "underlay to ToR2"
-#sonic_vtep_peers:
-#  - "ip": "172.16.0.2"
-#    "asn": "4210000002"
-#    "name": "EVPN overlay to ToR2"
+

@@ -4,43 +4,36 @@
 # sonic_asn: "4210000000"
 
 sonic_interfaces:
-  "1": 
-    description: "Microcloud Node 1 IMPI"
+  "1":
+    description: "Uplink"
     vlans:
       - vlan: 2
         mode: "untagged"
   "2":
-    description: "Microcloud Node 2 IMPI"
     vlans:
       - vlan: 2
         mode: "untagged"
   "3":
-    description: "Microcloud Node 3 IMPI"
     vlans:
       - vlan: 2
         mode: "untagged"
   "4":
-    description: "Microcloud Node 4 IMPI"
     vlans:
       - vlan: 2
         mode: "untagged"
   "5":
-    description: "Microcloud Node 5 IMPI"
     vlans:
       - vlan: 2
         mode: "untagged"
   "6":
-    description: "Microcloud Node 6 IMPI"
     vlans:
       - vlan: 2
         mode: "untagged"
   "7":
-    description: "Microcloud Node 7 IMPI"
     vlans:
       - vlan: 2
         mode: "untagged"
   "8":
-    description: "Microcloud Node 8 IMPI"
     vlans:
       - vlan: 2
         mode: "untagged"
@@ -53,10 +46,12 @@ sonic_interfaces:
       - vlan: 2
         mode: "untagged"
   "11":
+    description: "TORSW1 MGMT"
     vlans:
       - vlan: 2
         mode: "untagged"
   "12":
+    description: "TORSW2 MGMT"
     vlans:
       - vlan: 2
         mode: "untagged"
@@ -173,35 +168,58 @@ sonic_interfaces:
       - vlan: 2
         mode: "untagged"
   "41":
+    description: "Cloudstack1 IMPI"
     vlans:
       - vlan: 2
         mode: "untagged"
   "42":
+    description: "Cloudstack2 IMPI"
     vlans:
       - vlan: 2
         mode: "untagged"
   "43":
+    description: "Cloudstack3 IMPI"
     vlans:
       - vlan: 2
         mode: "untagged"
   "44":
+    description: "Cloudstack4 IMPI"
     vlans:
       - vlan: 2
         mode: "untagged"
   "45":
+    description: "Cloudstack5 IMPI"
     vlans:
       - vlan: 2
         mode: "untagged"
   "46":
+    description: "Cloudstack6 IMPI"
     vlans:
       - vlan: 2
         mode: "untagged"
   "47":
+    description: "Cloudstack7 IMPI"
     vlans:
       - vlan: 2
         mode: "untagged"
   "48":
-    description: "uplink"
+    description: "Cloudstack8 IMPI"
+    vlans:
+      - vlan: 2
+        mode: "untagged"
+  "49":
+    description: "torsw1 port 33"
+    autoneg: "off"
+    fec: "none"
+    speed: "10000"
+    vlans:
+      - vlan: 2
+        mode: "untagged"
+  "50":
+    description: "torsw2 port 33"
+    autoneg: "off"
+    fec: "none"
+    speed: "10000"
     vlans:
       - vlan: 2
         mode: "untagged"
@@ -217,4 +235,4 @@ sonic_routes:
     nexthop: "192.168.1.1"
 
 # Experimental
-sonic_bgp_external: false
+#sonic_bgp_external: false
