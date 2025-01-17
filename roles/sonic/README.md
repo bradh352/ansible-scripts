@@ -321,7 +321,7 @@ sonic-installer install https://...
 ```
 
 ### Issues / Fixes
-* https://github.com/sonic-net/sonic-buildimage/issues?is%3Apr+author%3Abradh352
+* https://github.com/sonic-net/sonic-buildimage/issues?q=is%3Apr+author%3Abradh352
 * https://github.com/sonic-net/sonic-swss/issues?q=is%3Apr+author%3Abradh352
 * https://github.com/sonic-net/sonic-utilities/issues?q=is%3Apr+author%3Abradh352
 * https://github.com/sonic-net/sonic-platform-daemons/issues?q=is%3Apr+author%3Abradh352
