@@ -20,13 +20,23 @@
   set_fact:
     hwsku: "{{ shellcmd.stdout }}"
 
+- name: retrieve platform asic
+  shell: "show platform summary | grep 'ASIC:' | cut -d : -f 2 | sed 's/ //g'"
+  register: shellcmd
+  failed_when: shellcmd.stdout | length == 0
+  changed_when: False
+
+- name: set platform asic fact
+  set_fact:
+    asic: "{{ shellcmd.stdout }}"
+
 - name: retrieve sonic version
   shell: "show version | grep 'SONiC Software Version' | sed -E 's/.*SONiC\\.([0-9]{6})-.*/\\1/'"
   register: shellcmd
   failed_when: shellcmd.stdout | length == 0
   changed_when: False
 
-- name: set hwsku fact
+- name: set sonic version fact
   set_fact:
     sonic_version: "{{ shellcmd.stdout }}"
 
@@ -49,6 +59,16 @@
 - name: Load port connectors from JSON
   set_fact:
     port_connectors: "{{ port_connectors.stdout|from_yaml }}"
+
+- name: Try to determine port permanent mac addresses
+  script: port_perm_macaddr.sh
+  register: port_perm_macaddr
+  failed_when: port_perm_macaddr.stdout | length == 0
+  changed_when: False
+
+- name: Load port permanent mac addresses from JSON
+  set_fact:
+    port_perm_macaddr: "{{ port_perm_macaddr.stdout|from_yaml }}"
 
 - name: Make sure current running config is written to file
   shell: "config save -y"

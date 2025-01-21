@@ -72,7 +72,9 @@
 {%       if vlan.vrf is defined %}
       "vrf_name": "{{ vlan.vrf }}",
 {%       endif %}
+{%       if asic != "mellanox" %}
       "mac_addr": "{{ vlan.mac_addr|default('02' | community.general.random_mac(seed=inventory_hostname ~ "_Vlan" ~ key|string)) }}",
+{%       endif %}
       "ipv6_use_link_local_only": "{{ "enable" if vlan.layer3|default(false) else "disable" }}"
     }
 {%     endif %}

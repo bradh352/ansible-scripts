@@ -61,6 +61,7 @@ router bgp {{ sonic_asn }}
     neighbor PEERS route-map PERMIT in
     neighbor PEERS route-map PERMIT out
     neighbor PEERS attribute-unchanged next-hop
+    autort rfc8365-compatible
     advertise-all-vni
     advertise-svi-ip
   !

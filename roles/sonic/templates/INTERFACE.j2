@@ -20,8 +20,17 @@
 {%       endif %}
 {# Need a unique mac address per routed interface, otherwise all interfaces use #}
 {# the system MAC, so if dual connected to the same system, this will cause #}
-{# collisions #}
-      "mac_addr": "{{ sonic_interfaces[port.index].mac_addr|default('02' | community.general.random_mac(seed=inventory_hostname ~ "_" ~ port.index|string)) }}",
+{# collisions.  Some switches like Mellanox have something called a permanent #}
+{# address which is unique to the port and is the only one allowed to be set #}
+{# differently from the global default. Use it if we have it, otherwise generate one #}
+{%       if sonic_interfaces[port.index].mac_addr is defined %}
+{%         set mac_addr=sonic_interfaces[port.index].mac_addr %}
+{%       elif port_perm_macaddr[port.port]|default("") != current_config.DEVICE_METADATA.localhost.mac %}
+{%         set mac_addr=port_perm_macaddr[port.port] %}
+{%       else %}
+{%         set mac_addr='02' | community.general.random_mac(seed=inventory_hostname ~ "_" ~ port.index|string) %}
+{%       endif %}
+      "mac_addr": "{{ mac_addr }}",
       "ipv6_use_link_local_only": "{{ 'enable' if sonic_interfaces[port.index].layer3|default(false) else 'disable' }}"
     }
 {%     endif %}
