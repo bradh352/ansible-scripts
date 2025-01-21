@@ -1,7 +1,6 @@
 ---
-# Basic switch, not participating in VXLAN
-# sonic_bgp_ip: "172.16.0.0/32"
-# sonic_asn: "4210000000"
+sonic_vxlan_vtep_ip: "172.16.0.3/32"
+sonic_asn: "4210000000"
 
 sonic_interfaces:
   "1":
@@ -212,27 +211,28 @@ sonic_interfaces:
     autoneg: "off"
     fec: "none"
     speed: "10000"
-    vlans:
-      - vlan: 2
-        mode: "untagged"
+    layer3: true
   "50":
     description: "torsw2 port 33"
     autoneg: "off"
     fec: "none"
     speed: "10000"
-    vlans:
-      - vlan: 2
-        mode: "untagged"
+    layer3: true
 
 sonic_vlans:
   "2":
     ips: [ "192.168.1.55/24" ]
     mtu: 1500
     layer3: false
+  "1002":
+    ips: [ "10.0.0.70/24" ]
+    mtu: 1500
+    layer3: false
+    vxlan: "10002"
 
 sonic_routes:
   - prefix: "0.0.0.0/0"
     nexthop: "192.168.1.1"
 
 # Experimental
-#sonic_bgp_external: false
+sonic_bgp_external: false

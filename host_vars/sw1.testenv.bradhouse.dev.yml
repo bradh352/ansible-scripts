@@ -51,6 +51,7 @@ sonic_interfaces:
     autoneg: "off"
     fec: "none"
     speed: "10000"
+    layer3: true
   "41":
     description: "fakeinet ge-0/8"
     autoneg: "off"
