@@ -23,7 +23,12 @@ while read line ; do
   if echo $key | grep "^Ethernet" > /dev/null ; then
     output_eth
     eth="$key"
-    conn="unknown"
+    if echo $val | grep "RJ45" > /dev/null ; then
+      # Mellanox outputs: SFP EEPROM is not applicable for RJ45 port
+      conn="RJ45"
+    else
+      conn="unknown"
+    fi
   fi
 
   if [ "$key" == "Connector" ] ; then
