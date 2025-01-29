@@ -150,8 +150,12 @@ config if still confused.
     `none` if port speed is less than 25000 or autonegotiation is on otherwise
     `rs`.
   * `layer3`: `true`/`false`. Whether this interface will be used as a layer3
-    interface.  This enables IPv6 link-local address support and also activates
-    BGP on the interface. Default is `false`.
+    interface.  Currently this just enables ipv6 link local addresses on the
+    interface and allows other config options to be used (like `mtu` even if no
+    ip addresses are set). Default is `false`.
+  * `bgp_underlay`: `true/false`. Whether this interface is part of the bgp
+    underlay network using BGP Unnumbered.  Requires `layer3` set to `true`.
+    Default is `false`.
   * `vrf`: Name of the VRF to assign the interface to. Always starts with `Vrf`.
   * `mac_addr`: MAC address of the interface.  Only relevant for routed
     interfaces (e.g. those with `ips` or `layer3` set).  If not specified, will
@@ -165,8 +169,8 @@ config if still confused.
     with an ip address list instead). Example:
     `[ "1.2.3.4/24", "2620:3:4:5::6/64" ]`
   * `vlans`: Vlans to assign to an interface. The vlan must have been already
-    created using the `sonic_vlans` configuration. The value is an array of
-    dictionaries with these keys:
+    created using the `sonic_vlans` configuration. Cannot be used with `ips`,
+    or `layer3`. The value is an array of dictionaries with these keys:
     * `vlan`: Vlan id to use (1-4096), required.
     * `mode`: `tagged`/`untagged`. Only a single vlan may be marked as untagged
       for a single interface.

@@ -4,27 +4,35 @@ sonic_asn: "4210000002"
 sonic_interfaces:
   "1":
     layer3: true
+    bgp_underlay: true
     description: "CloudStack1 port 2"
   "2":
     layer3: true
+    bgp_underlay: true
     description: "CloudStack2 port 2"
   "3":
     layer3: true
+    bgp_underlay: true
     description: "CloudStack3 port 2"
   "4":
     layer3: true
+    bgp_underlay: true
     description: "CloudStack4 port 2"
   "5":
     layer3: true
+    bgp_underlay: true
     description: "CloudStack5 port 2"
   "6":
     layer3: true
+    bgp_underlay: true
     description: "CloudStack6 port 2"
   "7":
     layer3: true
+    bgp_underlay: true
     description: "CloudStack7 port 2"
   "8":
     layer3: true
+    bgp_underlay: true
     description: "CloudStack8 port 2"
   "17":
     description: "PortChannel1 MGMT p1"
@@ -57,16 +65,14 @@ sonic_interfaces:
     autoneg: "off"
     fec: "none"
     speed: "1000"
-    vlans:
-      - vlan: 2
-        mode: "untagged"
+    layer3: true
   "47":
     description: "fw1 ge-0/9"
     autoneg: "off"
     fec: "none"
     speed: "1000"
     vlans:
-      - vlan: 2
+      - vlan: 10
         mode: "untagged"
   "48":
     description: "fw2 ge-0/9"
@@ -74,18 +80,20 @@ sonic_interfaces:
     fec: "none"
     speed: "1000"
     vlans:
-      - vlan: 2
+      - vlan: 10
         mode: "untagged"
   "55":
     layer3: true
+    bgp_underlay: true
     description: "torsw1 port 55"
   "56":
     layer3: true
+    bgp_underlay: true
     description: "torsw1 port 56"
 
 sonic_vlans:
-  "2":
-    vxlan: "10002"
+  "10":
+    vxlan: "10010"
     mtu: 1500
     ips: [ "10.0.0.72/24" ]
     layer3: true
@@ -105,7 +113,7 @@ sonic_portchannel:
       - "19"
       - "20"
     vlans:
-      - vlan: 2
+      - vlan: 10
         mode: "untagged"
 
 sonic_routes:

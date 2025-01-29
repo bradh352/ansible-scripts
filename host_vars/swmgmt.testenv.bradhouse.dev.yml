@@ -1,5 +1,5 @@
 ---
-sonic_vxlan_vtep_ip: "172.16.0.3/32"
+sonic_vxlan_vtep_ip: "172.16.0.0/32"
 sonic_asn: "4210000000"
 
 sonic_interfaces:
@@ -131,8 +131,9 @@ sonic_interfaces:
       - vlan: 2
         mode: "untagged"
   "32":
+    description: "vxlan test port"
     vlans:
-      - vlan: 2
+      - vlan: 10
         mode: "untagged"
   "33":
     vlans:
@@ -212,23 +213,25 @@ sonic_interfaces:
     fec: "none"
     speed: "10000"
     layer3: true
+    bgp_underlay: true
   "50":
     description: "torsw2 port 33"
     autoneg: "off"
     fec: "none"
     speed: "10000"
     layer3: true
+    bgp_underlay: true
 
 sonic_vlans:
   "2":
     ips: [ "192.168.1.55/24" ]
     mtu: 1500
-    layer3: false
-  "1002":
+    layer3: true
+  "10":
     ips: [ "10.0.0.70/24" ]
     mtu: 1500
-    layer3: false
-    vxlan: "10002"
+    layer3: true
+    vxlan: "10010"
 
 sonic_routes:
   - prefix: "0.0.0.0/0"

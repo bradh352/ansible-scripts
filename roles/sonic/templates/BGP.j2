@@ -54,7 +54,10 @@
 
 {%   set ns = namespace(has_dynamic_neighbor=false) %}
 {%   for port in ports %}
-{%     if sonic_interfaces[port.index].layer3|default(false) %}
+{%     if sonic_interfaces[port.index].bgp_underlay|default(false) %}
+{%       if not sonic_interfaces[port.index].layer3|default(false) %}
+{{ notdefined | mandatory(msg='if bgp_underlay is set, layer3 must also be set on port ' ~ port.index|string ~ '.') }}
+{%       endif %}
 {%       set ns.has_dynamic_neighbor=true %}
 {%     endif %}
 {%   endfor %}
@@ -65,7 +68,7 @@
 {%     if sonic_bgp_peers|default([])|count == 0 %}
 {%       set ns = namespace(has_neighbor=false) %}
 {%       for port in ports %}
-{%         if sonic_interfaces[port.index].layer3|default(false) %}
+{%         if sonic_interfaces[port.index].bgp_underlay|default(false) %}
 {%-           if ns.has_neighbor %}
         ,
 {%            endif %}
