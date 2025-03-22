@@ -1,6 +1,10 @@
 ---
 sonic_vxlan_vtep_ip: "172.16.0.1/32"
 sonic_asn: "4210000001"
+# sonic_mclag:
+#   group_id: 1
+#   peer_ip: 172.16.0.2
+#   source_ip: 172.16.0.1
 sonic_interfaces:
   "1":
     layer3: true
@@ -67,21 +71,15 @@ sonic_interfaces:
     speed: "1000"
     layer3: true
   "47":
-    description: "fw1 ge-0/8"
+    description: "PortChannel3 fw1 ge-0/8"
     autoneg: "off"
     fec: "none"
     speed: "1000"
-    vlans:
-      - vlan: 10
-        mode: "untagged"
   "48":
-    description: "fw2 ge-0/8"
+    description: "PortChannel4 fw2 ge-0/8"
     autoneg: "off"
     fec: "none"
     speed: "1000"
-    vlans:
-      - vlan: 10
-        mode: "untagged"
   "55":
     layer3: true
     bgp_underlay: true
@@ -115,6 +113,22 @@ sonic_portchannel:
     vlans:
       - vlan: 10
         mode: "untagged"
+  "3":
+    description: "fw1"
+    interfaces:
+      - "47"
+    vlans:
+      - vlan: 10
+        mode: "untagged"
+    mclag: true
+  "4":
+    description: "fw2"
+    interfaces:
+      - "48"
+    vlans:
+      - vlan: 10
+        mode: "untagged"
+    mclag: true
 
 sonic_routes:
   - prefix: "8.8.4.4/32"

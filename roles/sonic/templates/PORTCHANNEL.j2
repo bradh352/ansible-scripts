@@ -1,6 +1,26 @@
 {
 {% if sonic_portchannel|default([])|count > 0 %}
 
+{%   if sonic_mclag.group_id is defined %}
+{%      set mclag_members=sonic_portchannel | dict2items | selectattr('value.mclag', 'defined') | selectattr('value.mclag') | map(attribute='key') | map('int')  %}
+{%      if mclag_members|count > 0 %}
+  "MCLAG_DOMAIN": {
+    "{{ sonic_mclag.group_id }}": {
+      "source_ip": "{{ sonic_mclag.source_ip }}",
+      "peer_ip": "{{ sonic_mclag.peer_ip }}"
+    }
+  },
+  "MCLAG_INTERFACE": {
+{%        for member in mclag_members %}
+    "{{ sonic_mclag.group_id }}|PortChannel{{ "%04d" | format(member|int) }}": {}
+{%-         if not loop.last %}
+    ,
+{%          endif %}
+{%        endfor %}
+  },
+{%     endif %}
+{%   endif %}
+
   "PORTCHANNEL": {
 {%   for key, channel in sonic_portchannel.items() %}
     "PortChannel{{ "%04d" | format(key|int) }}" : {

@@ -11,6 +11,6 @@ while read intf ; do
   "${intf}" : "${permaddr}"
 EOF
   has_cnt=1
-done < <(ip a | grep Ethernet | sed -E 's/[0-9]+: (Ethernet[0-9]+):.*/\1/')
+done < <(ip a | grep Ethernet | sed -E 's/[0-9]+: (Ethernet[0-9]+):.*/\1/' | grep ^Ethernet)
 
 echo "}"
