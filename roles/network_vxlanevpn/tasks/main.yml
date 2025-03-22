@@ -15,9 +15,12 @@
       - ifupdown-ng
     state: absent
 
+- debug:
+    var: ansible_facts
+
 - name: "Gather interface mappings"
   set_fact:
-    network_vxlanevpn_interfaces_json: "{{ lookup('template', 'resolv_vxlan_interfaces.j2') }}"
+    network_vxlanevpn_interfaces_json: "{{ lookup('template', 'resolve_vxlan_interfaces.j2') }}"
 
 - name: "Parse interface mappings"
   set_fact:
@@ -27,13 +30,14 @@
   template:
     src: netplan.conf.j2
     dest: /etc/netplan/config.yaml
+    mode: "600"
   register: netplan
 
 - name: "FRR: enable bgp and bfd"
   lineinfile:
      path: /etc/frr/daemons
-     regexp: "^{{ key }}=.*"
-     line: "{{key}}={{val}}"
+     regexp: "^{{ item.key }}=.*"
+     line: "{{ item.key }}={{ item.val }}"
      state: present
   with_items:
     - key: "bgpd"
@@ -46,6 +50,7 @@
   template:
     src: frr.conf.j2
     dest: /etc/frr/frr.conf
+    mode: "660"
   notify: frr_restart
 
 - name: "FRR: ensure enabled and started"
@@ -57,7 +62,6 @@
 - name: "UFW: allow BGP unnumbered"
   community.general.ufw:
     rule: allow
-    name: vxlan-bgp
     port: 179
     proto: tcp
     src: "fe80::/10"
@@ -66,7 +70,6 @@
 - name: "UFW: allow BFD"
   community.general.ufw:
     rule: allow
-    name: vxlan-bfd
     port: 3784
     proto: udp
     src: "fe80::/10"
@@ -75,7 +78,6 @@
 - name: "UFW: allow VXLAN VTEP"
   community.general.ufw:
     rule: allow
-    name: vxlan-vtep
     port: 4789
     proto: udp
     src: "{{ network_vtep_ip }}"
@@ -89,7 +91,7 @@
 
 - name: "NetPlan: apply asyncronously"
   when: netplan.changed
-  command: "netplan -a"
+  command: "netplan apply"
   async: 0
   poll: 0
   ignore_errors: true

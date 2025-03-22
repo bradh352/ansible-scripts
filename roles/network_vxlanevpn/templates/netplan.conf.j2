@@ -19,7 +19,7 @@ network:
 {%   for interface in network_vxlan_interfaces %}
     {{ interface.name }}:
       mode: vxlan
-      local: {{ network_vtep_ip }}
+      local: {{ network_vtep_ip|split('/')|first }}
       id: {{ interface.vni }}
       mac-learning: false
       link-local: [ ]
@@ -33,7 +33,7 @@ network:
       dhcp6: false
       accept-ra: false
       addresses:
-{%       for address in interfaces.addresses %}
+{%       for address in interface.addresses %}
         - {{ address }}
 {%       endfor %}
 {%     endif %}
@@ -51,6 +51,7 @@ network:
 {%         for address in interface.nameservers.addresses %}
           - {{ address }}
 {%         endfor %}
+{%       endif %}
 {%     endif %}
 {%     if interface.nameservers.search|default([])|count > 0 %}
         search:
@@ -65,7 +66,7 @@ network:
       match:
         name: lo
       addresses:
-        - 127.0.0.1/32
+        - 127.0.0.1/8
         - ::1/128
         - {{ network_vtep_ip|split('/')|first }}/32
 {% for interface in network_vxlanevpn_interfaces %}
@@ -84,7 +85,7 @@ network:
       dhcp4: true
       accept-ra: true
       dhcp4-overrides:
-        use_dns: false
+        use-dns: false
         use-ntp: false
         use-routes: false
         use-domains: false
@@ -96,7 +97,7 @@ network:
       dhcp6: false
       accept-ra: false
       addresses:
-{%     for address in interfaces.addresses %}
+{%     for address in interface.addresses %}
         - {{ address }}
 {%     endfor %}
 {%   endif %}
@@ -114,6 +115,7 @@ network:
 {%       for address in interface.nameservers.addresses %}
           - {{ address }}
 {%       endfor %}
+{%     endif %}
 {%   endif %}
 {%   if interface.nameservers.search|default([])|count > 0 %}
         search:
