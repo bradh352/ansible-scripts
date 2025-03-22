@@ -1,0 +1,63 @@
+{% if network_underlay_interfaces is not defined %}
+{{ notdefined | mandatory(msg='network_underlay_interfaces must be defined') }}
+{% endif %}
+[
+set ns = namespace(has_iface=false,iface_found=false) 
+{% for interface in network_underlay_interfaces %}
+{%   if interface.ifname is defined %}
+{%     if not interface.ifname in ansible_facts.ansible_interfaces %}
+{{ notdefined | mandatory(msg='interface with ifname ' + interface.ifname + ' not found') }}
+{%     endif %}
+{%-    if ns.has_iface %}
+,
+{%     endif %}
+{%     set ns.has_iface = true %}
+"{{ interface.ifname }}"
+{%   elif interface.macaddr is defined %}
+{%     set ns.iface_found = false %}
+{%     for host_iface in ansible_facts.ansible_interfaces %}
+{%       if ansible_facts["ansible_" + host_iface].macaddress == interface.macaddr %}
+{%-        if ns.has_iface %}
+,
+{%         endif %}
+{%         set ns.has_iface = true %}
+{%         set ns.iface_found = true %}
+"{{ host_iface }}"
+{%       endif %}
+{%     endfor %}
+{%     if not ns.iface_found %}
+{{ notdefined | mandatory(msg='interface with macaddr ' + interface.macaddr + ' not found') }}
+{%     endif %}
+{%   elif interface.driver is defined %}
+{%     set ns.iface_found = false %}
+{%     for host_iface in ansible_facts.ansible_interfaces %}
+{%       if ansible_facts["ansible_" + host_iface].module == interface.driver %}
+{%-        if ns.has_iface %}
+,
+{%         endif %}
+{%         set ns.has_iface = true %}
+{%         set ns.iface_found = true %}
+"{{ host_iface }}"
+{%       endif %}
+{%     endfor %}
+{%     if not ns.iface_found %}
+{{ notdefined | mandatory(msg='interface with driver ' + interface.driver + ' not found') }}
+{%     endif %}
+{%   elif interface.pattern is defiend %}
+{%     set ns.iface_found = false %}
+{%     for host_iface in ansible_facts.ansible_interfaces %}
+{%       if host_iface|regex_search(interface.pattern)|length > 0 %}
+{%-        if ns.has_iface %}
+,
+{%         endif %}
+{%         set ns.has_iface = true %}
+{%         set ns.iface_found = true %}
+"{{ host_iface }}"
+{%       endif %}
+{%     endfor %}
+{%     if not ns.iface_found %}
+{{ notdefined | mandatory(msg='interface with pattern ' + interface.pattern + ' not found') }}
+{%     endif %}
+{%   endif %}
+{% endfor %}
+]

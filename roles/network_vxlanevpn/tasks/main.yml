@@ -1,0 +1,102 @@
+---
+
+- name: "APT: Install required packages"
+  ansible.builtin.apt:
+    pkg:
+      - netplan.io
+      - frr
+      - ufw
+    state: present
+
+- name: "APT: Purge undesired packages"
+  ansible.builtin.apt:
+    pkg:
+      - ifupdown
+      - ifupdown-ng
+    state: absent
+
+- name: "Gather interface mappings"
+  set_fact:
+    network_vxlanevpn_interfaces_json: "{{ lookup('template', 'resolv_vxlan_interfaces.j2') }}"
+
+- name: "Parse interface mappings"
+  set_fact:
+    network_vxlanevpn_interfaces: "{{ network_vxlanevpn_interfaces_json|from_yaml }}"
+
+- name: "NetPlan: write configuration"
+  template:
+    src: netplan.conf.j2
+    dest: /etc/netplan/config.yaml
+  register: netplan
+
+- name: "FRR: enable bgp and bfd"
+  lineinfile:
+     path: /etc/frr/daemons
+     regexp: "^{{ key }}=.*"
+     line: "{{key}}={{val}}"
+     state: present
+  with_items:
+    - key: "bgpd"
+      val: "yes"
+    - key: "bfdd"
+      val: "yes"
+  notify: frr_restart
+
+- name: "FRR: write configuration"
+  template:
+    src: frr.conf.j2
+    dest: /etc/frr/frr.conf
+  notify: frr_restart
+
+- name: "FRR: ensure enabled and started"
+  service:
+    name: frr
+    state: started
+    enabled: true
+
+- name: "UFW: allow BGP unnumbered"
+  community.general.ufw:
+    rule: allow
+    name: vxlan-bgp
+    port: 179
+    proto: tcp
+    src: "fe80::/10"
+    dest: "fe80::/10"
+
+- name: "UFW: allow BFD"
+  community.general.ufw:
+    rule: allow
+    name: vxlan-bfd
+    port: 3784
+    proto: udp
+    src: "fe80::/10"
+    dest: "fe80::/10"
+
+- name: "UFW: allow VXLAN VTEP"
+  community.general.ufw:
+    rule: allow
+    name: vxlan-vtep
+    port: 4789
+    proto: udp
+    src: "{{ network_vtep_ip }}"
+    dest: "{{ network_vtep_ip|split('/')|first }}/32"
+
+- name: "UFW: ensure ufw is enabled and started"
+  service:
+    name: ufw
+    state: started
+    enabled: true
+
+- name: "NetPlan: apply asyncronously"
+  when: netplan.changed
+  command: "netplan -a"
+  async: 0
+  poll: 0
+  ignore_errors: true
+
+- name: "Wait for host to come back online"
+  when: netplan.changed
+  wait_for_connection:
+    timeout: 60
+    delay: 5
+
