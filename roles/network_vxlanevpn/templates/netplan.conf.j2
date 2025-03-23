@@ -3,27 +3,31 @@
 {% endif %}
 network:
   version: 2
-  bridges:
-    br:
-      dhcp4: no
-      dhcp6: no
-      accept-ra: no
-{% if network_vxlan_interfaces|default([])|count > 0 %}
-      interfaces:
-{%   for interface in network_vxlan_interfaces %}
-        - {{ interface.name }}
-{%   endfor %}
-{% endif %}
+{# Create the VXLAN Tunnels for each one the host uses in form of vxlan{{ vni }} #}
 {% if network_vxlan_interfaces|default([])|count > 0 %}
   tunnels:
 {%   for interface in network_vxlan_interfaces %}
-    {{ interface.name }}:
+    vxlan{{ interface.vni }}:
       mode: vxlan
       local: {{ network_vtep_ip|split('/')|first }}
       id: {{ interface.vni }}
       mac-learning: false
-      link-local: [ ]
       port: 4789
+{%   endfor %}
+{% endif %}
+{# Must create a bridge per vxlan #}
+{% if network_vxlan_interfaces|default([])|count > 0 %}
+  bridges:
+{%   for interface in network_vxlan_interfaces %}
+{# User-specified interface name is bridge name.  We are assigning IPs, etc to #}
+{# the bridge itself instead of attaching a virtual interface. #}
+    {{ interface.name }}:
+      dhcp4: no
+      dhcp6: no
+      accept-ra: no
+      interfaces:
+        - vxlan{{ interface.vni }}
+      link-local: [ ]
       mtu: {{ interface.mtu|default(1500) }}
 {%     if interface.dhcp|default(false) %}
       dhcp4: true
@@ -69,6 +73,7 @@ network:
         - 127.0.0.1/8
         - ::1/128
         - {{ network_vtep_ip|split('/')|first }}/32
+{# For each underlay interface, configure it, enable ipv6 link-local #}
 {% for interface in network_vxlanevpn_interfaces %}
     {{ interface }}:
       link-local: [ ipv6 ]
@@ -77,6 +82,7 @@ network:
       dhcp6: false
       accept-ra: false
 {% endfor %}
+{# User specified fallback interfaces, configure here #}
 {% for interface in network_interfaces %}
     {{ interface.ifname }}:
       link-local: [ ipv6 ]
