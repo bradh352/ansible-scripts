@@ -1,7 +1,7 @@
 ---
-ansible_host: 192.168.1.220
-network_vtep_ip:  "172.16.0.101/24"
-network_underlay_asn: 4220000001
+ansible_host: 192.168.1.135
+network_vtep_ip:  "172.16.0.103/24"
+network_underlay_asn: 4220000003
 network_underlay_interfaces:
   - driver: "mlx5_core"
 network_vxlan_interfaces:
@@ -9,17 +9,17 @@ network_vxlan_interfaces:
     vni: 100
     mtu: 9000
     addresses:
-      - "10.10.100.2/24"
+      - "10.10.100.4/24"
   - name: "ceph"
     vni: 200
     mtu: 9000
     addresses:
-      - "10.10.200.2/24"
+      - "10.10.200.4/24"
   - name: "public"
     vni: 10010
     mtu: 1500
     addresses:
-      - "10.0.0.91/24"
+      - "10.0.0.93/24"
     nameservers:
       addresses:
         - 8.8.8.8

@@ -1,0 +1,3 @@
+---
+host_roles: [ "base", "service_apache", "service_php", "service_mariadb", "app_wordpress" ]
+
