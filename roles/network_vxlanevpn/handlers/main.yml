@@ -1,4 +1,9 @@
 ---
+- name: frr_reload
+  service:
+    name: frr
+    state: reloaded
+
 - name: frr_restart
   service:
     name: frr

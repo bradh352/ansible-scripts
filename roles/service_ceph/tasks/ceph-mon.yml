@@ -3,14 +3,26 @@
   include_tasks: "ceph-mon-bootstrap.yml"
   when: ceph_bootstrap|default(false)
 
+- name: "Check to see if monitor configuration exists"
+  stat:
+    path: "/var/lib/ceph/mon/ceph-{{ inventory_hostname|split('.')|first }}"
+  register: ceph_mon_configured
+
 - name: "monitor add"
   include_tasks: "ceph-mon-add.yml"
-  when: not ceph_bootstrap|default(false)
+  when: not ceph_bootstrap|default(false) and not ceph_mon_configured.stat.exists
 
-- name: "UFW: Allow ceph monitor traffic"
+- name: "UFW: Allow ceph monitor traffic v1"
   community.general.ufw:
     rule: allow
     port: 6789
+    proto: tcp
+    dest: "{{ ceph_mon_ip }}"
+
+- name: "UFW: Allow ceph monitor traffic v2"
+  community.general.ufw:
+    rule: allow
+    port: 3300
     proto: tcp
     dest: "{{ ceph_mon_ip }}"
 
@@ -53,3 +65,15 @@
     name: "ceph-mgr@{{ inventory_hostname | split('.') | first }}"
     state: started
     enabled: true
+
+- name: "Ceph: check auth_allow_insecure_global_id_reclaim"
+  shell: ceph config get mon auth_allow_insecure_global_id_reclaim
+  register: ceph_insecure_global_id
+
+- name: "Ceph: set auth_allow_insecure_global_id_reclaim to false"
+  shell: "ceph config set mon auth_allow_insecure_global_id_reclaim false"
+  when: ceph_insecure_global_id.stdout_lines|first == "true"
+
+- name: "Ceph: enable msgr2 protocol"
+  shell: "ceph mon enable-msgr2"
+  when: ceph_bootstrap|default(false)

@@ -45,10 +45,11 @@
 
 - name: "FRR: write configuration"
   template:
+    backup: true
     src: frr.conf.j2
     dest: /etc/frr/frr.conf
     mode: "660"
-  notify: frr_restart
+  notify: frr_reload
 
 - name: "Instruct networkd not to mess with our routes"
   community.general.ini_file:
