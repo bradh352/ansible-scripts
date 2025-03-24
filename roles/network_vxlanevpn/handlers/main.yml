@@ -3,3 +3,6 @@
   service:
     name: frr
     state: restarted
+
+- name: networkctl_reload
+  shell: networkctl reload

@@ -50,6 +50,25 @@
     mode: "660"
   notify: frr_restart
 
+- name: "Instruct networkd not to mess with our routes"
+  community.general.ini_file:
+    path: /etc/systemd/networkd.conf
+    no_extra_spaces: true
+    section: "{{ item.section }}"
+    option: "{{ item.key }}"
+    value: "{{ item.val }}"
+  with_items:
+    - section: "Network"
+      key: "ManageForeignNextHops"
+      val: "no"
+    - section: "Network"
+      key: "ManageForeignRoutes"
+      val: "no"
+    - section: "Network"
+      key: "ManageForeignRoutingPolicyRules"
+      val: "no"
+  notify: networkctl_reload
+
 - name: "FRR: ensure enabled and started"
   service:
     name: frr
