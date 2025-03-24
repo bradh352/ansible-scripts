@@ -1,0 +1,55 @@
+---
+- name: "monitor bootstrap"
+  include_tasks: "ceph-mon-bootstrap.yml"
+  when: ceph_bootstrap|default(false)
+
+- name: "monitor add"
+  include_tasks: "ceph-mon-add.yml"
+  when: not ceph_bootstrap|default(false)
+
+- name: "UFW: Allow ceph monitor traffic"
+  community.general.ufw:
+    rule: allow
+    port: 6789
+    proto: tcp
+    dest: "{{ ceph_mon_ip }}"
+
+- name: "Ensure ceph-mon is enabled and started"
+  service:
+    name: "ceph-mon@{{ inventory_hostname | split('.') | first }}"
+    state: started
+    enabled: true
+
+- name: "Make sure the mgr data directory exists"
+  file:
+    path: "/var/lib/ceph/mgr/ceph-{{ inventory_hostname | split('.') | first }}"
+    state: directory
+
+- name: "Make sure the mgr has a keyring"
+  stat:
+    path: "/var/lib/ceph/mgr/ceph-{{ inventory_hostname | split('.') | first }}/keyring"
+  register: mgr_keyring
+
+- name: "Make the keyring"
+  when: not mgr_keyring.stat.exists
+  shell: "ceph auth get-or-create mgr.{{ inventory_hostname | split('.') | first }} mon 'allow profile mgr' osd 'allow *' mds 'allow *' -o /var/lib/ceph/mgr/ceph-{{ inventory_hostname | split('.') | first }}/keyring"
+
+- name: "Make sure permissions are proper"
+  file:
+    path: "{{ item }}"
+    owner: ceph
+  with_items:
+    - "/var/lib/ceph/mgr/ceph-{{ inventory_hostname | split('.') | first }}/keyring"
+
+- name: "UFW: Allow ceph mgr traffic"
+  community.general.ufw:
+    rule: allow
+    port: "6800:7300"
+    proto: tcp
+    dest: "{{ ceph_mon_ip }}"
+
+- name: "Ensure ceph-mgr is enabled and started"
+  service:
+    name: "ceph-mgr@{{ inventory_hostname | split('.') | first }}"
+    state: started
+    enabled: true

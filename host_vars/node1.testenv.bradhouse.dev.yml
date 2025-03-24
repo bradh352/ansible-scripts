@@ -1,5 +1,6 @@
 ---
 ansible_host: 192.168.1.220
+ceph_mon_ip: 10.10.100.2
 network_vtep_ip:  "172.16.0.101/24"
 network_underlay_asn: 4220000001
 network_underlay_interfaces:

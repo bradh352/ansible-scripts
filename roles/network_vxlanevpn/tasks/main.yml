@@ -15,9 +15,6 @@
       - ifupdown-ng
     state: absent
 
-- debug:
-    var: ansible_facts
-
 - name: "Gather interface mappings"
   set_fact:
     network_vxlanevpn_interfaces_json: "{{ lookup('template', 'resolve_vxlan_interfaces.j2') }}"
