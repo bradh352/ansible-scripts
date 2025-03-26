@@ -1,1 +1,15 @@
 ---
+- name: "Make sure we have the osd boostrap keyring"
+  include_tasks: "ceph-osd-bootstrap-keyring.yml"
+
+- name: "Gather a list of new OSDs"
+  set_fact:
+    ceph_new_osds_json: "{{ lookup('template', 'enumerate_new_osds.j2') }}"
+
+- name: "Parse list of new OSDs"
+  set_fact:
+    ceph_new_osds: "{{ ceph_new_osds_json|from_yaml }}"
+
+- name: "Create OSDs"
+  shell: "ceph-volume lvm create --data /dev/{{ item }}"
+  with_items: "{{ ceph_new_osds }}"

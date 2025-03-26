@@ -39,6 +39,19 @@ This role is initially targeting Ubuntu, and tested on 24.04LTS.
   generate this value.  This should be a group var for the cluster.
  `ceph_mon_ip`: Must be unique for each monitor node in the cluster.  This
   is a node-specific value.
+* `ceph_osd_room`: Optional. Short alphanumeric (no spaces) name of the room in
+  which the ceph host resides.  Specifying this will place the OSD in this
+  bucket to assist in determining the proper failure domains.
+* `ceph_osd_row`: Optional. Short alphanumeric (no spaces) name of the row in
+  which the ceph host resides.  Specifying this will place the OSD in this
+  bucket to assist in determining the proper failure domains.
+* `ceph_osd_rack`: Optional. Short alphanumeric (no spaces) name of the rack in
+  which the ceph host resides.  Specifying this will place the OSD in this
+  bucket to assist in determining the proper failure domains.
+* `ceph_osd_chassis`: Optional. Short alphanumeric (no spaces) name of the
+  chassis (such as when hosts share a single chassis, e.g. Supermicro microcloud)
+  in which the ceph host resides.  Specifying this will place the OSD in this
+  bucket to assist in determining the proper failure domains.
 
 ## Groups used by this role
 
