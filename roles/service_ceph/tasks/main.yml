@@ -23,7 +23,7 @@
   lineinfile:
     path: /etc/hosts
     line: "{{ hostvars[item]['ceph_mon_ip'] }} {{ item|split('.')|first }} {{ item }}"
-  with_items: "{{ ceph_hosts }}"
+  with_items: "{{ ceph_hosts | reject('search', inventory_hostname | split('.') | first ) }}"
 
 - name: "Create ceph.conf"
   template:

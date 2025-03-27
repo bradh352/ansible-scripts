@@ -24,3 +24,8 @@ osd_crush_chooseleaf_type = 1
     host = {{ host|split('.')|first }}
     mon addr = {{ hostvars[host]['ceph_mon_ip'] }}:6789
 {% endfor %}
+
+{% for host in groups["ceph_" + ceph_cluster_name + "_mds"]|default([]) %}
+[mds.{{ host|split('.')|first }}]
+    host = {{ host|split('.')|first }}
+{% endfor %}

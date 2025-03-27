@@ -2,8 +2,11 @@
 {% for host in groups["ceph_" + ceph_cluster_name + "_mon"] %}
 {%   do host_list.append(host) %}
 {% endfor %}
+{% for host in groups["ceph_" + ceph_cluster_name + "_mds"]|default([]) %}
+{%   do host_list.append(host) %}
+{% endfor %}
 [
-{% for host in host_list|unique %}
+{% for host in host_list|unique|sort %}
 {%   if not loop.first %}
 ,
 {%   endif %}
