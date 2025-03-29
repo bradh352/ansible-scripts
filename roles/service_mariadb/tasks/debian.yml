@@ -16,7 +16,7 @@
     url: https://mariadb.org/mariadb_release_signing_key.pgp
     dest: /etc/apt/trusted.gpg.d/mariadb-keyring.pgp
     mode: "644"
-  when: keyring_exists.stat.exists
+  when: not keyring_exists.stat.exists
   register: keyring
 
 - name: "APT: Import Key"
@@ -40,6 +40,7 @@
   ansible.builtin.apt:
     pkg:
       - "mariadb-server"
+      - "python3-pymysql"
     state: present
 
 - name: "APT: install cluster dependencies"

@@ -25,30 +25,42 @@
   with_items: "{{ mariadb_hosts | reject('search', inventory_hostname | split('.') | first ) }}"
   when: mariadb_cluster|default(false)
 
+- name:
+  set_fact:
+    mariadb_config_dir: "{{ '/etc/my.cnf.d/' if ansible_os_family == 'RedHat' else '/etc/mysql/conf.d/' }}"
+    mariadb_sock: "{{ '/var/lib/mysql/mysql.sock' if ansible_os_family == 'Redhat' else '/run/mysqld/mysqld.sock' }}"
 - name: Install configuration
   template:
     src: zcustom_base.cnf
-    dest: /etc/my.cnf.d/zcustom_base.cnf
+    dest: "{{ mariadb_config_dir }}/zcustom_base.cnf"
     owner: root
     group: root
     mode: 0644
-  notify: mariadb_restart
+  notify: "{{ 'mariadb_restart' if not mariadb_bootstrap|default(false) }}"
 
 - name: Install cluster configuration
   template:
     src: cluster.cnf.j2
-    dest: /etc/my.cnf.d/cluster.cnf
+    dest: "{{ mariadb_config_dir }}/cluster.cnf"
     owner: root
     group: root
     mode: 0644
-  when:
-  notify: mariadb_restart
+  notify: "{{ 'mariadb_restart' if not mariadb_bootstrap|default(false) }}"
 
-- name: Start and Enable MariaDB
+- name: Enable MariaDB
   service:
-    name: "{{ 'mariadb' if not mariadb_bootstrap|default(false) else 'mariadb@bootstrap' }}"
+    name: mariadb
     enabled: true
+
+- name: Ensure MariaDB is started
+  service:
+    name: mariadb
     state: started
+  when: not mariadb_bootstrap|default(false)
+
+- name: Initialize new cluster
+  shell: "galera_new_cluster"
+  when: mariadb_bootstrap|default(false)
 
 - name: Set root password for MariaDB for localhost
   community.mysql.mysql_user:
@@ -56,7 +68,7 @@
     login_password: "{{ mariadb_root_password }}"
     check_implicit_admin: true
     column_case_sensitive: false
-    login_unix_socket: /var/lib/mysql/mysql.sock
+    login_unix_socket: "{{ mariadb_sock }}"
     name: root
     password: "{{ mariadb_root_password }}"
     host: "{{ item }}"
@@ -67,7 +79,7 @@
 
 - name: Remove root password for MariaDB for non-localhost users
   community.mysql.mysql_user:
-    login_unix_socket: /var/lib/mysql/mysql.sock
+    login_unix_socket: "{{ mariadb_sock }}"
     login_user: root
     login_password: "{{ mariadb_root_password }}"
     check_implicit_admin: true
@@ -78,7 +90,7 @@
 
 - name: Remove all anonymous users from MariaDB
   community.mysql.mysql_user:
-    login_unix_socket: /var/lib/mysql/mysql.sock
+    login_unix_socket: "{{ mariadb_sock }}"
     login_user: root
     login_password: "{{ mariadb_root_password }}"
     check_implicit_admin: true
@@ -89,12 +101,12 @@
 
 - name: Make cluster sync user for SST
   community.mysql.mysql_user:
-    login_unix_socket: /var/lib/mysql/mysql.sock
+    login_unix_socket: "{{ mariadb_sock }}"
     login_user: root
     login_password: "{{ mariadb_root_password }}"
     check_implicit_admin: true
     column_case_sensitive: false
-    name: "{{ mariadb_sst_username }}"
+    name: "{{ mariadb_sst_user }}"
     password: "{{ mariadb_sst_password }}"
     host: "localhost"
     priv: "*.*:RELOAD,PROCESS,LOCK TABLES,BINLOG MONITOR,REPLICATION CLIENT"
@@ -102,12 +114,12 @@
 
 - name: Make cluster health check user
   community.mysql.mysql_user:
-    login_unix_socket: /var/lib/mysql/mysql.sock
+    login_unix_socket: "{{ mariadb_sock }}"
     login_user: root
     login_password: "{{ mariadb_root_password }}"
     check_implicit_admin: true
     column_case_sensitive: false
-    name: "{{ mariadb_clustercheck_username }}"
+    name: "{{ mariadb_clustercheck_user }}"
     password: "{{ mariadb_clustercheck_password }}"
     host: "localhost"
     priv: "*.*:PROCESS"
