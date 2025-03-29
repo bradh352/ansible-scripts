@@ -6,22 +6,27 @@
       - curl
     state: present
 
-- name: "APT: Keyring directory"
-  file:
-    path: "/etc/apt/keyrings"
-    mode: "640"
-    state: directory
+- name: "APT: see if we have a keyring"
+  stat:
+    path: /etc/apt/trusted.gpg.d/mariadb-keyring.pgp
+  register: keyring_exists
 
 - name: "APT: fetch keyring"
   ansible.builtin.get_url:
     url: https://mariadb.org/mariadb_release_signing_key.pgp
-    dest: /etc/apt/keyrings/mariadb-keyring.pgp
+    dest: /etc/apt/trusted.gpg.d/mariadb-keyring.pgp
     mode: "644"
+  when: keyring_exists.stat.exists
+  register: keyring
+
+- name: "APT: Import Key"
+  shell: "apt-key add /etc/apt/trusted.gpg.d/mariadb-keyring.pgp"
+  when: keyring.changed
 
 - name: "APT: Install mariadb repository"
   template:
     src: mariadb.sources.j2
-    dest: /etc/apt/sources.list.d/mariadb.sources
+    dest: /etc/apt/sources.list.d/mariadb-keyring.pgp
     owner: root
     mode: "644"
   register: repo

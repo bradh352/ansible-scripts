@@ -23,6 +23,7 @@
     path: /etc/hosts
     line: "{{ hostvars[item]['mariadb_cluster_ip']}} {{ item|split('.')|first }} {{ item }}"
   with_items: "{{ mariadb_hosts | reject('search', inventory_hostname | split('.') | first ) }}"
+  when: mariadb_cluster|default(false)
 
 - name: Install configuration
   template:
@@ -97,6 +98,7 @@
     password: "{{ mariadb_sst_password }}"
     host: "localhost"
     priv: "*.*:RELOAD,PROCESS,LOCK TABLES,BINLOG MONITOR,REPLICATION CLIENT"
+  when: mariadb_cluster|default(false)
 
 - name: Make cluster health check user
   community.mysql.mysql_user:
@@ -109,6 +111,7 @@
     password: "{{ mariadb_clustercheck_password }}"
     host: "localhost"
     priv: "*.*:PROCESS"
+  when: mariadb_cluster|default(false)
 
 - name: Create clustercheck health check script
   template:
@@ -116,4 +119,5 @@
     dest: /usr/local/bin/clustercheck
     owner: root
     mode: 755
+  when: mariadb_cluster|default(false)
 

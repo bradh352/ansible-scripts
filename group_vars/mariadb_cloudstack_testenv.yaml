@@ -1,10 +1,9 @@
 ---
-ceph_cluster_name: "testenv"
-ceph_bootstrap_node: node1.testenv.bradhouse.dev
-ceph_public_network: 10.10.100.0/24
-ceph_cluster_network: 10.10.200.0/24
-ceph_uuid: "82136E90-C2CB-434A-9C3C-4EE61C6D72B7"
-ceph_osd_room: "homeoffice"
-ceph_osd_rack: "mini1"
-
-
+mariadb_cluster_name: "cloudstack_testenv"
+mariadb_root_password: "Test123$"
+mariadb_cluster: true
+mariadb_sst_user: sstuser
+mariadb_sst_password: sstpass
+mariadb_clustercheck_user: clustercheck
+mariadb_clustercheck_password: clustercheck
+mariadb_cluster_singlewriter: true
