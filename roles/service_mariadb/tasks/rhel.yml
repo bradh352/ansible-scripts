@@ -1,0 +1,59 @@
+---
+- name: Install MariaDB AppStream
+  dnf:
+    name: "@mariadb:10.11"
+    state: installed
+
+- name: Install MariaDB Server
+  dnf:
+    name: [ "mariadb-server", "python3-PyMySQL" ]
+    state: installed
+
+- name: Install cluster dependencies
+  dnf:
+    name: [ "mariabackup", "socat" ]
+    state: installed
+
+- name: Create mysql tmp directory
+  file:
+    path: /var/lib/mysql-tmp
+    state: directory
+    owner: mysql
+    group: mysql
+    mode: 0750
+    setype: mysqld_db_t
+  notify: mariadb_restart
+
+- name: Set SELinux file context appropriately for /var/lib/mysql-tmp
+  sefcontext:
+    state: present
+    setype: mysqld_db_t
+    target: /var/lib/mysql-tmp(/.*)?
+
+- name: enable or disable mariadb port depending on if external access is allowed
+  firewalld:
+    immediate: yes
+    permanent: yes
+    port: "3306/tcp"
+    state: "{{ 'enabled' if (mariadb_external_access|default(false) or mariadb_cluster|default(false)) else 'disabled' }}"
+
+- name: enable galera cluster communication
+  firewalld:
+    immediate: yes
+    permanent: yes
+    port: "4567/tcp"
+    state: "{{ 'enabled' if mariadb_cluster|default(false) else 'disabled' }}"
+
+- name: enable galera IST
+  firewalld:
+    immediate: yes
+    permanent: yes
+    port: "4568/tcp"
+    state: "{{ 'enabled' if mariadb_cluster|default(false) else 'disabled' }}"
+
+- name: enable galera SST
+  firewalld:
+    immediate: yes
+    permanent: yes
+    port: "4444/tcp"
+    state: "{{ 'enabled' if mariadb_cluster|default(false) else 'disabled' }}"

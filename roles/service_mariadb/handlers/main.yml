@@ -1,5 +1,5 @@
 ---
-- name: mysql_restart
+- name: mariadb_restart
   service:
-    name: mysql
+    name: mariadb
     state: restarted

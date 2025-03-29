@@ -1,0 +1,8 @@
+---
+# This should list all mariadb nodes in the cluster
+mariadb_cloudstack_testenv:
+  hosts:
+    node1.testenv.bradhouse.dev:
+    node2.testenv.bradhouse.dev:
+    node3.testenv.bradhouse.dev:
+

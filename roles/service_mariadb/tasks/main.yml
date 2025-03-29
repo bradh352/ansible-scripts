@@ -1,13 +1,28 @@
 ---
-- name: Install MariaDB AppStream
-  dnf:
-    name: "@mariadb:10.11"
-    state: installed
 
-- name: Install MariaDB Server
-  dnf:
-    name: [ "mariadb-server", "python3-PyMySQL" ]
-    state: installed
+- name: Perform Distribution-specific tasks
+  include_tasks: "rhel.yml"
+  when: ansible_os_family == 'RedHat'
+
+- name: Perform Distribution-specific tasks
+  include_tasks: "debian.yml"
+  when: ansible_os_family == 'Debian'
+
+- name: "Gather mariadb hosts"
+  set_fact:
+    mariadb_hosts_json: "{{ lookup('template', 'mariadb_hosts.j2') }}"
+  when: mariadb_cluster|default(false)
+
+- name: "Parse mariadb hosts"
+  set_fact:
+    mariadb_hosts: "{{ mariadb_hosts_json|from_yaml }}"
+  when: mariadb_cluster|default(false)
+
+- name: "Add known mariadb nodes to /etc/hosts"
+  lineinfile:
+    path: /etc/hosts
+    line: "{{ hostvars[item]['mariadb_cluster_ip']}} {{ item|split('.')|first }} {{ item }}"
+  with_items: "{{ mariadb_hosts | reject('search', inventory_hostname | split('.') | first ) }}"
 
 - name: Install configuration
   template:
@@ -16,39 +31,33 @@
     owner: root
     group: root
     mode: 0644
-  notify: mysql_restart
+  notify: mariadb_restart
 
-- name: Create mysql tmp directory
-  file:
-    path: /var/lib/mysql-tmp
-    state: directory
-    owner: mysql
-    group: mysql
-    mode: 0750
-    setype: mysqld_db_t
-  notify: mysql_restart
-
-- name: Set SELinux file context appropriately for /var/lib/mysql-tmp
-  sefcontext:
-    state: present
-    setype: mysqld_db_t
-    target: /var/lib/mysql-tmp(/.*)?
+- name: Install cluster configuration
+  template:
+    src: cluster.cnf.j2
+    dest: /etc/my.cnf.d/cluster.cnf
+    owner: root
+    group: root
+    mode: 0644
+  when:
+  notify: mariadb_restart
 
 - name: Start and Enable MariaDB
   service:
-    name: mariadb
+    name: "{{ 'mariadb' if not mariadb_bootstrap|default(false) else 'mariadb@bootstrap' }}"
     enabled: true
     state: started
 
 - name: Set root password for MariaDB for localhost
   community.mysql.mysql_user:
     login_user: root
-    login_password: "{{ vault_root_password }}"
+    login_password: "{{ mariadb_root_password }}"
     check_implicit_admin: true
     column_case_sensitive: false
     login_unix_socket: /var/lib/mysql/mysql.sock
     name: root
-    password: "{{ vault_root_password }}"
+    password: "{{ mariadb_root_password }}"
     host: "{{ item }}"
   with_items:
     - localhost
@@ -59,7 +68,7 @@
   community.mysql.mysql_user:
     login_unix_socket: /var/lib/mysql/mysql.sock
     login_user: root
-    login_password: "{{ vault_root_password }}"
+    login_password: "{{ mariadb_root_password }}"
     check_implicit_admin: true
     column_case_sensitive: false
     name: root
@@ -70,17 +79,41 @@
   community.mysql.mysql_user:
     login_unix_socket: /var/lib/mysql/mysql.sock
     login_user: root
-    login_password: "{{ vault_root_password }}"
+    login_password: "{{ mariadb_root_password }}"
     check_implicit_admin: true
     column_case_sensitive: false
     name: ''
     host_all: yes
     state: absent
 
-- name: enable or disable mariadb port depending on if external access is allowed
-  firewalld:
-    immediate: yes
-    permanent: yes
-    port: "3306/tcp"
-    state: "{{ 'enabled' if mariadb_external_access else 'disabled' }}"
+- name: Make cluster sync user for SST
+  community.mysql.mysql_user:
+    login_unix_socket: /var/lib/mysql/mysql.sock
+    login_user: root
+    login_password: "{{ mariadb_root_password }}"
+    check_implicit_admin: true
+    column_case_sensitive: false
+    name: "{{ mariadb_sst_username }}"
+    password: "{{ mariadb_sst_password }}"
+    host: "localhost"
+    priv: "*.*:RELOAD,PROCESS,LOCK TABLES,BINLOG MONITOR,REPLICATION CLIENT"
+
+- name: Make cluster health check user
+  community.mysql.mysql_user:
+    login_unix_socket: /var/lib/mysql/mysql.sock
+    login_user: root
+    login_password: "{{ mariadb_root_password }}"
+    check_implicit_admin: true
+    column_case_sensitive: false
+    name: "{{ mariadb_clustercheck_username }}"
+    password: "{{ mariadb_clustercheck_password }}"
+    host: "localhost"
+    priv: "*.*:PROCESS"
+
+- name: Create clustercheck health check script
+  template:
+    src: clustercheck.j2
+    dest: /usr/local/bin/clustercheck
+    owner: root
+    mode: 755
 

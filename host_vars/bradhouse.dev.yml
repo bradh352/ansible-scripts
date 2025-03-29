@@ -3,6 +3,7 @@ ssh_port:                 5022
 superuser:                infra
 base_autoupdate:          true
 apache_letsencrypt:       true
+mariadb_root_password:    "{{ vault_root_password }}"
 wordpress_install_path:   "/var/www/bradhouse.dev/public"
 wordpress_domain:         "bradhouse.dev"
 wordpress_domain_aliases: [ "www.bradhouse.dev", "brad-house.com", "www.brad-house.com" ]

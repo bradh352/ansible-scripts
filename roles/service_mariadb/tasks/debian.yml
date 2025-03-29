@@ -1,0 +1,83 @@
+---
+- name: "APT: install dependencies"
+  ansible.builtin.apt:
+    pkg:
+      - apt-transport-https
+      - curl
+    state: present
+
+- name: "APT: Keyring directory"
+  file:
+    path: "/etc/apt/keyrings"
+    mode: "640"
+    state: directory
+
+- name: "APT: fetch keyring"
+  ansible.builtin.get_url:
+    url: https://mariadb.org/mariadb_release_signing_key.pgp
+    dest: /etc/apt/keyrings/mariadb-keyring.pgp
+    mode: "644"
+
+- name: "APT: Install mariadb repository"
+  template:
+    src: mariadb.sources.j2
+    dest: /etc/apt/sources.list.d/mariadb.sources
+    owner: root
+    mode: "644"
+  register: repo
+
+- name: "APT: Update cache"
+  ansible.builtin.apt:
+    update_cache: true
+  when: repo.changed
+
+- name: "APT: Install mariadb"
+  ansible.builtin.apt:
+    pkg:
+      - "mariadb-server"
+    state: present
+
+- name: "APT: install cluster dependencies"
+  ansible.builtin.apt:
+    pkg:
+      - "mariadb-backup"
+      - "socat"
+    state: present
+
+- name: Create mysql tmp directory
+  file:
+    path: /var/lib/mysql-tmp
+    state: directory
+    owner: mysql
+    group: mysql
+    mode: 0750
+  notify: mariadb_restart
+
+- name: "UFW: enable or disable mariadb port depending on if external access is allowed"
+  community.general.ufw:
+    rule: allow
+    port: "3306"
+    proto: tcp
+  when: mariadb_external_access|default(false) or mariadb_cluster|default(false)
+
+- name: "UFW: enable galera replication"
+  community.general.ufw:
+    rule: allow
+    port: "4567"
+    proto: tcp
+  when: mariadb_cluster|default(false)
+
+- name: "UFW: enable galera IST"
+  community.general.ufw:
+    rule: allow
+    port: "4568"
+    proto: tcp
+  when: mariadb_cluster|default(false)
+
+- name: "UFW: enable galera SST"
+  community.general.ufw:
+    rule: allow
+    port: "4444"
+    proto: tcp
+  when: mariadb_cluster|default(false)
+

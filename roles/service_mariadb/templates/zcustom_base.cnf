@@ -9,7 +9,7 @@
 {% endif %}
 
 [mysqld]
-bind-address                   = {{ "0.0.0.0" if mariadb_external_access else "localhost" }}
+bind-address                   = {{ "0.0.0.0" if (mariadb_external_access|default(false) or mariadb_cluster|default(false)) else "localhost" }}
 # move tmpdir due to /tmp being a memory backed tempfs filesystem, mysql uses this for on disk sorting
 tmpdir                         = /var/lib/mysql-tmp
 default_storage_engine         = innodb
@@ -28,12 +28,9 @@ innodb_log_checksums           = ON
 innodb_file_per_table          = 1
 innodb_flush_method            = O_DIRECT
 innodb_flush_neighbors         = 0
-#innodb_io_capacity             = 3000
-#innodb_io_capacity_max         = 6000
 innodb_log_write_ahead_size    = 4096
 innodb_log_file_size           = 1G
 innodb_stats_on_metadata       = OFF
-#innodb_thread_concurrency      = 12
 
 # Query Cache causes additional locking, reducing parallelization.  More harm than good.
 query_cache_size               = 0
@@ -50,9 +47,6 @@ table_open_cache_instances     = 16
 
 # This settings makes MySQL prefer indexes with low cardinality over table scans (essentially, trust DBA more)
 max_seeks_for_key              = 100
-
-# Specific to use, keygen can create huge concat columns on license skus
-group_concat_max_len           = 102400
 
 sql_mode = "NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION,ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES"
 

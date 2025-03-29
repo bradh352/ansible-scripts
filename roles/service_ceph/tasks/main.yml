@@ -15,7 +15,7 @@
   set_fact:
     ceph_hosts_json: "{{ lookup('template', 'ceph_hosts.j2') }}"
 
-- name: "Parse interface mappings"
+- name: "Parse ceph hosts"
   set_fact:
     ceph_hosts: "{{ ceph_hosts_json|from_yaml }}"
 

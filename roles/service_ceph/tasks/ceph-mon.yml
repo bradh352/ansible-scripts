@@ -69,6 +69,7 @@
 - name: "Ceph: check auth_allow_insecure_global_id_reclaim"
   shell: ceph config get mon auth_allow_insecure_global_id_reclaim
   register: ceph_insecure_global_id
+  changed_when: false
 
 - name: "Ceph: set auth_allow_insecure_global_id_reclaim to false"
   shell: "ceph config set mon auth_allow_insecure_global_id_reclaim false"
