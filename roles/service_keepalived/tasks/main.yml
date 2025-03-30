@@ -1,0 +1,41 @@
+---
+- name: "APT: install keepalived and helpers"
+  ansible.builtin.apt:
+    pkg:
+      - keepalived
+      - curl
+      - netcat
+      - openssl
+    state: present
+
+- name: "install healthcheck scripts"
+  copy:
+    src: "{{ item }}"
+    dest: "/usr/local/bin/{{ item }}"
+    mode: "755"
+    owner: root
+  with_items:
+    - healthcheck_ip.sh
+    - healthcheck_tls.sh
+
+- name: "create configuration files"
+  template:
+    src: "keepalived_vrrp.conf.j2"
+    dest: "/etc/keepalived/vrrp_{{ item.name }}.conf"
+    owner: keepalived
+    mode: "640"
+  with_items: "{{ keepalived_vips }}"
+  notify: keepalived_restart
+
+- name: "UFW: enable VRRP"
+  community.general.ufw:
+    rule: allow
+    proto: vrrp
+    interface: "{{ item.vrrp_interface|default(item.interface) }}"
+  with_items: "{{ keepalived_vips }}"
+
+- name: Ensure Keepalived is enabled and started
+  service:
+    name: keepalived
+    enabled: true
+    state: started
