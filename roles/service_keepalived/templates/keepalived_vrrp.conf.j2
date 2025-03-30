@@ -28,13 +28,29 @@ vrrp_instance {{ item.name }} {
   priority 100
 {% endif %}
 {% if item.priority_host is not defined %}
-  no_preempt
+  nopreempt
 {% endif %}
-  virtual_ip_address {
+
+{% if item.ips|ansible.utils.ipv4|count > 0 and item.ips|ansible.utils.ipv6|count > 0 %}
+  virtual_ipaddress {
+{% for ip in item.ips | ansible.utils.ipv4 %}
+    {{ ip }} dev {{ item.interface }}
+{% endfor %}
+  }
+
+  virtual_ipaddress_excluded {
+{% for ip in item.ips | ansible.utils.ipv6 %}
+    {{ ip }} dev {{ item.interface }}
+{% endfor %}
+  }
+{% else %}
+  virtual_ipaddress {
 {% for ip in item.ips %}
     {{ ip }} dev {{ item.interface }}
 {% endfor %}
   }
+{% endif %}
+
   track_script {
     {{ item.name }}
   }

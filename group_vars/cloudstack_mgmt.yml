@@ -1,4 +1,4 @@
 ---
-host_roles: [ "network_vxlanevpn", "service_ceph", "service_mariadb" ]
+host_roles: [ "network_vxlanevpn", "service_ceph", "service_mariadb", "service_keepalived" ]
 ansible_user: brad
 ansible_password: "Test123$"

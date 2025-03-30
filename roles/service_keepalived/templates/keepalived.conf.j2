@@ -1,0 +1,5 @@
+global_defs {
+    router_id {{ inventory_hostname | split('.') | first }}
+}
+
+includea /etc/keepalived/conf.d/*.conf

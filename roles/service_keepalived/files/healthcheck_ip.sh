@@ -7,5 +7,5 @@ fi
 host=$1
 port=$2
 
-nc -w 5 $host $port < /dev/null > /dev/null 2>&1
+nc -w 5 -q 0 $host $port < /dev/null > /dev/null 2>&1
 exit $?

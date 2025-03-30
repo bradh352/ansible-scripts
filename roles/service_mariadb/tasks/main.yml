@@ -27,12 +27,13 @@
 
 - name:
   set_fact:
-    mariadb_config_dir: "{{ '/etc/my.cnf.d/' if ansible_os_family == 'RedHat' else '/etc/mysql/conf.d/' }}"
+    mariadb_config_dir: "{{ '/etc/my.cnf.d/' if ansible_os_family == 'RedHat' else '/etc/mysql/mariadb.conf.d/' }}"
     mariadb_sock: "{{ '/var/lib/mysql/mysql.sock' if ansible_os_family == 'Redhat' else '/run/mysqld/mysqld.sock' }}"
+
 - name: Install configuration
   template:
-    src: zcustom_base.cnf
-    dest: "{{ mariadb_config_dir }}/zcustom_base.cnf"
+    src: 99_base.cnf.j2
+    dest: "{{ mariadb_config_dir }}/99_base.cnf"
     owner: root
     group: root
     mode: 0644
@@ -40,8 +41,8 @@
 
 - name: Install cluster configuration
   template:
-    src: cluster.cnf.j2
-    dest: "{{ mariadb_config_dir }}/cluster.cnf"
+    src: 99_cluster.cnf.j2
+    dest: "{{ mariadb_config_dir }}/99_cluster.cnf"
     owner: root
     group: root
     mode: 0644
