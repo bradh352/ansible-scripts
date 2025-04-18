@@ -98,7 +98,7 @@
 
 - name: "Parse config: PORT"
   set_fact:
-    port: "{{ port_json|from_yaml }}"
+    portc: "{{ port_json|from_yaml }}"
 
 - name: "Generate config: INTERFACE"
   set_fact:
@@ -171,6 +171,8 @@
       - '^DEVICE_NEIGHBOR$'
       - '^INTERFACE$'
       - '^LOOPBACK_INTERFACE$'
+      - '^MCLAG_DOMAIN$'
+      - '^MCLAG_INTERFACE$'
       - '^PORTCHANNEL$'
       - '^PORTCHANNEL_MEMBER$'
       - '^PORTCHANNEL_INTERFACE$'
@@ -189,7 +191,7 @@
     config: |
       {{ current_config
           | ansible.utils.remove_keys(target=remove_keys, matching_parameter='regex')
-          | combine(port, list_merge='replace')
+          | combine(portc, list_merge='replace')
           | combine(interface, list_merge='replace')
           | combine(portchannel, list_merge='replace')
           | combine(loopback, list_merge='replace')
