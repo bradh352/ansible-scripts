@@ -27,6 +27,11 @@
 {%         set mac_addr=sonic_interfaces[port.index].mac_addr %}
 {%       elif port_perm_macaddr[port.port]|default(current_config.DEVICE_METADATA.localhost.mac) != current_config.DEVICE_METADATA.localhost.mac %}
 {%         set mac_addr=port_perm_macaddr[port.port] %}
+{%       elif asic == "mellanox" %}
+{# We can't use a custom mac, not sure what to do here other than just use the system one. #}
+{# On SN2410 we've seen 1 port not have a permaddr, so presumably this means they want #}
+{# the system mac used there #}
+{%         set mac_addr=current_config.DEVICE_METADATA.localhost.mac %}
 {%       else %}
 {%         set mac_addr='02' | community.general.random_mac(seed=inventory_hostname ~ "_" ~ port.index|string) %}
 {%       endif %}
