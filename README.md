@@ -24,5 +24,5 @@ python3 -m venv ./venv
 ## Running the core playbook
 
 ```
-ansible-playbook -vv playbook.yml -l sw1.testenv.bradhouse.dev
+ansible-playbook -vv deploy.yml -l sw1.testenv.bradhouse.dev,sw2.testenv.bradhouse.dev -i inventory/testenv
 ```

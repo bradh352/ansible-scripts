@@ -1,10 +1,5 @@
----
-wordpress:
-  hosts:
-    bradhouse.dev:
 sonic:
   hosts:
     sw1.testenv.bradhouse.dev:
     sw2.testenv.bradhouse.dev:
     swmgmt.testenv.bradhouse.dev:
-
