@@ -1,5 +1,5 @@
 ---
-ansible_host: 192.168.1.189
+ansible_host: 192.168.1.169
 sonic_vxlan_vtep_ip: "172.16.0.1/32"
 sonic_asn: "4210000001"
 # sonic_mclag:
@@ -11,54 +11,62 @@ sonic_interfaces:
     layer3: true
     bgp_underlay: true
     description: "CloudStack1 port 1"
+    speed: "25000"
   "2":
     layer3: true
     bgp_underlay: true
     description: "CloudStack2 port 1"
+    speed: "25000"
   "3":
     layer3: true
     bgp_underlay: true
     description: "CloudStack3 port 1"
+    speed: "25000"
   "4":
     layer3: true
     bgp_underlay: true
     description: "CloudStack4 port 1"
+    speed: "25000"
   "5":
     layer3: true
     bgp_underlay: true
     description: "CloudStack5 port 1"
+    speed: "25000"
   "6":
     layer3: true
     bgp_underlay: true
     description: "CloudStack6 port 1"
+    speed: "25000"
   "7":
     layer3: true
     bgp_underlay: true
     description: "CloudStack7 port 1"
+    speed: "25000"
   "8":
     layer3: true
     bgp_underlay: true
     description: "CloudStack8 port 1"
-  "17":
-    description: "PortChannel1 MGMT p1"
-    autoneg: "off"
-    fec: "none"
-    speed: "10000"
-  "18":
-    description: "PortChannel1 MGMT p2"
-    autoneg: "off"
-    fec: "none"
-    speed: "10000"
-  "19":
-    description: "PortChannel2 MGMTLoop p1"
-    autoneg: "off"
-    fec: "none"
-    speed: "10000"
-  "20":
-    description: "PortChannel2 MGMTLoop p2"
-    autoneg: "off"
-    fec: "none"
-    speed: "10000"
+    speed: "25000"
+  # "17":
+  #   description: "PortChannel1 MGMT p1"
+  #   autoneg: "off"
+  #   fec: "none"
+  #   speed: "10000"
+  # "18":
+  #   description: "PortChannel1 MGMT p2"
+  #   autoneg: "off"
+  #   fec: "none"
+  #   speed: "10000"
+  # "19":
+  #   description: "PortChannel2 MGMTLoop p1"
+  #   autoneg: "off"
+  #   fec: "none"
+  #   speed: "10000"
+  # "20":
+  #   description: "PortChannel2 MGMTLoop p2"
+  #   autoneg: "off"
+  #   fec: "none"
+  #   speed: "10000"
   "33":
     description: "mgmtsw port 49"
     autoneg: "off"
@@ -85,10 +93,12 @@ sonic_interfaces:
     layer3: true
     bgp_underlay: true
     description: "torsw2 port 55"
+    speed: "100000"
   "56":
     layer3: true
     bgp_underlay: true
     description: "torsw2 port 56"
+    speed: "100000"
 
 sonic_vlans:
   "10":
@@ -98,22 +108,22 @@ sonic_vlans:
     layer3: true
 
 sonic_portchannel:
-  "1":
-    description: "management interface"
-    interfaces:
-      - "17"
-      - "18"
-    mtu: 1500
-    layer3: true
-    ips: [ "10.1.0.11/24" ]
-  "2":
-    description: "redundant access port for management interface loop"
-    interfaces:
-      - "19"
-      - "20"
-    vlans:
-      - vlan: 10
-        mode: "untagged"
+# #   "1":
+# #     description: "management interface"
+# #     interfaces:
+# #       - "17"
+# #       - "18"
+# #     mtu: 1500
+# #     layer3: true
+# #     ips: [ "10.1.0.11/24" ]
+# #   "2":
+# #     description: "redundant access port for management interface loop"
+# #     interfaces:
+# #       - "19"
+# #       - "20"
+# #     vlans:
+# #       - vlan: 10
+# #         mode: "untagged"
   "3":
     description: "fw1"
     interfaces:
@@ -121,7 +131,7 @@ sonic_portchannel:
     vlans:
       - vlan: 10
         mode: "untagged"
-    mclag: true
+#     mclag: true
   "4":
     description: "fw2"
     interfaces:
@@ -129,7 +139,7 @@ sonic_portchannel:
     vlans:
       - vlan: 10
         mode: "untagged"
-    mclag: true
+#     mclag: true
 
 sonic_routes:
   - prefix: "8.8.4.4/32"

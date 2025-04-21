@@ -2,10 +2,10 @@
 ansible_host: 192.168.1.129
 sonic_vxlan_vtep_ip: "172.16.0.2/32"
 sonic_asn: "4210000002"
-sonic_mclag:
-  group_id: 1
-  peer_ip: 172.16.0.1
-  source_ip: 172.16.0.2
+# sonic_mclag:
+#   group_id: 1
+#   peer_ip: 172.16.0.1
+#   source_ip: 172.16.0.2
 sonic_interfaces:
   "1":
     layer3: true
@@ -114,22 +114,22 @@ sonic_portchannel:
     vlans:
       - vlan: 10
         mode: "untagged"
-  "3":
-    description: "fw1"
-    interfaces:
-      - "47"
-    vlans:
-      - vlan: 10
-        mode: "untagged"
-    mclag: true
-  "4":
-    description: "fw2"
-    interfaces:
-      - "48"
-    vlans:
-      - vlan: 10
-        mode: "untagged"
-    mclag: true
+  # "3":
+  #   description: "fw1"
+  #   interfaces:
+  #     - "47"
+  #   vlans:
+  #     - vlan: 10
+  #       mode: "untagged"
+  #   mclag: true
+  # "4":
+  #   description: "fw2"
+  #   interfaces:
+  #     - "48"
+  #   vlans:
+  #     - vlan: 10
+  #       mode: "untagged"
+  #   mclag: true
 
 sonic_routes:
   - prefix: "8.8.4.4/32"

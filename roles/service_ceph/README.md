@@ -11,7 +11,7 @@ deploy Monitors, MDS, and OSDs and is targeting Hyperconvered deployments.
 
 This role is initially targeting Ubuntu, and tested on 24.04LTS.
 
-## Variables used by this role
+## Core variables used by this role
 * `ceph_cluster_name`: This name is used as an organization tool in Ansible.
   There are groups (specified in the next section) that are used to identify
   what services are deployed on each node in the cluster, and this name is
@@ -52,6 +52,24 @@ This role is initially targeting Ubuntu, and tested on 24.04LTS.
   chassis (such as when hosts share a single chassis, e.g. Supermicro microcloud)
   in which the ceph host resides.  Specifying this will place the OSD in this
   bucket to assist in determining the proper failure domains.
+
+### Variables for configuring resources
+
+* `ceph_pools`: List of ceph pools to create.  If a ceph pool by the same name
+  already exists, it will not be modified with the possible settings.  It is
+  up to the user to correct any settings post-creation.  Pools created here are
+  always configured to be used as `rbd` pools.  The autoscaler is also automatically
+  enabled.  Does not currently support creating erasure coded pools.
+  See `ceph_fs`, which will create its own pools for CephFS.
+  * `name`: Name of the ceph pool.  Can contain alpha-numerics, hypens, periods,
+    and underscores (`[A-Za-z0-9_.-]`).
+  * `replica`: Number of replicas for the data.  Defaults to `3`.
+  * `min_size`: Minimum number of replicas online before the pool goes offline.
+    Recommended to be at least `2`.
+  * `bulk`: Whether or not the pool is expected to be large (contain a lot of
+    data).  Defaults to `true`.
+
+* `ceph_fs`
 
 ## Groups used by this role
 

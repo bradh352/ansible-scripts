@@ -40,6 +40,16 @@
   set_fact:
     sonic_version: "{{ shellcmd.stdout }}"
 
+- name: retrieve base mac address
+  shell: "decode-syseeprom -m"
+  register: shellcmd
+  failed_when: shellcmd.stdout | length == 0
+  changed_when: False
+
+- name: set sonic mac address fact
+  set_fact:
+    sonic_mac_address: "{{ shellcmd.stdout | lower }}"
+
 - name: Parse port_config.ini
   script: port_config_to_json.sh /usr/share/sonic/device/{{ platform }}/{{ hwsku }}/port_config.ini
   register: port_config
