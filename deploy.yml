@@ -1,7 +1,10 @@
 ---
 
-# For bootstrapping, run:
-#  ansible-playbook -vv playbook.yml --ask-pass -e ansible_ssh_port=22 -e ansible_user=root --limit bradhouse.dev
+# For bootstrapping, often the username and password are different than are
+# used after initial provisioning.  That means we need to override those
+# settings on the command line.  The SSH port may also be changed during
+# execution, so that too can be specified, like:
+#  ansible-playbook -vv playbook.yml --ask-pass -e ansible_become_password="Test123$" -e ansible_ssh_port=22 -e ansible_user=root --limit myhostname.com
 
 - hosts: all
   become: no
