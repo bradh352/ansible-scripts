@@ -283,11 +283,17 @@
 - name: Perform CIS hardening
   include_tasks: "cis.yml"
 
-- name: check if server needs rebooting
+- name: "RedHat: check if server needs rebooting"
   command: "needs-restarting -r"
   notify: reboot
   register: reboot_req
   changed_when: (reboot_req.rc == 1)
   failed_when: (reboot_req.rc > 1)
+  when: ansible_os_family == 'RedHat'
 
-
+- name: "Debian: check if server needs rebooting"
+  stat: path=/var/run/reboot-required
+  notify: reboot
+  register: reboot_req
+  changed_when: reboot_req.stat.exists
+  when: ansible_os_family == 'Debian'

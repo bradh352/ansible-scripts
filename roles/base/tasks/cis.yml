@@ -98,8 +98,8 @@
   register: auditd_conf
 
 - name: "CIS: add configuration to /etc/audit.d/rules.d/audit.rules"
-  copy:
-    src: audit.rules
+  template:
+    src: audit.rules.j2
     dest: /etc/audit/rules.d/audit.rules
     owner: root
     group: root
@@ -132,7 +132,7 @@
     enabled: yes
   with_items:
     - auditd
-    - crond
+    - "{{ 'crond' if ansible_os_family == 'RedHat' else 'cron' }}"
 
 - name: "CIS: set owner,group and perms for cron and anacron files, and blank them out"
   copy:
@@ -164,7 +164,7 @@
 
 - name: "CIS: set user umask in bashrc"
   replace:
-    path: /etc/bashrc
+    path: "{{ '/etc/bashrc' if ansible_os_family == 'RedHat' else '/etc/bash.bashrc' }}"
     regexp: 'umask [0-9]+'
     replace: "umask 077"
 
