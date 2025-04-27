@@ -7,7 +7,7 @@ SyslogFacility AUTHPRIV
 LogLevel INFO
 PermitRootLogin no
 AuthorizedKeysFile .ssh/authorized_keys
-PasswordAuthentication no
+PasswordAuthentication {{ 'yes' if ssh_password_auth else 'no' }}
 PubkeyAuthentication yes
 ChallengeResponseAuthentication no
 GSSAPIAuthentication yes

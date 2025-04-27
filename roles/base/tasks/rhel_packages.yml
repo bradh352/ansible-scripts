@@ -1,0 +1,20 @@
+---
+- name: ensure EPEL is installed
+  dnf:
+    name: "epel-release"
+    state: installed
+
+- name: upgrade all packages to the latest versions
+  dnf:
+    name: "*"
+    state: latest
+    update_cache: true
+  ignore_errors: false
+  when: not skip_updates|default(false)
+
+- name: install base build packages for RHEL-like systems
+  dnf:
+    name: ["wget", "openssh-clients", "chrony", "acpid", "nano", "nc", "bzip2",
+           "dnf-utils", "rsyslog", "tar", "unzip", "python3-policycoreutils",
+           "fail2ban", "exim", "firewalld" ]
+    state: installed

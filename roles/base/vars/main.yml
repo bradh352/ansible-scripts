@@ -1,0 +1,7 @@
+---
+# These are defaults and overwritten by host/group vars.
+timezone: UTC
+ssh_port: 22
+ntp_pools: [ "0.us.pool.ntp.org", "1.us.pool.ntp.org", "2.us.pool.ntp.org", "3.us.pool.ntp.org" ]
+os_autoupdate: false
+ssh_password_auth: false

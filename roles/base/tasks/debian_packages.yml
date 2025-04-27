@@ -1,0 +1,14 @@
+---
+- name: upgrade all packages to the latest versions
+  ansible.builtin.apt:
+    name: "*"
+    state: latest
+    update_cache: true
+  ignore_errors: false
+  when: not skip_updates|default(false)
+
+- name: install base build packages for Debian-like systems
+  ansible.builtin.apt:
+    name: ["wget", "openssh-client", "chrony", "acpid", "nano", "netcat-openbsd",
+           "bzip2", "rsyslog", "tar", "unzip", "fail2ban", "exim4", "ufw", "auditd" ]
+    state: present

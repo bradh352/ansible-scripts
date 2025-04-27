@@ -1,8 +1,4 @@
 ---
-- name: set rhel_ver8plus fact
-  set_fact:
-    rhel_ver8plus: "{{ true if 8 >= ansible_distribution_major_version|int else false }}"
-  when: 'ansible_distribution == "CentOS" or ansible_distribution == "RHEL" or ansible_distribution == "Rocky" or ansible_distribution == "AlmaLinux"'
 
 # We do this because ansible_inventory isn't quite the right thing to do as that is read from the
 # destination machine, and if it hasn't been configured yet, it won't be right.
@@ -11,13 +7,10 @@
     short_host: "{{ inventory_hostname.split('.')[0] }}"
 
 - name: configure hosts for hostname
-  template:
-    src: hosts.j2
-    dest: /etc/hosts
-    backup: yes
-    owner: root
-    group: root
-    mode: 0644
+  lineinfile:
+    path: /etc/hosts
+    line: "127.0.1.1 {{ inventory_hostname }} {{ short_host }}"
+    regexp: '^127\.0\.1\.1'
   notify: set_hostname
 
 - name: configure hostname
@@ -30,26 +23,28 @@
     mode: 0644
   notify: set_hostname
 
-- name: configure network interface
-  lineinfile:
-    dest: /etc/sysconfig/network-scripts/ifcfg-{{ ansible_default_ipv4.alias }}
-    regexp: "{{ item.regexp }}"
-    line: "{{ item.line }}"
-    state: "{{ item.state }}"
-  with_items:
-    - { regexp: 'DNS1\=*', line: "DNS1=8.8.8.8", state: "present" }
-    - { regexp: 'DNS2\=*', line: "DNS2=8.8.4.4", state: "present" }
-    - { regexp: 'DNS3\=*', line: "",             state: "absent" }
+# Move to network config
+# - name: configure network interface
+#   lineinfile:
+#     dest: /etc/sysconfig/network-scripts/ifcfg-{{ ansible_default_ipv4.alias }}
+#     regexp: "{{ item.regexp }}"
+#     line: "{{ item.line }}"
+#     state: "{{ item.state }}"
+#     when: ansible_os_family == 'RedHat'
+#   with_items:
+#     - { regexp: 'DNS1\=*', line: "DNS1=8.8.8.8", state: "present" }
+#     - { regexp: 'DNS2\=*', line: "DNS2=8.8.4.4", state: "present" }
+#     - { regexp: 'DNS3\=*', line: "",             state: "absent" }
 
 - name: Make sure the infrastructure user is created for management.
   user:
     name: "{{ superuser }}"
     create_home: yes
     shell: "/bin/bash"
-    groups: [ "wheel", "users", "adm", "lp" ]
+    groups: "{{ [ 'wheel', 'users', 'adm', 'lp' ] if ansible_os_family == 'RedHat' else [ 'adm', 'sudo', 'plugdev', 'cdrom', 'dip' ] }}"
     state: present
     append: yes
-    password: "{{ vault_root_password | password_hash('sha512') }}"
+    password: "{{ superuser_password | password_hash('sha512') }}"
     update_password: "on_create"
 
 - name: disable root user
@@ -63,8 +58,8 @@
     path: "/home/{{ superuser }}/.ssh/"
     state: directory
     mode: 0700
-    owner: infra
-    group: infra
+    owner: "{{ superuser }}"
+    group: "{{ superuser }}"
 
 - name: "Make sure the public key for ssh authentication is configured for the {{ superuser }} user"
   lineinfile:
@@ -74,36 +69,17 @@
     owner: infra
     group: infra
     mode: 0600
-    line: "{{ superuser_pubkey }}"
+    line: "{{ item }}"
+  with_items: "{{ superuser_pubkey }}"
+  when: superuser_pubkey is defined
 
-- name: ensure EPEL is installed
-  dnf:
-    name: "epel-release"
-    state: latest
+- name: Install packages
+  include_tasks: "rhel_packages.yml"
+  when: ansible_os_family == 'RedHat'
 
-- name: upgrade all packages to the latest versions
-  dnf:
-    name: "*"
-    state: latest
-    update_cache: true
-  ignore_errors: false
-
-- name: install base build packages for RHEL-like systems
-  dnf:
-    name: ["wget", "openssh-clients", "chrony", "acpid", "nano", "nc", "bzip2",
-           "dnf-utils", "rsyslog", "tar", "unzip", "python3-policycoreutils", "fail2ban" ]
-    state: installed
-
-- name: ensure firewalld is installed
-  dnf:
-    name: firewalld
-    state: installed
-
-- name: ensure firewalld is started and enabled
-  service:
-    name: firewalld
-    state: started
-    enabled: true
+- name: Debian packages
+  include_tasks: "debian_packages.yml"
+  when: ansible_os_family == 'Debian'
 
 - name: check if systemd-timesyncd is installed
   shell: systemctl status systemd-timesyncd
@@ -133,24 +109,11 @@
     state: started
     enabled: true
 
-- name: Set timezone to eastern
+- name: Set timezone
   file:
     path: /etc/localtime
-    src: "/usr/share/zoneinfo/{{ base_timezone}}"
+    src: "/usr/share/zoneinfo/{{ timezone }}"
     state: link
-
-- name: "open up port {{ ssh_port }} for SSHd alternative port"
-  firewalld:
-    immediate: yes
-    permanent: yes
-    port: "{{ ssh_port }}/tcp"
-    state: enabled
-
-- name: "SELinux allow SSHd to use port {{ ssh_port }}"
-  seport:
-    proto: tcp
-    ports: "{{ ssh_port }}"
-    setype: ssh_port_t
 
 - name: install /etc/ssh/sshd_config
   template:
@@ -162,16 +125,6 @@
     backup: true
   notify: sshd_restart
 
-- name: remove firewalld services no longer desired
-  firewalld:
-    service: "{{ item }}"
-    immediate: yes
-    permanent: yes
-    state: disabled
-  with_items:
-    - cockpit
-    - sshd
-
 # Rsyslog recommends using imuxsock, so that means we need ForwardToSyslog
 # and we want to otherwise make journald unused as we don't want stuff to persist.
 # https://www.rsyslog.com/doc/v8-stable/configuration/modules/imjournal.html
@@ -182,7 +135,7 @@
     option: "{{ item.key }}"
     value: "{{ item.val }}"
   with_items:
-    - { key: "{{ 'RateLimitIntervalSec' if rhel_ver8plus else 'RateLimitInterval' }}", val: "0" }
+    - { key: "RateLimitIntervalSec", val: "0" }
     - { key: "RateLimitBurst",       val: "0" }
     - { key: "RuntimeMaxUse",        val: "100M" }
     - { key: "Storage",              val: "volatile" }
@@ -260,14 +213,10 @@
     line: "MAILTO={{ admin_email }}"
     backrefs: true
 
-- name: install exim package
-  dnf:
-    name: exim
-
 - name: configure exim
   template:
     src: exim.conf
-    dest: /etc/exim/exim.conf
+    dest: "{{ '/etc/exim/exim.conf' if ansible_os_family == 'RedHat' else '/etc/exim4/exim4.conf' }}"
     backup: yes
     owner: root
     group: root
@@ -275,255 +224,17 @@
 
 - name: make sure exim doesn't start, we don't need the daemon
   service:
-    name: exim
+    name: "{{ 'exim' if ansible_os_family == 'RedHat' else 'exim4' }}"
     state: stopped
     enabled: no
 
-- name: check if mta is already set to sendmail
-  shell: alternatives --display mta | grep link | grep /usr/sbin/sendmail.exim
-  changed_when: false
-  failed_when: false
-  register: mta
+- name: Perform RHEL-specific tasks
+  include_tasks: "rhel_tasks.yml"
+  when: ansible_os_family == 'RedHat'
 
-- name: set mta alternative to exim
-  command: alternatives --set mta /usr/sbin/sendmail.exim
-  when: mta.failed
-
-
-# Automatic updates
-- name: "Automatic updates: {{ 'yes' if base_autoupdate else 'no' }}"
-  dnf:
-    name: dnf-automatic
-    state: "{{ 'installed' if base_autoupdate else 'absent' }}"
-
-- name: "Automatic updates: config"
-  copy:
-    src: dnf_automatic.conf
-    dest: /etc/dnf/automatic.conf
-    mode: 0600
-    owner: root
-    group: root
-  when: base_autoupdate
-
-
-- name: "Automatic updates: systemd timer config dir"
-  file:
-    path: /etc/systemd/system/dnf-automatic.timer.d/
-    state: directory
-    mode: 0700
-    owner: root
-    group: root
-  when: base_autoupdate
-
-- name: "Automatic updates: schedule"
-  copy:
-    src: dnf_automatic_schedule.conf
-    dest: /etc/systemd/system/dnf-automatic.timer.d/local.conf
-    mode: 0600
-    owner: root
-    group: root
-  when: base_autoupdate
-
-- name: "Automatic updates: started"
-  systemd:
-    name: dnf-automatic.timer
-    enabled: yes
-    state: started
-  when: base_autoupdate
-
-# Hardening as per CIS
-- name: "CIS: disable loading of unneeded filesystem types"
-  copy:
-    src: modprobe_CIS.conf
-    dest: /etc/modprobe.d/CIS.conf
-    owner: root
-    group: root
-    mode: 0600
-
-- name: "CIS: remove unneeded or insecure software packages"
-  dnf:
-    name: [ "setroubleshoot", "mcstrans", "telnet-server", "telnet", "rsh-server", "rsh",
-            "ypbind", "ypserv", "tftp", "talk", "talk-server", "vsftpd" ]
-    state: absent
-
-- name: "CIS: disable unneeded services"
-  service:
-    name: "{{ item }}"
-    state: stopped
-    enabled: no
-  failed_when: false
-  with_items:
-    - chargen-dgram
-    - chargen-stream
-    - daytime-dgram
-    - daytime-stream
-    - echo-dgram
-    - echo-stream
-    - tcpmux-server
-    - avahi-daemon
-    - cups
-
-- name: "CIS: set owner, group and perms on /boot/grub2.grub.cfg"
-  file:
-    path: /boot/grub2/grub.cfg
-    owner: root
-    group: root
-    mode: 0600
-  ignore_errors: yes
-  notify: update_grub
-
-- name: "CIS: install /etc/grub.d/40_custom for boot loader password"
-  template:
-    src: grub_40_custom
-    dest: /etc/grub.d/40_custom
-    owner: root
-    group: root
-    mode: 0755
-  notify: update_grub
-
-- name: "CIS: update /etc/default/grub to enable audit logging at boot"
-  lineinfile:
-    dest: /etc/default/grub
-    regexp: '^GRUB_CMDLINE_LINUX_DEFAULT='
-    state: present
-    line: 'GRUB_CMDLINE_LINUX_DEFAULT="audit=1"'
-  notify: update_grub
-
-- name: "CIS: restrict core dumps"
-  copy:
-    src: security_limits.conf
-    dest: /etc/security/limits.conf
-    owner: root
-    group: root
-    mode: 0600
-
-- name: "CIS: set configs in sysctl.d"
-  copy:
-    src: sysctl_80-CIS.conf
-    dest: /etc/sysctl.d/80-CIS.conf
-    owner: root
-    group: root
-    mode: 0600
-
-- name: "CIS: set default umask in login.defs"
-  lineinfile:
-    dest: /etc/login.defs
-    state: present
-    line: "UMASK           077"
-    regexp: "^UMASK .*"
-
-- name: "CIS: add auditd.conf configuration"
-  copy:
-    src: auditd.conf
-    dest: /etc/audit/auditd.conf
-    owner: root
-    group: root
-    mode: 0600
-  register: auditd_conf
-
-- name: "CIS: add configuration to /etc/audit.d/rules.d/audit.rules"
-  copy:
-    src: audit.rules
-    dest: /etc/audit/rules.d/audit.rules
-    owner: root
-    group: root
-    mode: 0600
-  register: audit_rules
-
-- name: "CIS: add configuration to /etc/audit.d/rules.d/pcidss.rules"
-  copy:
-    src: audit_pcidss.rules
-    dest: /etc/audit/rules.d/pcidss.rules
-  register: pcidss_rules
-
-- name: "CIS: run augenrules when audit rules have changed"
-  command: "augenrules --load"
-  when: audit_rules.changed or pcidss_rules.changed
-  notify: auditd_reload
-
-- name: "CIS: enable auditd to write to syslog for log collection"
-  copy:
-    src: audit_syslog.conf
-    dest: '/etc/audit/plugins.d/syslog.conf'
-    owner: root
-    group: root
-    mode: 0640
-
-- name: "CIS: enable critical daemons"
-  service:
-    name: "{{ item }}"
-    state: started
-    enabled: yes
-  with_items:
-    - auditd
-    - crond
-
-- name: "CIS: set owner,group and perms for cron and anacron files, and blank them out"
-  copy:
-    dest: "/etc/{{ item }}"
-    owner: root
-    group: root
-    mode: 0600
-    force: no
-    content: ""
-  with_items:
-    - anacrontab
-    - crontab
-    - at.allow
-    - cron.allow
-
-- name: "CIS: set owner,group and perms for cron directories"
-  file:
-    path: "/etc/{{ item }}"
-    state: directory
-    owner: root
-    group: root
-    mode: 0700
-  with_items:
-    - cron.d
-    - cron.hourly
-    - cron.daily
-    - cron.weekly
-    - cron.monthly
-
-- name: "CIS: set user umask in bashrc"
-  replace:
-    path: /etc/bashrc
-    regexp: 'umask [0-9]+'
-    replace: "umask 077"
-
-- name: "CIS: set user umask in /etc/profile.d/cis.sh"
-  copy:
-    src: profile_cis.sh
-    dest: /etc/profile.d/cis.sh
-    owner: root
-    group: root
-    mode: 0700
-
-- name: "CIS: copy banner to /etc/issue, /etc/issue.net"
-  copy:
-    src: banner
-    dest: "/etc/{{ item }}"
-    owner: root
-    group: root
-    mode: 0600
-  with_items:
-    - issue
-    - issue.net
-
-- name: "CIS: blank motd"
-  copy:
-    dest: "/etc/motd"
-    owner: root
-    group: root
-    mode: 0600
-    force: no
-    content: ""
-
-- name: "CIS: ensure SELinux is enforcing"
-  selinux:
-    policy: targeted
-    state: enforcing
+- name: Perform Debian-specific tasks
+  include_tasks: "debian_tasks.yml"
+  when: ansible_os_family == 'Debian'
 
 - name: "fail2ban: create /etc/fail2ban/jail.d/sshd.local file"
   template:
@@ -538,8 +249,8 @@
   file:
     path: /var/run/fail2ban
     state: directory
-    seuser: system_u
-    setype: fail2ban_var_run_t
+    seuser: "{{ 'system_u' if ansible_os_family == 'RedHat' }}"
+    setype: "{{ 'fail2ban_var_run_t' if ansible_os_family == 'RedHat' }}"
     owner: root
     group: root
     mode: 0755
@@ -552,12 +263,14 @@
     enabled: yes
 
 # Kernel Dump is not needed on a production system, disable.
-# This frees up about 160MB of RAM, especially important on low-memory systems.
+# This frees up about 160MB of RAM, especially important on low-memory VMs.
 - name: "kdump: disable service"
   service:
     name: kdump
     state: stopped
     enabled: no
+  when: ansible_os_family == 'RedHat'
+
 - name: "kdump: disable crashkernel"
   lineinfile:
      path: /etc/default/grub
@@ -566,6 +279,9 @@
      line: 'GRUB_CMDLINE_LINUX=\1crashkernel=no\2'
      state: present
   notify: update_grub
+
+- name: Perform CIS hardening
+  include_tasks: "cis.yml"
 
 - name: check if server needs rebooting
   command: "needs-restarting -r"
