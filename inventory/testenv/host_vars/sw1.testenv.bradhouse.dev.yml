@@ -1,5 +1,5 @@
 ---
-ansible_host: 192.168.1.169
+ansible_host: 192.168.1.224
 sonic_vxlan_vtep_ip: "172.16.0.1/32"
 sonic_asn: "4210000001"
 # sonic_mclag:
@@ -67,34 +67,34 @@ sonic_interfaces:
   #   autoneg: "off"
   #   fec: "none"
   #   speed: "10000"
-  "33":
+  "16":
     description: "mgmtsw port 49"
     autoneg: "off"
     fec: "none"
     speed: "10000"
     layer3: true
-  "41":
+  "15":
     description: "fakeinet ge-0/8"
     autoneg: "off"
     fec: "none"
     speed: "1000"
     layer3: true
-  "47":
+  "23":
     description: "PortChannel3 fw1 ge-0/8"
     autoneg: "off"
     fec: "none"
     speed: "1000"
-  "48":
+  "24":
     description: "PortChannel4 fw2 ge-0/8"
     autoneg: "off"
     fec: "none"
     speed: "1000"
-  "55":
+  "31":
     layer3: true
     bgp_underlay: true
     description: "torsw2 port 55"
     speed: "100000"
-  "56":
+  "32":
     layer3: true
     bgp_underlay: true
     description: "torsw2 port 56"
@@ -127,7 +127,7 @@ sonic_portchannel:
   "3":
     description: "fw1"
     interfaces:
-      - "47"
+      - "23"
     vlans:
       - vlan: 10
         mode: "untagged"
@@ -135,7 +135,7 @@ sonic_portchannel:
   "4":
     description: "fw2"
     interfaces:
-      - "48"
+      - "24"
     vlans:
       - vlan: 10
         mode: "untagged"

@@ -16,7 +16,7 @@
 
 - name: sshd_restart
   service:
-    name: sshd
+    name: "{{ 'sshd' if ansible_os_family == 'RedHat' else 'ssh' }}"
     state: restarted
 
 - name: firewall_reload

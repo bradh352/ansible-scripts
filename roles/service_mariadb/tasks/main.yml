@@ -37,7 +37,7 @@
     owner: root
     group: root
     mode: 0644
-  notify: "{{ 'mariadb_restart' if not mariadb_bootstrap|default(false) }}"
+  notify: "{{ 'mariadb_restart' if not mariadb_bootstrap|default(false) else 'noop' }}"
 
 - name: Install cluster configuration
   template:
@@ -46,7 +46,7 @@
     owner: root
     group: root
     mode: 0644
-  notify: "{{ 'mariadb_restart' if not mariadb_bootstrap|default(false) }}"
+  notify: "{{ 'mariadb_restart' if not mariadb_bootstrap|default(false) else 'noop' }}"
 
 - name: Enable MariaDB
   service:

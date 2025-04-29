@@ -36,7 +36,7 @@
 #     - { regexp: 'DNS2\=*', line: "DNS2=8.8.4.4", state: "present" }
 #     - { regexp: 'DNS3\=*', line: "",             state: "absent" }
 
-- name: Make sure the infrastructure user is created for management.
+- name: Make sure the superuser is created for management.
   user:
     name: "{{ superuser }}"
     create_home: yes
@@ -45,7 +45,26 @@
     state: present
     append: yes
     password: "{{ superuser_password | password_hash('sha512') }}"
-    update_password: "on_create"
+    update_password: on_create
+  register: superuser_created
+
+- name: Fetch the hash for the existing superuser password
+  script: get_pw_hash.sh "{{ superuser }}"
+  register: pwhash
+  changed_when: false
+
+- name: Make sure the superuser password is up to date
+  user:
+    name: "{{ superuser }}"
+    password: "{{ superuser_password | password_hash('sha512', pwhash.stdout | trim) }}"
+    update_password: always
+  register: superuser_pwchanged
+
+- name: Fixup ansible password for this playbook
+  set_fact:
+    ansible_password: "{{ superuser_password }}"
+    ansible_become_pass: "{{ superuser_password }}"
+  when: ansible_user == superuser and (superuser_created.changed or superuser_pwchanged.changed)
 
 - name: disable root user
   user:
