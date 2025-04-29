@@ -144,6 +144,11 @@
     backup: true
   notify: sshd_restart
 
+- name: Ensure we update the ssh port if it was changed
+  set_fact:
+    ansible_ssh_port: "{{ ssh_port }}"
+  when: ansible_ssh_port != ssh_port
+
 # Rsyslog recommends using imuxsock, so that means we need ForwardToSyslog
 # and we want to otherwise make journald unused as we don't want stuff to persist.
 # https://www.rsyslog.com/doc/v8-stable/configuration/modules/imjournal.html
@@ -281,24 +286,6 @@
     state: started
     enabled: yes
 
-# Kernel Dump is not needed on a production system, disable.
-# This frees up about 160MB of RAM, especially important on low-memory VMs.
-- name: "kdump: disable service"
-  service:
-    name: kdump
-    state: stopped
-    enabled: no
-  when: ansible_os_family == 'RedHat'
-
-- name: "kdump: disable crashkernel"
-  lineinfile:
-     path: /etc/default/grub
-     backrefs: yes
-     regexp: '^GRUB_CMDLINE_LINUX=(.*)crashkernel=[a-z]+(.*)'
-     line: 'GRUB_CMDLINE_LINUX=\1crashkernel=no\2'
-     state: present
-  notify: update_grub
-
 - name: Perform CIS hardening
   include_tasks: "cis.yml"
 
@@ -316,3 +303,17 @@
   register: reboot_req
   changed_when: reboot_req.stat.exists
   when: ansible_os_family == 'Debian'
+
+- name: "Debian: check if any installed services or sessions may need to be restarted"
+  shell: "needrestart -r l -b | grep -e NEEDRESTART-SVC -e NEEDRESTART-SESS"
+  register: reboot_req
+  failed_when: false
+  changed_when: reboot_req.rc == 0
+  notify: reboot
+
+# We want to flush any handlers for the base role before executing any other
+# roles as other roles may perform tasks like bootstrapping a cluster which
+# a node reboot after package updates might invalidate such bootstrapping.
+- name: "Flush handlers"
+  ansible.builtin.meta: flush_handlers
+

@@ -57,6 +57,16 @@
     mode: 0755
   notify: update_grub
 
+- name: "CIS: update /etc/grub/10_linux to ensure boot loader password is only for changes not booting"
+  lineinfile:
+    dest: /etc/grub.d/10_linux
+    backrefs: yes
+    regexp: '^CLASS="(--unrestricted |)(.*)"'
+    state: present
+    line: 'CLASS="--unrestricted \2"'
+  when: ansible_os_family == "Debian"
+  notify: update_grub
+
 - name: "CIS: update /etc/default/grub to enable audit logging at boot"
   lineinfile:
     dest: /etc/default/grub

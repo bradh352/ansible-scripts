@@ -29,11 +29,11 @@ common to all systems, including hardening as per CIS and PCI-DSS standards.
 - `skip_updates` - This role automatically attempts to upgrade all packages to
   their latest versions.  May specify `-e skip_updates=true` on the command line
   to bypass this behavior.
-- ntp_pools - List of NTP pools. Defaults to
+- `ntp_pools` - List of NTP pools. Defaults to
   `["0.us.pool.ntp.org", "1.us.pool.ntp.org", "2.us.pool.ntp.org", "3.us.pool.ntp.org"]`
-- ntp_peers - If running multiple internal NTP servers, these can be the ones to
+- `ntp_peers` - If running multiple internal NTP servers, these can be the ones to
   peer with. Default none.
-- grub_password - This is a hashed password used by Grub for making changes
+- `grub_password` - This is a hashed password used by Grub for making changes
   via the grub menu.  It must be generated via:
   `grub2-mkpasswd-pbkdf2` (RedHat) or `grub-mkpasswd-pbkdf2` (Debian)
   We can't do this dynamically because of the random salt, so it is no longer

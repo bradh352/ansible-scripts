@@ -57,7 +57,7 @@
     owner: mysql
     group: mysql
     mode: 0750
-  notify: mariadb_restart
+  notify: "{{ 'mariadb_restart' if not mariadb_bootstrap|default(false) else 'noop' }}"
 
 - name: "UFW: enable or disable mariadb port depending on if external access is allowed"
   community.general.ufw:

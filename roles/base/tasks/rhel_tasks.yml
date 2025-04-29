@@ -38,6 +38,25 @@
   command: alternatives --set mta /usr/sbin/sendmail.exim
   when: mta.failed
 
+# Kernel Dump is not needed on a production system, disable.
+# This frees up about 160MB of RAM, especially important on low-memory VMs.
+- name: "kdump: disable service"
+  service:
+    name: kdump
+    state: stopped
+    enabled: no
+  when: ansible_os_family == 'RedHat'
+
+- name: "kdump: disable crashkernel"
+  lineinfile:
+     path: /etc/default/grub
+     backrefs: yes
+     regexp: '^GRUB_CMDLINE_LINUX=(.*)crashkernel=[a-z]+(.*)'
+     line: 'GRUB_CMDLINE_LINUX=\1crashkernel=no\2'
+     state: present
+  when: ansible_os_family == 'RedHat'
+  notify: update_grub
+
 
 # Automatic updates
 - name: "Automatic updates: {{ 'yes' if base_autoupdate else 'no' }}"

@@ -22,7 +22,7 @@
     group: mysql
     mode: 0750
     setype: mysqld_db_t
-  notify: mariadb_restart
+  notify: "{{ 'mariadb_restart' if not mariadb_bootstrap|default(false) else 'noop' }}"
 
 - name: Set SELinux file context appropriately for /var/lib/mysql-tmp
   sefcontext:
