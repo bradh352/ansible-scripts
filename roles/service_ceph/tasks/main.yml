@@ -43,6 +43,7 @@
     ansible_become_pass: "{{ superuser_password }}"
   delegate_to: "{{ ceph_bootstrap_node }}"
   delegate_facts: True
+  no_log: true
   when: ansible_user == superuser and ((superuser_created is defined and superuser_created.changed) or (superuser_pwchanged is defined and superuser_pwchanged.changed))
 
 - name: "Fetch the client admin keyring"

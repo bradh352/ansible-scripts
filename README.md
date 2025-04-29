@@ -8,12 +8,21 @@ source ./venv/bin/activate
 pip3 install -r requirements.txt
 ```
 
+If using password authentication (like during initial setup), install the
+`sshpass` helper:
+```
+brew install sshpass
+```
+```
+sudo apt-get install sshpass
+```
+
 ### Initialize ansible vault password
 
 This uses the OS keychain mechanism.  We must first populate it with the
 vault master password:
 ```
-python3 ./lib/vault-keyring.py set
+python3 ./library/vault-keyring.py set
 ```
 
 ## Resuming environment

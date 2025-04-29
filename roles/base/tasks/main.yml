@@ -64,6 +64,7 @@
   set_fact:
     ansible_password: "{{ superuser_password }}"
     ansible_become_pass: "{{ superuser_password }}"
+  no_log: true
   when: ansible_user == superuser and (superuser_created.changed or superuser_pwchanged.changed)
 
 - name: disable root user
