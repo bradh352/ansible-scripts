@@ -119,3 +119,7 @@
     timeout: 60
     delay: 5
 
+# We want to flush any handlers to make sure BGP comes online at this point as
+# other roles may require connectivity provided.
+- name: "Flush handlers"
+  ansible.builtin.meta: flush_handlers

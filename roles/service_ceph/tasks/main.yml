@@ -37,6 +37,14 @@
     path: /etc/ceph/ceph.client.admin.keyring
   register: admin_keyring
 
+- name: Fixup ansible password for this playbook if it was changed in the base role
+  set_fact:
+    ansible_password: "{{ superuser_password }}"
+    ansible_become_pass: "{{ superuser_password }}"
+  delegate_to: "{{ ceph_bootstrap_node }}"
+  delegate_facts: True
+  when: ansible_user == superuser and ((superuser_created is defined and superuser_created.changed) or (superuser_pwchanged is defined and superuser_pwchanged.changed))
+
 - name: "Fetch the client admin keyring"
   shell: base64 /etc/ceph/ceph.client.admin.keyring
   register: admin_keyring_data

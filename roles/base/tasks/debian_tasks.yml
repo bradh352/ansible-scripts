@@ -1,5 +1,5 @@
 ---
-- name: ensure ufw is started and enabled
+- name: "ensure ufw service is started and enabled"
   service:
     name: ufw
     state: started
@@ -10,6 +10,12 @@
     rule: allow
     port: "{{ ssh_port|default(22) }}"
     proto: tcp
+
+- name: "enable UFW and set default policy to disallow incoming"
+  community.general.ufw:
+    state: enabled
+    policy: deny
+    direction: incoming
 
 # Automatic updates
 - name: "Automatic updates: {{ 'yes' if base_autoupdate else 'no' }}"
