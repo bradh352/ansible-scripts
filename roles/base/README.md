@@ -35,7 +35,7 @@ common to all systems, including hardening as per CIS and PCI-DSS standards.
   peer with. Default none.
 - grub_password - This is a hashed password used by Grub for making changes
   via the grub menu.  It must be generated via:
-  `grub2-mkpasswd-pbkdf2 2>/dev/null | grep 'password is' | sed 's/.*password is //'`
+  `grub2-mkpasswd-pbkdf2` (RedHat) or `grub-mkpasswd-pbkdf2` (Debian)
   We can't do this dynamically because of the random salt, so it is no longer
   idempotent.  So we cache it here.  Should be updated whenever
   `superuser_password` is updated if using the same password.  Likely this should

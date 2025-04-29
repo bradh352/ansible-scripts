@@ -38,9 +38,8 @@
     state: restarted
     use: service
 
-# update grub.cfg when changed
 - name: update_grub
-  command: 'grub2-mkconfig -o /boot/grub2/grub.cfg'
+  command: "{{ 'grub2-mkconfig -o /boot/grub2/grub.cfg' if ansible_os_family == 'RedHat' else 'grub-mkconfig -o /boot/grub/grub.cfg' }}"
 
 - name: reboot
   reboot:
