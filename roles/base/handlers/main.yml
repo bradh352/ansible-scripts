@@ -44,5 +44,5 @@
 - name: reboot
   reboot:
     msg: "rebooting now"
-    connect_timeout: 30
-    post_reboot_delay: 120
+    connect_timeout: 10
+    post_reboot_delay: 60
