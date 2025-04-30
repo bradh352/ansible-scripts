@@ -95,7 +95,7 @@
 
 - name: Determine if configuration is too great for in-place update and may require a reboot
   set_fact:
-    require_reboot: "{{ true if current_config.DEVICE_METADATA.localhost.docker_routing_config_mode|default('') != ('split' if sonic_bgp_external|default(true) else 'unified') or current_config.DEVICE_METADATA.localhost.hostname != inventory_hostname or current_config.DEVICE_METADATA.localhost.type != 'LeafRouter' else false }}"
+    require_reboot: "{{ true if current_config.DEVICE_METADATA.localhost.docker_routing_config_mode|default('') != ('split' if sonic_bgp_external|default(true) else 'unified') or current_config.DEVICE_METADATA.localhost.hostname != inventory_hostname or current_config.DEVICE_METADATA.localhost.type != 'LeafRouter' or current_config.MGMT_VRF_CONFIG.vrf_global.mgmtVrfEnabled|default(false) != sonic_mgmt_vrf else false }}"
 
 - debug:
     msg: "** REBOOT IS REQUIRED ** (will be performed automatically)"
@@ -158,6 +158,14 @@
   set_fact:
     static_route: "{{ static_route_json|from_yaml }}"
 
+- name: "Generate config: MGMT"
+  set_fact:
+    mgmt_json: "{{ lookup('template', 'MGMT.j2') }}"
+
+- name: "Parse config: MGMT"
+  set_fact:
+    mgmt: "{{ mgmt_json|from_yaml }}"
+
 - name: "Generate config: DEVICE_METADATA"
   set_fact:
     device_metadata_json: "{{ lookup('template', 'DEVICE_METADATA.j2') }}"
@@ -183,6 +191,9 @@
       - '^LOOPBACK_INTERFACE$'
       - '^MCLAG_DOMAIN$'
       - '^MCLAG_INTERFACE$'
+      - '^MGMT_INTERFACE$'
+      - '^MGMT_PORT$'
+      - '^MGMT_VRF_CONFIG$'
       - '^PORTCHANNEL$'
       - '^PORTCHANNEL_MEMBER$'
       - '^PORTCHANNEL_INTERFACE$'
@@ -208,6 +219,7 @@
           | combine(vxlan, list_merge='replace')
           | combine(bgp, list_merge='replace')
           | combine(static_route, list_merge='replace')
+          | combine(mgmt, list_merge='replace')
           | combine(device_metadata, recursive=True)
           | to_nice_json }}
 

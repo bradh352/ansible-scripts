@@ -2,6 +2,7 @@
 ansible_host: 192.168.1.129
 sonic_vxlan_vtep_ip: "172.16.0.2/32"
 sonic_asn: "4210000002"
+sonic_mgmt_vrf: true
 # sonic_mclag:
 #   group_id: 1
 #   peer_ip: 172.16.0.1
