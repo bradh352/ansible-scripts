@@ -1,5 +1,5 @@
 ---
-ansible_host: 192.168.1.251
+ansible_host: 192.168.1.220
 ceph_mon_ip: 10.10.100.2
 mariadb_cluster_ip: 10.10.100.2
 ceph_osd_chassis: "microcloud1"

@@ -40,3 +40,13 @@ common to all systems, including hardening as per CIS and PCI-DSS standards.
   idempotent.  So we cache it here.  Should be updated whenever
   `superuser_password` is updated if using the same password.  Likely this should
   also be stored in the vault even though it is hashed.
+
+## Initial deployment
+
+Since the username and password used to log into a machine may not be the same
+as gets used once this playbook runs, these additional command line
+`ansible-playbook` variables may need to be specified:
+```
+-e ansible_user=infra -e ansible_password="Test123$" -e ansible_become_password="Test123$"
+```
+ * NOTE: do not use `ansible_become_pass` as that isn't able to be overwriten

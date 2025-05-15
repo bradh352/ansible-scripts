@@ -95,7 +95,7 @@
 
 - name: Determine if configuration is too great for in-place update and may require a reboot
   set_fact:
-    require_reboot: "{{ true if current_config.DEVICE_METADATA.localhost.docker_routing_config_mode|default('') != ('split' if sonic_bgp_external|default(true) else 'unified') or current_config.DEVICE_METADATA.localhost.hostname != inventory_hostname or current_config.DEVICE_METADATA.localhost.type != 'LeafRouter' or current_config.MGMT_VRF_CONFIG.vrf_global.mgmtVrfEnabled|default(false) != sonic_mgmt_vrf else false }}"
+    require_reboot: "{{ true if current_config.DEVICE_METADATA.localhost.docker_routing_config_mode|default('') != ('split' if sonic_bgp_external|default(true) else 'unified') or current_config.DEVICE_METADATA.localhost.hostname != inventory_hostname or current_config.DEVICE_METADATA.localhost.type != 'LeafRouter' or current_config.MGMT_VRF_CONFIG.vrf_global.mgmtVrfEnabled|default(false)|bool != sonic_mgmt_vrf else false }}"
 
 - debug:
     msg: "** REBOOT IS REQUIRED ** (will be performed automatically)"
