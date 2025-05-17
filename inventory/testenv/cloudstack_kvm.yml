@@ -1,5 +1,5 @@
 ---
-cloudstack:
+cloudstack_kvm:
   hosts:
     node4.testenv.bradhouse.dev:
     node5.testenv.bradhouse.dev:

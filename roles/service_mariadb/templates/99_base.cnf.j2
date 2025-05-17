@@ -31,6 +31,8 @@ innodb_flush_neighbors         = 0
 innodb_log_write_ahead_size    = 4096
 innodb_log_file_size           = 1G
 innodb_stats_on_metadata       = OFF
+innodb_rollback_on_timeout     = 1
+innodb_lock_wait_timeout       = 600
 
 # Query Cache causes additional locking, reducing parallelization.  More harm than good.
 query_cache_size               = 0

@@ -48,6 +48,14 @@
     mode: 0644
   notify: "{{ 'mariadb_restart' if not mariadb_bootstrap|default(false) else 'noop' }}"
 
+- name: Create clustercheck health check script
+  template:
+    src: clustercheck.j2
+    dest: /usr/local/bin/clustercheck
+    owner: root
+    mode: 755
+  when: mariadb_cluster|default(false)
+
 - name: Enable MariaDB
   service:
     name: mariadb
@@ -58,10 +66,19 @@
     name: mariadb
     state: started
   when: not mariadb_bootstrap|default(false)
+  register: mariadb_started
 
 - name: Initialize new cluster
   shell: "galera_new_cluster"
   when: mariadb_bootstrap|default(false)
+
+- name: Wait for sync if joining cluster and not bootstrap
+  ansible.builtin.shell: /usr/local/bin/clustercheck
+  register: result
+  until: result.rc == 0
+  retries: 20
+  delay: 30
+  when: not mariadb_bootstrap|default(false) and mariadb_started.changed
 
 - name: Set root password for MariaDB for localhost
   community.mysql.mysql_user:
@@ -126,11 +143,5 @@
     priv: "*.*:PROCESS"
   when: mariadb_cluster|default(false)
 
-- name: Create clustercheck health check script
-  template:
-    src: clustercheck.j2
-    dest: /usr/local/bin/clustercheck
-    owner: root
-    mode: 755
-  when: mariadb_cluster|default(false)
+
 

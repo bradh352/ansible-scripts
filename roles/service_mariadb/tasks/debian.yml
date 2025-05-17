@@ -26,7 +26,7 @@
 - name: "APT: Install mariadb repository"
   template:
     src: mariadb.sources.j2
-    dest: /etc/apt/sources.list.d/mariadb-keyring.pgp
+    dest: /etc/apt/sources.list.d/mariadb.sources
     owner: root
     mode: "644"
   register: repo

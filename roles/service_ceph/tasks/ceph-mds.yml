@@ -25,7 +25,7 @@
   shell: ceph auth add mds.{{ inventory_hostname | split('.') | first }} osd "allow rwx" mds "allow *" mon "allow profile mds" -i /var/lib/ceph/mds/ceph-{{ inventory_hostname | split('.') | first }}/keyring
   when: not mds_keyring.stat.exists
 
-- name: "Ensure ceph-mdsis enabled and started"
+- name: "Ensure ceph-mds is enabled and started"
   service:
     name: "ceph-mds@{{ inventory_hostname | split('.') | first }}"
     state: started
@@ -36,3 +36,4 @@
     rule: allow
     port: 6800:7568
     proto: tcp
+    # NOTE: should be just the public network IP

@@ -50,3 +50,5 @@ as gets used once this playbook runs, these additional command line
 -e ansible_user=infra -e ansible_password="Test123$" -e ansible_become_password="Test123$"
 ```
  * NOTE: do not use `ansible_become_pass` as that isn't able to be overwriten
+   internally by the playbook as part of the process of changing authentication
+   during the deployment.

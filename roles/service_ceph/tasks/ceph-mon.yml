@@ -17,14 +17,14 @@
     rule: allow
     port: 6789
     proto: tcp
-    dest: "{{ ceph_mon_ip }}"
+    # Only public network is needed
 
 - name: "UFW: Allow ceph monitor traffic v2"
   community.general.ufw:
     rule: allow
     port: 3300
     proto: tcp
-    dest: "{{ ceph_mon_ip }}"
+    # Only public network is needed
 
 - name: "Ensure ceph-mon is enabled and started"
   service:
