@@ -116,14 +116,21 @@
   when: not ceph_bootstrap and not admin_keyring.stat.exists
 
 - name: "Configure monitor"
-  include_tasks: "ceph-mon.yml"
+  import_tasks: "ceph-mon.yml"
   when: inventory_hostname in groups["ceph_" + ceph_cluster_name + "_mon"]
 
 - name: "Configure mds"
-  include_tasks: "ceph-mds.yml"
+  import_tasks: "ceph-mds.yml"
   when: inventory_hostname in groups["ceph_" + ceph_cluster_name + "_mds"]
 
 - name: "Configure osd"
-  include_tasks: "ceph-osd.yml"
+  import_tasks: "ceph-osd.yml"
   when: inventory_hostname in groups["ceph_" + ceph_cluster_name + "_osd"]
 
+- name: "Configure pools"
+  import_tasks: "ceph-pools.yml"
+  when: inventory_hostname in groups["ceph_" + ceph_cluster_name + "_mon"]
+
+- name: "Configure filesystems"
+  import_tasks: "ceph-fs.yml"
+  when: inventory_hostname in groups["ceph_" + ceph_cluster_name + "_mon"]
