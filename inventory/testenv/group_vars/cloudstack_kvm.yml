@@ -1,4 +1,5 @@
 ---
-host_roles: [ "base", "network_vxlanevpn", "service_ceph", "service_cloudstackf" ]
+host_roles: [ "base", "network_vxlanevpn", "service_ceph", "service_cloudstack" ]
 ansible_user: "{{ superuser }}"
 ansible_become_password: "{{ superuser_password }}"
+cloudstack_ceph_fs: "cloudstack"

@@ -61,8 +61,12 @@ This role is initially targeting Ubuntu, and tested on 24.04LTS.
     Recommended to be at least `2`.
   * `bulk`: Whether or not the pool is expected to be large (contain a lot of
     data).  Defaults to `true`.
+* `ceph_fs`: List of ceph filesystems to create.  IMPORTANT: each filesystem
+  created will use a dedicated MDS node, you must ensure you have enough
+  MDS nodes to support your use case.
+  * name: Name of ceph filesystem. Can contain alpha-numerics, hypens, periods,
+    and underscores (`[A-Za-z0-9_.-]`).
 
-* `ceph_fs`
 
 ## Groups used by this role
 

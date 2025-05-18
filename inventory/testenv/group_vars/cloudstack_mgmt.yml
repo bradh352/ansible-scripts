@@ -2,3 +2,4 @@
 host_roles: [ "base", "network_vxlanevpn", "service_ceph", "service_mariadb", "service_keepalived", "service_cloudstack" ]
 ansible_user: "{{ superuser }}"
 ansible_become_password: "{{ superuser_password }}"
+cloudstack_ceph_fs: "cloudstack"

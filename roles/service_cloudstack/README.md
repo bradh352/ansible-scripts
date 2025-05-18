@@ -20,4 +20,5 @@ database is always `cloud_usage`.  There is no ability to change these.
 - cloudstack_db_password
 - cloudstack_mgmt_key - encryption key used to store credentials in the Cloudstack properties file. Use text string like password.
 - cloudstack_db_key - encryption key used to store credentials in the Cloudstack database. Use text string like password.
+- cloudstack_ceph_fs - name of ceph fs to use for secondary storage
 

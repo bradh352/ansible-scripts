@@ -1,0 +1,5 @@
+---
+- name: "libvirt_restart"
+  service:
+    name: libvirtd
+    state: restarted
