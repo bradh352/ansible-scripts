@@ -23,8 +23,12 @@
 - name: Update sudoers for cloudstack agent setup nopasswd
   lineinfile:
     path: /etc/sudoers
-    line: "cloudstack ALL=NOPASSWD: /usr/bin/cloudstack-setup-agent"
+    line: "{{ item }}"
     insertafter: "^root.*"
+  with_items:
+    - "cloudstack ALL=NOPASSWD: /usr/bin/cloudstack-setup-agent"
+    - "cloudstack ALL=NOPASSWD: /usr/share/cloudstack-common/scripts/util/keystore-setup"
+    - "cloudstack ALL=NOPASSWD: /usr/share/cloudstack-common/scripts/util/keystore-cert-import"
 
 - name: See if public key is registered
   stat:
@@ -118,3 +122,8 @@
   shell: "apparmor_parser -R /etc/apparmor.d/usr.sbin.libvirtd && apparmor_parser -R /etc/apparmor.d/usr.lib.libvirt.virt-aa-helper"
   when: disable_apparmor.changed
 
+- name: "Configure for vxlan evpn"
+  file:
+    state: link
+    src: "/usr/share/cloudstack-common/scripts/vm/network/vnet/modifyvxlan-evpn.sh"
+    dest: "/usr/share/modifyvxlan.sh"
