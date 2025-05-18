@@ -1,0 +1,119 @@
+---
+- name: "APT: Install cloudstack-management"
+  ansible.builtin.apt:
+    pkg:
+      - "cloudstack-management"
+      - "cloudstack-usage"
+    state: present
+
+
+- name: "Determine mariadb unix socket path"
+  set_fact:
+    mariadb_sock: "{{ '/var/lib/mysql/mysql.sock' if ansible_os_family == 'Redhat' else '/run/mysqld/mysqld.sock' }}"
+
+- name: "Determine IPs that might be used to connect to DB"
+  set_fact:
+    cloudstack_db_src_ips: >-
+      {%- set iplist = [ ] %}
+      {%- for subnet in mariadb_cluster_vips %}
+      {%-   for addr in ansible_facts['all_ipv4_addresses'] + ansible_facts['all_ipv6_addresses'] %}
+      {%-     if addr | ansible.utils.ipaddr(subnet) is not none %}
+      {%-       set _ = iplist.append(addr) %}
+      {%-     endif %}
+      {%-   endfor %}
+      {%- endfor %}
+      {{- iplist -}}
+
+- name: Create database for cloudstack
+  community.mysql.mysql_db:
+    name: cloud
+    login_unix_socket: "{{ mariadb_sock }}"
+    login_user: root
+    login_password: "{{ mariadb_root_password }}"
+    check_implicit_admin: true
+    state: present
+
+- name: Create database for cloudstack usage
+  community.mysql.mysql_db:
+    name: cloud_usage
+    login_unix_socket: "{{ mariadb_sock }}"
+    login_user: root
+    login_password: "{{ mariadb_root_password }}"
+    check_implicit_admin: true
+    state: present
+
+- name: Create db user for cloudstack
+  community.mysql.mysql_user:
+    login_user: root
+    login_password: "{{ mariadb_root_password }}"
+    check_implicit_admin: true
+    column_case_sensitive: false
+    login_unix_socket: "{{ mariadb_sock }}"
+    name: "{{ cloudstack_db_user }}"
+    password: "{{ cloudstack_db_password }}"
+    state: present
+    priv:
+      'cloud.*': 'ALL,GRANT'
+      'cloud_usage.*': 'ALL,GRANT'
+      '*.*': 'PROCESS'
+    host: "{{ item }}"
+  with_items: "{{ [ 'localhost', '127.0.0.1', '::1' ] + cloudstack_db_src_ips }}"
+
+- name: Determine if cloudstack database is already initialized
+  community.mysql.mysql_info:
+    login_user: "{{ cloudstack_db_user }}"
+    login_password: "{{ cloudstack_db_password }}"
+    login_unix_socket: "{{ mariadb_sock }}"
+    login_db: "cloud"
+    filter:
+    - databases
+    exclude_fields: db_size
+    return_empty_dbs: true
+  register: cloudstack_db_info
+
+- name: See if this node has valid configuration
+  lineinfile:
+    dest: "/etc/cloudstack/management/db.properties"
+    line: "{{ item }}"
+  check_mode: yes
+  register: db_config
+  failed_when: false
+  with_items:
+    - "db.cloud.username={{ cloudstack_db_user }}"
+    - "db.cloud.host={{ mariadb_cluster_vips[0].split('/')[0] }}"
+    - "cluster.node.IP={{ mariadb_cluster_vips[0].split('/')[0] }}"
+
+- name: Setup cloudstack database
+  shell: "cloudstack-setup-databases '{{ cloudstack_db_user }}:{{ cloudstack_db_password }}@{{ mariadb_cluster_vips[0].split('/')[0] }}' {{ '--schema-only' if cloudstack_db_info.databases['cloud'].tables == 0 else '' }} --mshost={{ mariadb_cluster_vips[0].split('/')[0] }} --encrypt-type=file --managementserver-secretkey='{{ cloudstack_mgmt_key }}' --database-secretkey='{{ cloudstack_db_key }}'"
+  when: cloudstack_db_info.databases["cloud"].tables == 0 or db_config.changed
+
+- name: "UFW: Enable Cloudstack Management Ports"
+  community.general.ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  with_items:
+    - 8080
+    - 8250
+    - 8443
+    - 9090
+
+- name: "Determine if cloudstack is running"
+  shell: systemctl is-active cloudstack-management
+  changed_when: false
+  failed_when: false
+  register: cloudstack_running
+
+- name: "Ensure cloudstack services are stopped if configuration changed"
+  service:
+    name: "{{ item }}"
+    state: stopped
+  with_items:
+    - "cloudstack-management"
+    - "cloudstack-usage"
+  when: db_config.changed
+
+- name: "Setup cloudstack management"
+  shell: cloudstack-setup-management
+  when: cloudstack_running.rc != 0 or db_config.changed
+

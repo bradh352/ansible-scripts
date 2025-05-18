@@ -29,16 +29,12 @@
     update_cache: true
   when: repo.changed
 
-- name: "APT: Install cloudstack-management"
-  ansible.builtin.apt:
-    pkg:
-      - "cloudstack-management"
-    state: present
+- name: Configure for Cloudstack Management
+  import_tasks: "cloudstack-mgmt.yml"
   when: inventory_hostname in groups["cloudstack_mgmt"]
 
-- name: "APT: Install cloudstack-agent"
-  ansible.builtin.apt:
-    pkg:
-      - "cloudstack-agent"
-    state: present
+- name: Configure for Cloudstack KVM Hypervisor
+  import_tasks: "cloudstack-kvm.yml"
   when: inventory_hostname in groups["cloudstack_kvm"]
+
+

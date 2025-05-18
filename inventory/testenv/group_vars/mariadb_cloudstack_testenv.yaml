@@ -1,18 +1,18 @@
 ---
 mariadb_cluster_name: "cloudstack_testenv"
-mariadb_root_password: "Test123$"
 mariadb_cluster: true
 mariadb_sst_user: sstuser
 mariadb_sst_password: sstpass
 mariadb_clustercheck_user: clustercheck
 mariadb_clustercheck_password: clustercheck
 mariadb_cluster_singlewriter: true
+mariadb_cluster_vips:
+  - 10.10.100.10/24
+  - 2620:1234:5::10/64
 keepalived_vips:
   - name: "mariadb"
     interface: "hypervisor"
-    ips:
-      - 10.10.100.10/24
-      - 2620:1234:5::10/64
+    ips: "{{ mariadb_cluster_vips }}"
     healthcheck:
       type: "script"
       script: "/usr/local/bin/clustercheck"

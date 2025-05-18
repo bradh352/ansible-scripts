@@ -1,11 +1,11 @@
 ---
 
 - name: Perform Distribution-specific tasks
-  include_tasks: "rhel.yml"
+  import_tasks: "rhel.yml"
   when: ansible_os_family == 'RedHat'
 
 - name: Perform Distribution-specific tasks
-  include_tasks: "debian.yml"
+  import_tasks: "debian.yml"
   when: ansible_os_family == 'Debian'
 
 - name: "Gather mariadb hosts"

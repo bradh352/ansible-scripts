@@ -1,0 +1,6 @@
+---
+- name: "APT: Install cloudstack-agent"
+  ansible.builtin.apt:
+    pkg:
+      - "cloudstack-agent"
+    state: present
