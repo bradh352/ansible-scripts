@@ -1,6 +1,6 @@
 ---
 - name: "Make sure we have the osd boostrap keyring"
-  include_tasks: "ceph-osd-bootstrap-keyring.yml"
+  import_tasks: "ceph-osd-bootstrap-keyring.yml"
 
 - name: "Gather a list of new OSDs"
   set_fact:

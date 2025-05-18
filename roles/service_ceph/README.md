@@ -20,13 +20,6 @@ This role is initially targeting Ubuntu, and tested on 24.04LTS.
   installed ceph instance, which is always "ceph" as unique cluster names are
   deprecated as per:
   https://docs.ceph.com/en/latest/rados/configuration/common/#naming-clusters-deprecated
-* `ceph_bootstrap`: Boolean, defaults to false. Bootstrap a new ceph cluster
-  monitor node.  This requires `ceph_mon` to be `true` as well. This variable is
-  meant to be specified on the command line using `-e ceph_bootstrap=true` when
-  bringing a new cluster online.  It should not be used for existing clusters.
-* `ceph_bootstrap_node`: When bringing additional nodes online, this is the
-  node that can be used to copy the necessary authentication data to bring
-  another node online.  This would typically be a Group var in the cluster.
 * `ceph_public_network`: The ipv4 subnet to use for public client communication.
   This is the network where ceph clients talk to the ceph backend.  This may
   be the same as `ceph_cluster_network`.  This should be a group var for the

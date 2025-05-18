@@ -1,8 +1,4 @@
 ---
-- name: "monitor bootstrap"
-  include_tasks: "ceph-mon-bootstrap.yml"
-  when: ceph_bootstrap|default(false)
-
 - name: "Check to see if monitor configuration exists"
   stat:
     path: "/var/lib/ceph/mon/ceph-{{ inventory_hostname|split('.')|first }}"
@@ -10,7 +6,7 @@
 
 - name: "monitor add"
   include_tasks: "ceph-mon-add.yml"
-  when: not ceph_bootstrap|default(false) and not ceph_mon_configured.stat.exists
+  when: not ceph_mon_configured.stat.exists
 
 - name: "UFW: Allow ceph monitor traffic v1"
   community.general.ufw:
@@ -70,15 +66,17 @@
   shell: ceph config get mon auth_allow_insecure_global_id_reclaim
   register: ceph_insecure_global_id
   changed_when: false
+  run_once: true
 
 - name: "Ceph: set auth_allow_insecure_global_id_reclaim to false"
   shell: "ceph config set mon auth_allow_insecure_global_id_reclaim false"
   when: ceph_insecure_global_id.stdout_lines|first == "true"
+  run_once: true
 
 - name: "Ceph: enable osd pg autoscaling by default"
   shell: "ceph config set global osd_pool_default_pg_autoscale_mode on"
-  when: ceph_bootstrap|default(false)
+  when: ceph_bootstrap
 
 - name: "Ceph: enable msgr2 protocol"
   shell: "ceph mon enable-msgr2"
-  when: ceph_bootstrap|default(false)
+  when: ceph_bootstrap
