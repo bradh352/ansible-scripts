@@ -93,12 +93,12 @@ sonic_interfaces:
   "31":
     layer3: true
     bgp_underlay: true
-    description: "torsw2 port 55"
+    description: "torsw2 port 31"
     speed: "100000"
   "32":
     layer3: true
     bgp_underlay: true
-    description: "torsw2 port 56"
+    description: "torsw2 port 32"
     speed: "100000"
 
 sonic_vlans:

@@ -11,7 +11,7 @@ mariadb_cluster_vips:
   - 2620:1234:5::10/64
 keepalived_vips:
   - name: "mariadb"
-    interface: "hypervisor"
+    interface: "cloudbr0"
     ips: "{{ mariadb_cluster_vips }}"
     healthcheck:
       type: "script"
