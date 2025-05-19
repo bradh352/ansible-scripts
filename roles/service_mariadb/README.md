@@ -13,12 +13,12 @@ This role is initially targeting Rocky 9 and Ubuntu 24.04LTS, but other systems
 such as RHEL derivatives and Debian derivatives may work, just not tested.
 
 ## Variables used by this role
-* `mariadb_boostrap`: Boolean. Specific to MariaDB clusters. Must only be
-  specified on the command line (e.g. `-e mariadb_bootstrap=true`).  Used to
-  either bring up the first node in a cluster during initial creating or
-  when recovering from a failure or shutdown of `all` nodes.  In failure
-  situations may need to evaluate `grastate.dat` to determine the most advanced
-  node and start that one as per https://mariadb.com/kb/en/getting-started-with-mariadb-galera-cluster/#restarting-the-cluster
+* `mariadb_ignore_offline_nodes`: Boolean. Specific to MariaDB clusters. If
+  one or more nodes in a cluster cannot be reached, this is not treated as a
+  failure condition.  The nodes that are available will be initialized.  This
+  can be dangerous if the node with the latest data is offline.   This may need
+  to be specified when bringing up an entirely new cluster if some of the nodes
+  aren't being provisioned at the same time.
 * `mariadb_root_password`: MariaDB root password.  This is a security-sensitive
   password that should be stored in a vault.
 * `mariadb_cluster`: Boolean. Whether or not this node is a member of a cluster.
@@ -55,3 +55,17 @@ such as RHEL derivatives and Debian derivatives may work, just not tested.
 
 * `mariadb_{{ mariadb_cluster_name }}`: This group should reference all members
   associated with the same mariadb cluster.
+
+## Re-initializing a cluster after an outage
+If there is a hard failure of a cluster, it may be necessary to re-bootstrap
+the cluster.  The innodb sequence number should be used to evaluate the most up
+to date node, and start that node as a new cluster then join the remaining
+members.
+
+An ansible playbook is being provided named `mariadb-start-cluster.yml` for
+this purpose.  It can be run like:
+
+```
+ansible-playbook -vv roles/service_mariadb/mariadb-start-cluster.yml -l mariadb_group_name
+```
+

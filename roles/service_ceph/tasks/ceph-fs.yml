@@ -2,11 +2,15 @@
 - name: "Retrieve ceph filesystems"
   shell: "ceph fs ls -f json"
   register: ceph_existing_filesystems
+  changed_when: false
+  run_once: true
 
 - name: "Create ceph filesystems"
   include_tasks: ceph-fs-create.yml
   vars:
-    fs_name: "{{ item.name }}"
+    fs_name: "{{ fs.name }}"
   with_items: "{{ ceph_fs }}"
-  when: item.name not in ceph_existing_filesystems.stdout|from_json
+  loop_control:
+    loop_var: fs
+  when: fs.name not in ceph_existing_filesystems.stdout|from_json|map(attribute='name')|list
   run_once: true
