@@ -23,6 +23,20 @@
   set_fact:
     network_vxlanevpn_interfaces: "{{ network_vxlanevpn_interfaces_json|from_yaml }}"
 
+- name: Find Netplan configuration
+  find:
+    paths: /etc/netplan
+    file_type: file
+    excludes:
+      - "config.yaml"
+  register: netplan_files
+
+- name: Delete unused netplan configuration
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  with_items: "{{ netplan_files['files'] }}"
+
 - name: "NetPlan: write configuration"
   template:
     src: netplan.conf.j2

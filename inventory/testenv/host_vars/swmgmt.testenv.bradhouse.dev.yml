@@ -209,14 +209,14 @@ sonic_interfaces:
       - vlan: 2
         mode: "untagged"
   "49":
-    description: "torsw1 port 33"
+    description: "torsw1 port 16"
     autoneg: "off"
     fec: "none"
     speed: "10000"
     layer3: true
     bgp_underlay: true
   "50":
-    description: "torsw2 port 33"
+    description: "torsw2 port 16"
     autoneg: "off"
     fec: "none"
     speed: "10000"
@@ -228,6 +228,7 @@ sonic_vlans:
     ips: [ "192.168.1.55/24" ]
     mtu: 1500
     layer3: true
+    vxlan: "2"
   "10":
     ips: [ "10.0.0.70/24" ]
     mtu: 1500
