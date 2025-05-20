@@ -73,6 +73,11 @@
     return_empty_dbs: true
   register: cloudstack_db_info
 
+- name: See if configuration exists
+  stat:
+    path: "/etc/cloudstack/management/db.properties"
+  register: db_file
+
 - name: See if this node has valid configuration
   lineinfile:
     dest: "/etc/cloudstack/management/db.properties"
@@ -92,16 +97,16 @@
   with_items:
     - "cloudstack-management"
     - "cloudstack-usage"
-  when: db_config.changed or cloudstack_db_info.databases["cloud"].tables == 0
+  when: db_config.changed or not db_file.stat.exists or cloudstack_db_info.databases["cloud"].tables == 0
 
 - name: Setup cloudstack database
   shell: "cloudstack-setup-databases '{{ cloudstack_db_user }}:{{ cloudstack_db_password }}@{{ mariadb_cluster_vips[0].split('/')[0] }}' {{ '--schema-only' if cloudstack_db_info.databases['cloud'].tables == 0 else '' }} --mshost={{ ansible_facts['cloudbr0']['ipv4']['address'] }} --encrypt-type=file --managementserver-secretkey='{{ cloudstack_mgmt_key }}' --database-secretkey='{{ cloudstack_db_key }}'"
-  when: cloudstack_db_info.databases["cloud"].tables == 0 or db_config.changed
+  when: cloudstack_db_info.databases["cloud"].tables == 0
   run_once: true
 
 - name: Generate local configuration
   shell: "cloudstack-setup-databases '{{ cloudstack_db_user }}:{{ cloudstack_db_password }}@{{ mariadb_cluster_vips[0].split('/')[0] }}' --mshost={{ ansible_facts['cloudbr0']['ipv4']['address'] }} --encrypt-type=file --managementserver-secretkey='{{ cloudstack_mgmt_key }}' --database-secretkey='{{ cloudstack_db_key }}'"
-  when: cloudstack_db_info.databases["cloud"].tables == 0 or db_config.changed
+  when: cloudstack_db_info.databases["cloud"].tables == 0 or db_config.changed or not db_file.stat.exists
 
 - name: "UFW: Enable Cloudstack Management Ports"
   community.general.ufw:
@@ -122,5 +127,5 @@
 
 - name: "Setup cloudstack management"
   shell: cloudstack-setup-management
-  when: cloudstack_running.rc != 0 or db_config.changed or cloudstack_db_info.databases["cloud"].tables == 0
+  when: cloudstack_running.rc != 0 or db_config.changed or not db_file.stat.exists or cloudstack_db_info.databases["cloud"].tables == 0
 

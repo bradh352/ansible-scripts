@@ -40,4 +40,5 @@
 - name: Populate systemvm
   run_once: true
   import_tasks: "cloudstack-systemvm.yml"
+  when: inventory_hostname in groups["cloudstack_mgmt"]
 
