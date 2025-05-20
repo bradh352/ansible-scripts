@@ -12,6 +12,7 @@ ceph_pools:
     bulk: true
 ceph_fs:
   - name: cloudstack
+    nfs: true
 
 
 

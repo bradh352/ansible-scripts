@@ -37,33 +37,7 @@
   import_tasks: "cloudstack-kvm.yml"
   when: inventory_hostname in groups["cloudstack_kvm"]
 
-- name: "Secondary: Make mount directory"
-  file:
-    path: /mnt/secondary
-    state: directory
-    mode: "777"
-
-- name: "Secondary: extract secret"
-  shell: "cat /etc/ceph/ceph.client.admin.keyring | grep key | cut -d = -f 2- | sed -e 's/ //g'"
-  changed_when: false
-  register: ceph_secret
-
-- name: "Secondary: Create fstab entry"
-  lineinfile:
-    path: /etc/fstab
-    line: "{{ groups['ceph_' + ceph_cluster_name + '_mon']|unique|sort|join(',') }}:/ /mnt/secondary ceph fs={{ cloudstack_ceph_fs }},name=admin,secret={{ ceph_secret.stdout_lines[0] }},noatime,_netdev    0       2"
-    regexp: ".* /mnt/secondary .*"
-    state: present
-  register: fstab
-
-- name: "Secondary: Mount filesystems"
-  shell: "mount -a"
-  when: fstab.changed
-
-- name: Populate System VM
-  import_tasks: cloudstack-systemvm.yml
-  when: inventory_hostname in groups["cloudstack_mgmt"]
+- name: Populate systemvm
   run_once: true
-
-
+  import_tasks: "cloudstack-systemvm.yml"
 

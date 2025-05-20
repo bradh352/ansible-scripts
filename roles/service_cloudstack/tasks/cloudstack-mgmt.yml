@@ -32,6 +32,7 @@
     login_password: "{{ mariadb_root_password }}"
     check_implicit_admin: true
     state: present
+  run_once: true
 
 - name: Create database for cloudstack usage
   community.mysql.mysql_db:
@@ -41,6 +42,7 @@
     login_password: "{{ mariadb_root_password }}"
     check_implicit_admin: true
     state: present
+  run_once: true
 
 - name: Create db user for cloudstack
   community.mysql.mysql_user:
@@ -83,8 +85,22 @@
     - "db.cloud.host={{ mariadb_cluster_vips[0].split('/')[0] }}"
     - "cluster.node.IP={{ mariadb_cluster_vips[0].split('/')[0] }}"
 
+- name: "Ensure cloudstack services are stopped if configuration changed"
+  service:
+    name: "{{ item }}"
+    state: stopped
+  with_items:
+    - "cloudstack-management"
+    - "cloudstack-usage"
+  when: db_config.changed or cloudstack_db_info.databases["cloud"].tables == 0
+
 - name: Setup cloudstack database
-  shell: "cloudstack-setup-databases '{{ cloudstack_db_user }}:{{ cloudstack_db_password }}@{{ mariadb_cluster_vips[0].split('/')[0] }}' {{ '--schema-only' if cloudstack_db_info.databases['cloud'].tables == 0 else '' }} --mshost={{ mariadb_cluster_vips[0].split('/')[0] }} --encrypt-type=file --managementserver-secretkey='{{ cloudstack_mgmt_key }}' --database-secretkey='{{ cloudstack_db_key }}'"
+  shell: "cloudstack-setup-databases '{{ cloudstack_db_user }}:{{ cloudstack_db_password }}@{{ mariadb_cluster_vips[0].split('/')[0] }}' {{ '--schema-only' if cloudstack_db_info.databases['cloud'].tables == 0 else '' }} --mshost={{ ansible_facts['cloudbr0']['ipv4']['address'] }} --encrypt-type=file --managementserver-secretkey='{{ cloudstack_mgmt_key }}' --database-secretkey='{{ cloudstack_db_key }}'"
+  when: cloudstack_db_info.databases["cloud"].tables == 0 or db_config.changed
+  run_once: true
+
+- name: Generate local configuration
+  shell: "cloudstack-setup-databases '{{ cloudstack_db_user }}:{{ cloudstack_db_password }}@{{ mariadb_cluster_vips[0].split('/')[0] }}' --mshost={{ ansible_facts['cloudbr0']['ipv4']['address'] }} --encrypt-type=file --managementserver-secretkey='{{ cloudstack_mgmt_key }}' --database-secretkey='{{ cloudstack_db_key }}'"
   when: cloudstack_db_info.databases["cloud"].tables == 0 or db_config.changed
 
 - name: "UFW: Enable Cloudstack Management Ports"
@@ -104,16 +120,7 @@
   failed_when: false
   register: cloudstack_running
 
-- name: "Ensure cloudstack services are stopped if configuration changed"
-  service:
-    name: "{{ item }}"
-    state: stopped
-  with_items:
-    - "cloudstack-management"
-    - "cloudstack-usage"
-  when: db_config.changed
-
 - name: "Setup cloudstack management"
   shell: cloudstack-setup-management
-  when: cloudstack_running.rc != 0 or db_config.changed
+  when: cloudstack_running.rc != 0 or db_config.changed or cloudstack_db_info.databases["cloud"].tables == 0
 

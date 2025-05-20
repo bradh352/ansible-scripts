@@ -134,3 +134,7 @@
 - name: "Configure filesystems"
   import_tasks: "ceph-fs.yml"
   when: inventory_hostname in groups["ceph_" + ceph_cluster_name + "_mon"]
+
+- name: "Configure nfs"
+  import_tasks: "ceph-nfs.yml"
+  when: inventory_hostname in groups["ceph_" + ceph_cluster_name + "_mds"]

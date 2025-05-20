@@ -64,8 +64,11 @@ This role is initially targeting Ubuntu, and tested on 24.04LTS.
 * `ceph_fs`: List of ceph filesystems to create.  IMPORTANT: each filesystem
   created will use a dedicated MDS node, you must ensure you have enough
   MDS nodes to support your use case.
-  * name: Name of ceph filesystem. Can contain alpha-numerics, hypens, periods,
+  * `name`: Name of ceph filesystem. Can contain alpha-numerics, hypens, periods,
     and underscores (`[A-Za-z0-9_.-]`).
+  * `nfs`: Boolean.  Defaults to false.  If set to true, will deploy NFS
+    services on each member of the mds group.  It is recommended to use a
+    Virtual IP such as through Keepalived High Availability/Fail Over.
 
 
 ## Groups used by this role

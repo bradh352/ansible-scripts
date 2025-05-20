@@ -23,12 +23,15 @@
 - name: Update sudoers for cloudstack agent setup nopasswd
   lineinfile:
     path: /etc/sudoers
-    line: "{{ item }}"
+    line: "cloudstack ALL=NOPASSWD: {{ item }}"
     insertafter: "^root.*"
   with_items:
-    - "cloudstack ALL=NOPASSWD: /usr/bin/cloudstack-setup-agent"
-    - "cloudstack ALL=NOPASSWD: /usr/share/cloudstack-common/scripts/util/keystore-setup"
-    - "cloudstack ALL=NOPASSWD: /usr/share/cloudstack-common/scripts/util/keystore-cert-import"
+    - "/usr/bin/cloudstack-setup-agent"
+    - "/usr/share/cloudstack-common/scripts/util/keystore-setup"
+    - "/usr/share/cloudstack-common/scripts/util/keystore-cert-import"
+    - "/usr/sbin/service"
+    - "/usr/sbin/update-rc.d"
+
 
 - name: See if public key is registered
   stat:
@@ -125,7 +128,5 @@
 - name: "Configure for vxlan evpn"
   copy:
     src: modifyvxlan-evpn.sh
-    state: link
-    owner: cloud
-    group: cloud
+    dest: /usr/share/modifyvxlan.sh
     mode: "755"

@@ -10,13 +10,27 @@
     cloudstack_minor: "{{ cloudstack_version_query.stdout_lines[0].split('.')[1] }}"
     cloudstack_release: "{{ cloudstack_version_query.stdout_lines[0].split('.')[2] }}"
 
+- name: "Secondary: Make mount directory"
+  file:
+    path: /mnt/tmp
+    state: directory
+    mode: "777"
+  changed_when: false
+
+- name: Temporarily mount secondary
+  shell: "mount -t ceph admin@.{{ cloudstack_ceph_fs }}=/ /mnt/tmp"
+  changed_when: false
+
 - name: "See if template directory exists"
   stat:
-    path: /mnt/secondary/template
+    path: /mnt/tmp/template
   register: templatedir
 
 # TODO: Determine how to update the system vm image on upgrades
 - name: "Generate system vm image"
-  shell: "/usr/share/cloudstack-common/scripts/storage/secondary/cloud-install-sys-tmplt -m /mnt/secondary -u http://download.cloudstack.org/systemvm/{{ cloudstack_major }}.{{ cloudstack_minor }}/systemvmtemplate-{{ cloudstack_major }}.{{ cloudstack_minor }}.{{ cloudstack_release }}-x86_64-kvm.qcow2.bz2 -h kvm -s '{{ cloudstack_mgmt_key }}' -F"
+  shell: "/usr/share/cloudstack-common/scripts/storage/secondary/cloud-install-sys-tmplt -m /mnt/tmp -u http://download.cloudstack.org/systemvm/{{ cloudstack_major }}.{{ cloudstack_minor }}/systemvmtemplate-{{ cloudstack_major }}.{{ cloudstack_minor }}.{{ cloudstack_release }}-x86_64-kvm.qcow2.bz2 -h kvm -s '{{ cloudstack_mgmt_key }}' -F"
   when: not templatedir.stat.exists
-  run_once: true
+
+- name: Unmount
+  shell: "umount /mnt/tmp"
+  changed_when: false

@@ -18,7 +18,9 @@ such as RHEL derivatives and Debian derivatives may work, just not tested.
   failure condition.  The nodes that are available will be initialized.  This
   can be dangerous if the node with the latest data is offline.   This may need
   to be specified when bringing up an entirely new cluster if some of the nodes
-  aren't being provisioned at the same time.
+  aren't being provisioned at the same time.  Defaults to false.  Typically
+  would be specified on the command line with
+  "-e mariadb_ignore_offline_nodes=true".
 * `mariadb_root_password`: MariaDB root password.  This is a security-sensitive
   password that should be stored in a vault.
 * `mariadb_cluster`: Boolean. Whether or not this node is a member of a cluster.
