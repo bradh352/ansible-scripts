@@ -22,3 +22,11 @@ database is always `cloud_usage`.  There is no ability to change these.
 - cloudstack_db_key - encryption key used to store credentials in the Cloudstack database. Use text string like password.
 - cloudstack_ceph_fs - name of ceph fs to use for secondary storage
 - cloudstack_mgmt_interface - name of cloudstack management interface (backend hypervisor communication)
+
+## Configuring CloudStack
+Global Settings -> management.network.cidr = desired management network subnet
+                   use.local.storage = true
+                   host (under hypervisor) = load balanced ip address
+
+Secondary storage requires HTTPS, so you may get a network error unless TLS is configured properly as per https://www.shapeblue.com/securing-cloudstack-4-11-with-https-tls/
+A workaround is to accept the certificate by going to https://{{ ssvm ip }} and accept the certificate then try again

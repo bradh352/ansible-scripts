@@ -130,12 +130,22 @@
   failed_when: false
   register: cloudstack_running
 
-- name: "Bring up cloudstack management services"
-  when: cloudstack_running.rc != 0 or db_config.changed or not db_file.stat.exists or cloudstack_db_info.databases["cloud"].tables == 0
+- name: "Bring up cloudstack management on first node"
+  shell: cloudstack-setup-management
+  when: inventory_hostname == cloudstack_bootstrap_node|default("")
+
+- name: "Wait for initialization of first node"
+  ansible.builtin.wait_for:
+    port: 8080
+    delay: 10
+  when: inventory_hostname == cloudstack_bootstrap_node|default("")
+
+- name: "Bring up cloudstack management on secondary nodes"
+  when: cloudstack_running.rc != 0 or db_config.changed or not db_file.stat.exists or cloudstack_db_info.databases["cloud"].tables == 0 && inventory_hostname != cloudstack_bootstrap_node|default("")
   throttle: 1
   block:
   - name: "Setup cloudstack management"
-    shell: cloudstack-setup-management
+    shell: "cloudstack-setup-management && sleep 30"
   - name: "Wait for initialization"
     ansible.builtin.wait_for:
       port: 8080

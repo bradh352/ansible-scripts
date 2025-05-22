@@ -130,3 +130,21 @@
     src: modifyvxlan-evpn.sh
     dest: /usr/share/modifyvxlan.sh
     mode: "755"
+
+- name: "UFW: Load bridge module"
+  lineinfile:
+    path: /etc/default/ufw
+    line: 'IPT_MODULES="bridge"'
+    regexp: "^IPT_MODULES"
+  notify: ufw_restart
+
+- name: "UFW: Don't apply rules on bridge traffic"
+  lineinfile:
+    path: /etc/ufw/sysctl.conf
+    line: "{{ item.key }} = {{ item.val }}"
+    regexp: "^{{ item.key }}.*"
+  with_items:
+    - { key: net.bridge.bridge-nf-call-ip6tables, val: 0 }
+    - { key: net.bridge.bridge-nf-call-iptables, val: 0 }
+    - { key: net.bridge.bridge-nf-call-arptables, val: 0 }
+  notify: ufw_restart
