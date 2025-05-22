@@ -4,10 +4,6 @@
     path: "/var/lib/ceph/mon/ceph-{{ inventory_hostname|split('.')|first }}"
   register: ceph_mon_configured
 
-- name: "monitor add"
-  include_tasks: "ceph-mon-add.yml"
-  when: not ceph_mon_configured.stat.exists
-
 - name: "UFW: Allow ceph monitor traffic v1"
   community.general.ufw:
     rule: allow
@@ -21,6 +17,10 @@
     port: 3300
     proto: tcp
     # Only public network is needed
+
+- name: "monitor add"
+  include_tasks: "ceph-mon-add.yml"
+  when: not ceph_mon_configured.stat.exists
 
 - name: "Ensure ceph-mon is enabled and started"
   service:
