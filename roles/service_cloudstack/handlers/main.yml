@@ -5,6 +5,6 @@
     state: restarted
 
 - name: "ufw_restart"
-    service:
+  service:
     name: ufw
     state: restarted

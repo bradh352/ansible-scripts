@@ -4,5 +4,5 @@ X-Repolib-Name: Cloudstack
 Types: deb
 URIs: https://download.cloudstack.org/{{ ansible_distribution|lower }}
 Suites: {{ ansible_distribution_release }}
-Components: 4.20
+Components: {{ cloudstack_version }}
 Signed-By: /etc/apt/trusted.gpg.d/cloudstack.asc

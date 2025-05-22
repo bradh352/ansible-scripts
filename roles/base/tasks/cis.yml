@@ -78,8 +78,8 @@
 - name: "CIS: restrict core dumps"
   lineinfile:
     path: /etc/security/limits.conf
-    line: "*                hard    core            0"
-    regexp: "^\* .* core .*"
+    line: '*                hard    core            0'
+    regexp: '^\* +core .*'
     create: true
     owner: root
     group: root

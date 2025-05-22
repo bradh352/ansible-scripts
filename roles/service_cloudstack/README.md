@@ -15,6 +15,7 @@ This role is initially targeting Ubuntu, and tested on 24.04LTS.
 ***NOTE***: The cloudstack database is always named `cloud` and the usage
 database is always `cloud_usage`.  There is no ability to change these.
 
+- cloudstack_version - Release series to use. E.g. 4.19
 - mariadb_root_password
 - cloudstack_db_user - defaults to 'cloudstack'
 - cloudstack_db_password
