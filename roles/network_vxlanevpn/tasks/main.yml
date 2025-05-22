@@ -25,6 +25,23 @@
   set_fact:
     network_vxlanevpn_interfaces: "{{ network_vxlanevpn_interfaces_json|from_yaml }}"
 
+- name: "FRR: enable bgp and bfd"
+  lineinfile:
+     path: /etc/frr/daemons
+     regexp: "^{{ item.key }}=.*"
+     line: "{{ item.key }}={{ item.val }}"
+     state: present
+  with_items:
+    - key: "bgpd"
+      val: "yes"
+    - key: "bfdd"
+      val: "yes"
+  notify: frr_restart
+
+# Flush handlers as frr_restart can interrupt.
+- name: "Flush handlers"
+  ansible.builtin.meta: flush_handlers
+
 - name: Find interfaces configuration
   find:
     paths: /etc/netplan
@@ -53,18 +70,7 @@
 #     mode: "600"
 #   register: interfaces
 
-- name: "FRR: enable bgp and bfd"
-  lineinfile:
-     path: /etc/frr/daemons
-     regexp: "^{{ item.key }}=.*"
-     line: "{{ item.key }}={{ item.val }}"
-     state: present
-  with_items:
-    - key: "bgpd"
-      val: "yes"
-    - key: "bfdd"
-      val: "yes"
-  notify: frr_restart
+
 
 - name: "FRR: write configuration"
   template:
