@@ -12,6 +12,7 @@
   ansible.builtin.apt:
     pkg:
       - ifupdown
+      - ifupdown2
       - ifupdown-ng
     state: absent
 
@@ -23,7 +24,7 @@
   set_fact:
     network_vxlanevpn_interfaces: "{{ network_vxlanevpn_interfaces_json|from_yaml }}"
 
-- name: Find Netplan configuration
+- name: Find interfaces configuration
   find:
     paths: /etc/netplan
     file_type: file
@@ -43,6 +44,13 @@
     dest: /etc/netplan/config.yaml
     mode: "600"
   register: netplan
+
+# - name: "ifupdown-ng: write configuration"
+#   template:
+#     src: interfaces.j2
+#     dest: /etc/network/interfaces
+#     mode: "600"
+#   register: interfaces
 
 - name: "FRR: enable bgp and bfd"
   lineinfile:
@@ -120,18 +128,28 @@
     state: started
     enabled: true
 
-- name: "NetPlan: apply asyncronously"
-  when: netplan.changed
-  command: "netplan apply"
-  async: 0
-  poll: 0
-  ignore_errors: true
+# - name: "Disable systemd-networkd"
+#   service:
+#     name: systemd-networkd-wait-online
+#     enabled: false
 
-- name: "Wait for host to come back online"
+# - name: "Mask systemd-networkd-wait-online"
+#   ansible.builtin.systemd_service:
+#     name: systemd-networkd-wait-online
+#     masked: true
+
+# - name: "Enable ifupdown2-ng networking"
+#   service:
+#     name: networking
+#     enabled: true
+
+- name: "VXLAN configuration changed, rebooting..."
+  reboot:
+    msg: "rebooting now"
+    connect_timeout: 10
+    post_reboot_delay: 60
   when: netplan.changed
-  wait_for_connection:
-    timeout: 60
-    delay: 5
+  throttle: 1
 
 # We want to flush any handlers to make sure BGP comes online at this point as
 # other roles may require connectivity provided.

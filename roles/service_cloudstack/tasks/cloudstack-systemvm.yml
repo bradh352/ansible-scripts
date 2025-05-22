@@ -18,7 +18,7 @@
   changed_when: false
 
 - name: Temporarily mount secondary
-  shell: "mount -t ceph admin@.{{ cloudstack_ceph_fs }}=/ /mnt/tmp"
+  shell: "mount -t nfs localhost:/{{ cloudstack_ceph_fs }} /mnt/tmp"
   changed_when: false
 
 - name: "See if template directory exists"

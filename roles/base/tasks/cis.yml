@@ -76,9 +76,11 @@
   notify: update_grub
 
 - name: "CIS: restrict core dumps"
-  copy:
-    src: security_limits.conf
-    dest: /etc/security/limits.conf
+  lineinfile:
+    path: /etc/security/limits.conf
+    line: "*                hard    core            0"
+    regexp: "^\* .* core .*"
+    create: true
     owner: root
     group: root
     mode: 0600

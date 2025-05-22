@@ -4,3 +4,4 @@ host_roles: [ "base", "network_vxlanevpn", "service_ceph", "service_mariadb", "s
 ansible_user: "{{ superuser }}"
 ansible_become_password: "{{ superuser_password }}"
 cloudstack_ceph_fs: "cloudstack"
+cloudstack_mgmt_interface: "hypervisor"
