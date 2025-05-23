@@ -158,6 +158,12 @@
   when: netplan.changed
   throttle: 1
 
+- name: Refresh facts
+  ansible.builtin.setup:
+    gather_subset:
+      - network
+  when: netplan.changed
+
 # We want to flush any handlers to make sure BGP comes online at this point as
 # other roles may require connectivity provided.
 - name: "Flush handlers"

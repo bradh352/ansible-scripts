@@ -96,6 +96,7 @@
     - localhost
     - 127.0.0.1
     - ::1
+  run_once: "{{ mariadb_cluster|default(false) }}"
 
 - name: Remove root password for MariaDB for non-localhost users
   community.mysql.mysql_user:
@@ -107,6 +108,7 @@
     name: root
     host: "{{ inventory_hostname }}"
     state: absent
+  run_once: "{{ mariadb_cluster|default(false) }}"
 
 - name: Remove all anonymous users from MariaDB
   community.mysql.mysql_user:
@@ -118,6 +120,7 @@
     name: ''
     host_all: yes
     state: absent
+  run_once: "{{ mariadb_cluster|default(false) }}"
 
 - name: Ensure Mariadb users needed for the cluster are created
   import_tasks: "cluster-users.yml"
