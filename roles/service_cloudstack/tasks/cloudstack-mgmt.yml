@@ -60,6 +60,7 @@
       '*.*': 'PROCESS'
     host: "{{ item }}"
   with_items: "{{ [ 'localhost', '127.0.0.1', '::1' ] + cloudstack_db_src_ips }}"
+  throttle: 1
 
 - name: Determine if cloudstack database is already initialized
   community.mysql.mysql_info:
@@ -141,7 +142,7 @@
   when: inventory_hostname == cloudstack_bootstrap_node|default("")
 
 - name: "Bring up cloudstack management on secondary nodes"
-  when: cloudstack_running.rc != 0 or db_config.changed or not db_file.stat.exists or cloudstack_db_info.databases["cloud"].tables == 0 && inventory_hostname != cloudstack_bootstrap_node|default("")
+  when: (cloudstack_running.rc != 0 or db_config.changed or not db_file.stat.exists or cloudstack_db_info.databases["cloud"].tables == 0) and inventory_hostname != cloudstack_bootstrap_node|default("")
   throttle: 1
   block:
   - name: "Setup cloudstack management"

@@ -10,7 +10,7 @@ network_vxlan_interfaces:
   # Management / Hypervisor network
   - name: "hypervisor"
     vni: 100
-    mtu: 1500
+    mtu: 9000
     addresses:
       - "10.10.100.5/24"
   # Storage network

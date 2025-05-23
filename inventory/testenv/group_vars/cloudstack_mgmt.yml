@@ -1,8 +1,9 @@
 ---
 host_roles: [ "base", "network_vxlanevpn", "service_ceph", "service_mariadb", "service_keepalived", "service_cloudstack" ]
-#host_roles: [ "service_ceph" ]
+#host_roles: [ "service_cloudstack" ]
 ansible_user: "{{ superuser }}"
 ansible_become_password: "{{ superuser_password }}"
 cloudstack_ceph_fs: "cloudstack"
 cloudstack_mgmt_interface: "hypervisor"
-cloudstack_version: "4.19"
+cloudstack_version: "4.20"
+cloudstack_systemvm: "http://download.cloudstack.org/systemvm/4.20/systemvmtemplate-4.20.0-x86_64-kvm.qcow2.bz2"

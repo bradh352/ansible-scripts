@@ -84,12 +84,19 @@
           {%- set best_node = node_sequence.items()|sort(attribute='1', reverse=true)|first %}
           {{- best_node[0] -}}
 
+    - name: Query for nodes that have been started previously
+      stat:
+        path: /var/lib/mysql/grastate.dat
+      register: mariadb_bootstrap_node_grastate
+      delegate_to: "{{ mariadb_bootstrap_node }}"
+
     - name: Mark selected node as safe to bootstrap
       lineinfile:
         path: /var/lib/mysql/grastate.dat
         line: "safe_to_bootstrap: 1"
         regexp: "^safe_to_bootstrap.*"
       delegate_to: "{{ mariadb_bootstrap_node }}"
+      when: mariadb_bootstrap_node_grastate.stat.exists
 
     - name: Start the bootstrap node
       shell: "galera_new_cluster"

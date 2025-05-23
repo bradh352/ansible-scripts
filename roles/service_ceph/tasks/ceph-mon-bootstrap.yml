@@ -58,6 +58,12 @@
   shell: ceph-mon --mkfs -i {{ inventory_hostname | split('.') | first }} --monmap /tmp/monmap --keyring /tmp/ceph.mon.keyring
   become_user: ceph
 
+- name: "Ensure ceph-mon is enabled and started"
+  service:
+    name: "ceph-mon@{{ inventory_hostname | split('.') | first }}"
+    state: started
+    enabled: true
+
 - name: cleanup
   file:
     path: "{{ item }}"

@@ -37,8 +37,7 @@
   import_tasks: "cloudstack-kvm.yml"
   when: inventory_hostname in groups["cloudstack_kvm"]
 
-- name: Populate systemvm
-  run_once: true
+- name: Configure SystemVM Template
   import_tasks: "cloudstack-systemvm.yml"
   when: inventory_hostname in groups["cloudstack_mgmt"]
-
+  run_once: true

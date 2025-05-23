@@ -5,4 +5,5 @@ ansible_user: "{{ superuser }}"
 ansible_become_password: "{{ superuser_password }}"
 cloudstack_ceph_fs: "cloudstack"
 cloudstack_mgmt_interface: "hypervisor"
-cloudstack_version: "4.19"
+cloudstack_version: "4.20"
+
