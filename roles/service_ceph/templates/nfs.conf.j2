@@ -175,7 +175,7 @@ CEPH
 RADOS_KV
 {
 	# Path to a ceph.conf file for this cluster.
-	Ceph_Conf = /etc/ceph/ceph.conf;
+	# Ceph_Conf = /etc/ceph/ceph.conf;
 
 	# The recoverybackend has its own ceph client. The default is to
 	# let libcephfs autogenerate the userid. Note that RADOS_KV block does
@@ -192,7 +192,7 @@ RADOS_KV
 	# a different hostname (i.e. if you're running an active/passive cluster
 	# with rados_ng/rados_kv and/or a scale-out rados_cluster). The default
 	# is to use the hostname of the node where ganesha is running.
-	nodeid = {{ inventory_hostname }}
+	# nodeid = {{ inventory_hostname }}
 }
 
 # Config block for rados:// URL access. It too uses its own client to access

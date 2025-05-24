@@ -18,7 +18,39 @@
       {%- for subnet in mariadb_cluster_vips %}
       {%-   for addr in ansible_facts['all_ipv4_addresses'] + ansible_facts['all_ipv6_addresses'] %}
       {%-     if addr | ansible.utils.ipaddr(subnet) is not none %}
-      {%-       set _ = iplist.append(addr) %}
+      {%-       do iplist.append(addr) %}
+      {%-     endif %}
+      {%-   endfor %}
+      {%- endfor %}
+      {{- iplist -}}
+
+- name: "Determine management subnet"
+  set_fact:
+    cloudstack_management_subnet: "{{ (ansible_facts[cloudstack_mgmt_interface]['ipv4']['address'] ~ '/' ~ ansible_facts[cloudstack_mgmt_interface]['ipv4']['prefix']) | ansible.utils.ipaddr('subnet') }}"
+
+- name: "Fetch network facts for other nodes"
+  ansible.builtin.setup:
+    gather_subset:
+      - network
+  delegate_to: "{{ item }}"
+  delegate_facts: true
+  ignore_unreachable: true
+  with_items: "{{ groups['cloudstack_mgmt'] }}"
+
+- name: "Determine management server ips"
+  set_fact:
+    cloudstack_management_ips: >-
+      {%- set iplist = [ ] %}
+      {%- for host in groups["cloudstack_mgmt"] %}
+      {%-   for iface in hostvars[host]['ansible_interfaces'] | default([]) %}
+      {%-     set iface_key = 'ansible_' ~ iface %}
+      {%-     if hostvars[host][iface_key] is not defined %}
+      {%-       set iface_key = iface %}
+      {%-     endif %}
+      {%-     if hostvars[host][iface_key]["ipv4"]["address"] is defined %}
+      {%-       if hostvars[host][iface_key]["ipv4"]["address"] | ansible.utils.ipaddr(cloudstack_management_subnet) is not none %}
+      {%-         do iplist.append(hostvars[host][iface_key]["ipv4"]["address"]) %}
+      {%-       endif %}
       {%-     endif %}
       {%-   endfor %}
       {%- endfor %}
@@ -151,3 +183,37 @@
     ansible.builtin.wait_for:
       port: 8080
       delay: 10
+
+- name: "Set up cloudmonkey"
+  shell: "cmk sync"
+  changed_when: false # don't care if this changes, not easy to detect
+
+- name: "Set configuration options"
+  include_tasks: "cloudstack-set-config.yml"
+  vars:
+    cmk_config_key: "{{ item.key }}"
+    cmk_config_val: "{{ item.val }}"
+  with_items:
+    - { key: "cpu.overprovisioning.factor",     val: "5" }
+    - { key: "storage.overprovisioning.factor", val: "10" }
+    - { key: "mem.overprovisioning.factor",     val: "1" }
+    - { key: "secstorage.vm.mtu.size",          val: "{{ ansible_facts[cloudstack_mgmt_interface]['mtu']|default(1500) }}" }
+    - { key: "management.network.cidr",         val: "{{ cloudstack_management_subnet }}" }
+    - { key: "host",                            val: "{{ cloudstack_management_ips | join(',') }}" }
+  run_once: true
+
+# Hack since we need to restart on all nodes, but the variable that gets set
+# ends up only being visible on one node.
+- name: "After configuration changes, may need to restart"
+  run_once: true
+  when: cmk_config_changed|default(false)
+  service:
+    name: "cloudstack-management"
+    state: "restarted"
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['cloudstack_mgmt'] }}"
+
+- name: "Make sure management nodes are back online"
+  ansible.builtin.wait_for:
+    port: 8080
+    delay: 5
