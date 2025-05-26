@@ -208,18 +208,18 @@ sonic_interfaces:
     vlans:
       - vlan: 2
         mode: "untagged"
-  "49":
-    description: "torsw1 port 16"
+  "51":
+    description: "torsw1 port 29"
     autoneg: "off"
-    fec: "none"
-    speed: "10000"
+    fec: "rs"
+    speed: "100000"
     layer3: true
     bgp_underlay: true
-  "50":
-    description: "torsw2 port 16"
+  "52":
+    description: "torsw2 port 29"
     autoneg: "off"
-    fec: "none"
-    speed: "10000"
+    fec: "rs"
+    speed: "100000"
     layer3: true
     bgp_underlay: true
 

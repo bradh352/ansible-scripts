@@ -1,9 +1,9 @@
 ---
-ansible_host: 192.168.1.84
-ceph_mon_ip: 10.10.100.5
+ansible_host: 192.168.1.87
+ceph_mon_ip: 10.10.100.8
 ceph_osd_chassis: "microcloud1"
-network_vtep_ip:  "172.16.0.104/24"
-network_underlay_asn: 4220000004
+network_vtep_ip:  "172.16.0.107/24"
+network_underlay_asn: 4220000007
 network_underlay_interfaces:
   - driver: "mlx5_core"
     speed: 25000
@@ -15,19 +15,19 @@ network_vxlan_interfaces:
     vni: 100
     mtu: 9000
     addresses:
-      - "10.10.100.5/24"
+      - "10.10.100.8/24"
   # Storage network
   - name: "ceph"
     vni: 200
     mtu: 9000
     addresses:
-      - "10.10.200.5/24"
+      - "10.10.200.8/24"
   # Public network
   - name: "public"
     vni: 2
     mtu: 1500
     addresses:
-      - "192.168.1.84/24"
+      - "192.168.1.87/24"
     routes:
       - to: "0.0.0.0/0"
         via: "192.168.1.1"

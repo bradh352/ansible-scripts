@@ -7,6 +7,9 @@ network_vtep_ip:  "172.16.0.103/24"
 network_underlay_asn: 4220000003
 network_underlay_interfaces:
   - driver: "mlx5_core"
+    speed: 25000
+    fec: "rs"
+    autonegotiation: false
 network_vxlan_interfaces:
   # Management / Hypervisor network
   - name: "hypervisor"
