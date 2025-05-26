@@ -19,3 +19,6 @@
 [submodule "roles/service_cloudstack"]
 	path = roles/service_cloudstack
 	url = ../ansible-role-service-cloudstack
+[submodule "roles/service_apache"]
+	path = roles/service_apache
+	url = ../ansible-role-service-apache
