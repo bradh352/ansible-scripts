@@ -16,3 +16,6 @@
 [submodule "roles/sonic"]
 	path = roles/sonic
 	url = ../ansible-role-sonic
+[submodule "roles/service_cloudstack"]
+	path = roles/service_cloudstack
+	url = ../ansible-role-service-cloudstack
