@@ -10,3 +10,6 @@
 [submodule "roles/service_mariadb"]
 	path = roles/service_mariadb
 	url = ../ansible-role-service-mariadb
+[submodule "roles/service_keepalived"]
+	path = roles/service_keepalived
+	url = ../ansible-role-service-keepalived
