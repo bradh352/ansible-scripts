@@ -22,3 +22,6 @@
 [submodule "roles/service_apache"]
 	path = roles/service_apache
 	url = ../ansible-role-service-apache
+[submodule "roles/app_wordpress"]
+	path = roles/app_wordpress
+	url = ../ansible-role-app-wordpress
