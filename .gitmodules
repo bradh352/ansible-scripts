@@ -4,3 +4,6 @@
 [submodule "roles/network_vxlanevpn"]
 	path = roles/network_vxlanevpn
 	url = ../ansible-role-network-vxlanevpn
+[submodule "roles/base"]
+	path = roles/base
+	url = ../ansible-role-base-linux
