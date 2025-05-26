@@ -1,8 +1,0 @@
----
-- name: mariadb_restart
-  service:
-    name: mariadb
-    state: restarted
-
-- name: noop
-  ansible.builtin.meta: noop

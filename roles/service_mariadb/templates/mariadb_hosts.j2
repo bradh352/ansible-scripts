@@ -1,5 +1,0 @@
-{% set host_list = [] %}
-{% for host in groups["mariadb_" + mariadb_cluster_name] %}
-{%   do host_list.append(host) %}
-{% endfor %}
-[ {{ host_list|unique|sort|join(",") }} ]

@@ -7,3 +7,6 @@
 [submodule "roles/base"]
 	path = roles/base
 	url = ../ansible-role-base-linux
+[submodule "roles/service_mariadb"]
+	path = roles/service_mariadb
+	url = ../ansible-role-service-mariadb
