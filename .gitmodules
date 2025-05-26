@@ -25,3 +25,6 @@
 [submodule "roles/app_wordpress"]
 	path = roles/app_wordpress
 	url = ../ansible-role-app-wordpress
+[submodule "roles/service_php"]
+	path = roles/service_php
+	url = ../ansible-role-service-php
