@@ -48,39 +48,12 @@ sonic_interfaces:
     bgp_underlay: true
     description: "CloudStack8 port 1"
     speed: "25000"
-  # "17":
-  #   description: "PortChannel1 MGMT p1"
-  #   autoneg: "off"
-  #   fec: "none"
-  #   speed: "10000"
-  # "18":
-  #   description: "PortChannel1 MGMT p2"
-  #   autoneg: "off"
-  #   fec: "none"
-  #   speed: "10000"
-  # "19":
-  #   description: "PortChannel2 MGMTLoop p1"
-  #   autoneg: "off"
-  #   fec: "none"
-  #   speed: "10000"
-  # "20":
-  #   description: "PortChannel2 MGMTLoop p2"
-  #   autoneg: "off"
-  #   fec: "none"
-  #   speed: "10000"
   "15":
     description: "fakeinet ge-0/8"
     autoneg: "off"
     fec: "none"
     speed: "1000"
     layer3: true
-  "16":
-    description: "mgmtsw port 49"
-    autoneg: "off"
-    fec: "none"
-    speed: "10000"
-    layer3: true
-    bgp_underlay: true
   "23":
     description: "PortChannel3 fw1 ge-0/8"
     autoneg: "off"
@@ -91,6 +64,11 @@ sonic_interfaces:
     autoneg: "off"
     fec: "none"
     speed: "1000"
+  "29":
+    layer3: true
+    bgp_underlay: true
+    description: "swmgmt port 51"
+    speed: "100000"
   "31":
     layer3: true
     bgp_underlay: true
