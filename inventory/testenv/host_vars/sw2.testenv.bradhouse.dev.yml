@@ -12,34 +12,42 @@ sonic_interfaces:
     layer3: true
     bgp_underlay: true
     description: "CloudStack1 port 2"
+    speed: "25000"
   "2":
     layer3: true
     bgp_underlay: true
     description: "CloudStack2 port 2"
+    speed: "25000"
   "3":
     layer3: true
     bgp_underlay: true
     description: "CloudStack3 port 2"
+    speed: "25000"
   "4":
     layer3: true
     bgp_underlay: true
     description: "CloudStack4 port 2"
+    speed: "25000"
   "5":
     layer3: true
     bgp_underlay: true
     description: "CloudStack5 port 2"
+    speed: "25000"
   "6":
     layer3: true
     bgp_underlay: true
     description: "CloudStack6 port 2"
+    speed: "25000"
   "7":
     layer3: true
     bgp_underlay: true
     description: "CloudStack7 port 2"
+    speed: "25000"
   "8":
     layer3: true
     bgp_underlay: true
     description: "CloudStack8 port 2"
+    speed: "25000"
   "15":
     description: "fakeinet ge-0/8"
     autoneg: "off"

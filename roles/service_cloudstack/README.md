@@ -26,12 +26,6 @@ database is always `cloud_usage`.  There is no ability to change these.
 - cloudstack_mgmt_interface - name of cloudstack management interface (backend hypervisor communication)
 
 ## Configuring CloudStack
-Global Settings -> management.network.cidr = desired management network subnet
-                   host (under hypervisor) = load balanced ip address
-                   secstorage.vm.mtu.size -> 9000
-
-
-
 
 Secondary storage requires HTTPS, so you may get a network error unless TLS is configured properly as per https://www.shapeblue.com/securing-cloudstack-4-11-with-https-tls/
 A workaround is to accept the certificate by going to https://{{ ssvm ip }} and accept the certificate then try again

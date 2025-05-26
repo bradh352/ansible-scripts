@@ -148,3 +148,17 @@
     - { key: net.bridge.bridge-nf-call-iptables, val: 0 }
     - { key: net.bridge.bridge-nf-call-arptables, val: 0 }
   notify: ufw_restart
+
+- name: "UFW: Enable Cloudstack Agent Ports"
+  community.general.ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  with_items:
+    - "1798"
+    - "16514" #libvirt
+    - "5900:6100" #VNC consoles)
+    - "49152:49216" #libvirt live migration
+
+- name: "Flush handlers"
+  meta: flush_handlers

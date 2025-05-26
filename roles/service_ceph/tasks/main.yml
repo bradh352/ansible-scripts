@@ -135,6 +135,11 @@
   import_tasks: "ceph-fs.yml"
   when: inventory_hostname in groups["ceph_" + ceph_cluster_name + "_mon"]
 
+- name: "See if NFS is desired"
+  set_fact:
+    ceph_nfs_exports: "{{ ceph_fs|default([]) | selectattr('nfs', 'defined') | selectattr('nfs', 'equalto', true) | map(attribute='name') | list }}"
+
 - name: "Configure nfs"
   import_tasks: "ceph-nfs.yml"
-  when: inventory_hostname in groups["ceph_" + ceph_cluster_name + "_mds"]
+  when: inventory_hostname in groups["ceph_" + ceph_cluster_name + "_mds"] and ceph_nfs_exports | length > 0
+

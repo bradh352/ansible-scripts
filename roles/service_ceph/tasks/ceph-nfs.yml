@@ -1,10 +1,6 @@
 ---
-- name: "See if NFS is desired"
-  set_fact:
-    ceph_nfs_exports: "{{ ceph_fs|default([]) | selectattr('nfs', 'defined') | selectattr('nfs', 'equalto', true) | map(attribute='name') | list }}"
 
 - name: Install NFS dependencies
-  when: ceph_nfs_exports | length > 0
   ansible.builtin.apt:
     pkg:
       - "libcephfs2"

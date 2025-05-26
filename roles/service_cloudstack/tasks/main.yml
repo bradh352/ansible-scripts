@@ -41,3 +41,7 @@
   import_tasks: "cloudstack-systemvm.yml"
   when: inventory_hostname in groups["cloudstack_mgmt"]
   run_once: true
+
+- name: Configure via CloudMonkey
+  import_tasks: "cloudstack-api.yml"
+  when: inventory_hostname in groups["cloudstack_mgmt"]
