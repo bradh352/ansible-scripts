@@ -13,3 +13,6 @@
 [submodule "roles/service_keepalived"]
 	path = roles/service_keepalived
 	url = ../ansible-role-service-keepalived
+[submodule "roles/sonic"]
+	path = roles/sonic
+	url = ../ansible-role-sonic
