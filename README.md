@@ -1,5 +1,21 @@
 # Ansible Scripts
 
+## Checking out
+
+### Initial
+```
+git clone --recurse-submodules https://github.com/bradh352/ansible-scripts && \
+cd ansible-scripts && \
+git config --local submodule.recurse true
+```
+
+### Updating when submodules change
+```
+git submodule update --remote --merge && \
+git add . && \
+git commit -m "update submodules to latest head"
+```
+
 ## Create initial environment
 
 ```
