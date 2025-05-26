@@ -1,5 +1,0 @@
----
-- name: restart_ganesha
-  service:
-    name: nfs-ganesha
-    state: restarted

@@ -1,0 +1,3 @@
+[submodule "roles/service_ceph"]
+	path = roles/service_ceph
+	url = ../ansible-role-ceph
