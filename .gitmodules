@@ -1,3 +1,6 @@
 [submodule "roles/service_ceph"]
 	path = roles/service_ceph
 	url = ../ansible-role-ceph
+[submodule "roles/network_vxlanevpn"]
+	path = roles/network_vxlanevpn
+	url = ../ansible-role-network-vxlanevpn
