@@ -1,4 +1,5 @@
 ---
+mariadb_buffer_pool_size: 2048
 mariadb_cluster_name: "cloudstack_testenv"
 mariadb_cluster: true
 mariadb_sst_user: sstuser
