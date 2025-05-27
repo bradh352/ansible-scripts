@@ -6,6 +6,9 @@ ceph_testenv_cluster:
     node2.testenv.bradhouse.dev:
     node3.testenv.bradhouse.dev:
     node4.testenv.bradhouse.dev:
+    node5.testenv.bradhouse.dev:
+    node6.testenv.bradhouse.dev:
+    node7.testenv.bradhouse.dev:
 # List all nodes that will have monitors
 ceph_testenv_mon:
   hosts:
@@ -20,6 +23,9 @@ ceph_testenv_osd:
     node2.testenv.bradhouse.dev:
     node3.testenv.bradhouse.dev:
     node4.testenv.bradhouse.dev:
+    node5.testenv.bradhouse.dev:
+    node6.testenv.bradhouse.dev:
+    node7.testenv.bradhouse.dev:
 # List all nodes that will have MDS daemons
 ceph_testenv_mds:
   hosts:
