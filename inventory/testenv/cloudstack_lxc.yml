@@ -1,8 +1,6 @@
 ---
-cloudstack_kvm:
+cloudstack_lxc:
   hosts:
-    node1.testenv.bradhouse.dev:
-    node2.testenv.bradhouse.dev:
-    node3.testenv.bradhouse.dev:
-    node4.testenv.bradhouse.dev:
-    node5.testenv.bradhouse.dev:
+    node6.testenv.bradhouse.dev:
+    node7.testenv.bradhouse.dev:
+    node8.testenv.bradhouse.dev:
