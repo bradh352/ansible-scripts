@@ -1,6 +1,0 @@
----
-cloudstack_lxc:
-  hosts:
-    node6.testenv.bradhouse.dev:
-    node7.testenv.bradhouse.dev:
-    node8.testenv.bradhouse.dev:
