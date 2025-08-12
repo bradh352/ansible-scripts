@@ -10,23 +10,36 @@ network_underlay_interfaces:
     speed: 25000
     fec: "rs"
     autonegotiation: false
-network_vxlan_interfaces:
+network_vxlans:
   # Management / Hypervisor network
-  - name: "hypervisor"
-    vni: 100
+  - vni: 100
+    bridge: "hypervisor"
     mtu: 9000
+  # Storage network
+  - vni: 200
+    bridge: "ceph"
+    mtu: 9000
+  # Public network
+  - vni: 2
+    bridge: "public"
+    mtu: 1500
+network_bridges:
+  - name: "hypervisor"
+    mtu: 9000
+    stp: false
+    vlan_aware: false
     addresses:
       - "10.10.100.3/24"
-  # Storage network
   - name: "ceph"
-    vni: 200
     mtu: 9000
+    stp: false
+    vlan_aware: false
     addresses:
       - "10.10.200.3/24"
-  # Public network
   - name: "public"
-    vni: 2
     mtu: 1500
+    stp: false
+    vlan_aware: false
     addresses:
       - "192.168.1.82/24"
     routes:
