@@ -12,15 +12,15 @@ network_underlay_interfaces:
 network_vxlans:
   # Management / Hypervisor network
   - vni: 100
-    bridge: "hypervisor"
+    ifname: "hypervisor"
     mtu: 9000
   # Storage network
   - vni: 200
-    bridge: "ceph"
+    ifname: "ceph"
     mtu: 9000
   # Public network
   - vni: 2
-    bridge: "public"
+    ifname: "public"
     mtu: 1500
 network_bridges:
   - name: "hypervisor"

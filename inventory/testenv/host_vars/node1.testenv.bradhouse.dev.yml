@@ -13,15 +13,15 @@ network_underlay_interfaces:
 network_vxlans:
   # Management / Hypervisor network
   - vni: 100
-    bridge: "hypervisor"
+    ifname: "hypervisor"
     mtu: 9000
   # Storage network
   - vni: 200
-    bridge: "ceph"
+    ifname: "ceph"
     mtu: 9000
   # Public network
   - vni: 2
-    bridge: "public"
+    ifname: "public"
     mtu: 1500
 network_bridges:
   - name: "hypervisor"
@@ -49,25 +49,3 @@ network_bridges:
       addresses:
         - 8.8.8.8
         - 2001:4860:4860::8888
-# network_interfaces:
-#   - name: "mgmt"
-#     addresses:
-#       - "192.168.1.81/24"
-#     mtu: 1500
-#     macaddr: "ac:1f:6b:2d:85:83"
-#     routes:
-#       - to: 0.0.0.0/0
-#         via: 192.168.1.1
-#     nameservers:
-#       addresses:
-#         - 8.8.8.8
-#         - 2001:4860:4860::8888
-#       search:
-#         - testenv.bradhouse.dev
-# network_vlans:
-#   - name: "hypervisor"
-#     vlan: 100
-#     bridge: "cloudbr0"
-#     mtu: 9000
-#     addresses:
-#       - "10.10.100.2/24"
