@@ -5,6 +5,7 @@ ansible_user: "{{ superuser }}"
 ansible_become_password: "{{ superuser_password }}"
 cloudstack_ceph_fs: "cloudstack"
 cloudstack_mgmt_interface: "hypervisor"
+cloudstack_hostname: "cs.testenv.bradhouse.dev"
 cloudstack_version: "4.20"
 cloudstack_systemvm: "http://download.cloudstack.org/systemvm/4.20/systemvmtemplate-4.20.1-x86_64-kvm.qcow2.bz2"
 keepalived_vips:
