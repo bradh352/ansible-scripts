@@ -7,3 +7,27 @@ cloudstack_ceph_fs: "cloudstack"
 cloudstack_mgmt_interface: "hypervisor"
 cloudstack_version: "4.20"
 cloudstack_systemvm: "http://download.cloudstack.org/systemvm/4.20/systemvmtemplate-4.20.1-x86_64-kvm.qcow2.bz2"
+keepalived_vips:
+  - name: "mariadb"
+    interface: "hypervisor"
+    ips: "{{ mariadb_cluster_vips }}" # From mariadb_cloudstack_testenv.yml
+    healthcheck:
+      type: "script"
+      script: "/usr/local/bin/clustercheck"
+  - name: "nfs"
+    interface: "public"
+    ips:
+      - 192.168.1.89
+    healthcheck:
+      type: "ip"
+      host: "localhost"
+      port: 2049
+  - name: "cloudstackui"
+    interface: "public"
+    ips:
+      - 192.168.1.80
+    healthcheck:
+      type: "ip"
+      host: "localhost"
+      port: 8080
+
