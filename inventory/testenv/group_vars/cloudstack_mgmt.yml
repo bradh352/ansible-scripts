@@ -5,9 +5,27 @@ ansible_user: "{{ superuser }}"
 ansible_become_password: "{{ superuser_password }}"
 cloudstack_ceph_fs: "cloudstack"
 cloudstack_mgmt_interface: "hypervisor"
-cloudstack_hostname: "cs.testenv.bradhouse.dev"
+cloudstack_hostname: "192.168.1.80"
 cloudstack_version: "4.20"
 cloudstack_systemvm: "http://download.cloudstack.org/systemvm/4.20/systemvmtemplate-4.20.1-x86_64-kvm.qcow2.bz2"
+cloudstack_saml_enable: true
+cloudstack_saml_metadata_url: "https://trial-1825032.okta.com/app/exkunxhcrgytprlvh697/sso/saml/metadata"
+cloudstack_saml_user_attribute: "uid"
+cloudstack_saml_ldap_server: "trial-1825032.ldap.okta.com"
+cloudstack_saml_use_ssl: true
+cloudstack_saml_binddn: "uid=bind@example.com,ou=users,dc=trial-1825032,dc=okta,dc=com"
+cloudstack_saml_bindpass: "Test123$"
+cloudstack_saml_userdn: "ou=users,dc=trial-1825032,dc=okta,dc=com"
+cloudstack_saml_groupdn: "ou=groups,dc=trial-1825032,dc=okta,dc=com"
+cloudstack_saml_ignore_users:
+  - "bind@example.com"
+cloudstack_saml_groups_allowed:
+  - "Everyone"
+cloudstack_saml_project_groups:
+  - "some_project"
+cloudstack_saml_admin_groups:
+  - "cs_admins"
+
 keepalived_vips:
   - name: "mariadb"
     interface: "hypervisor"
