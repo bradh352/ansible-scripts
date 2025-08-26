@@ -13,6 +13,8 @@ ceph_pools:
 ceph_fs:
   - name: cloudstack
     nfs: true
+    nfs_root: "/cloudstack_nfs"
+    nfs_export: "/cloudstack/"
 
 
 
