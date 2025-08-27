@@ -11,7 +11,7 @@ ceph_pools:
     min_size: 2
     bulk: true
 ceph_fs:
-  - name: cloudstack
+  - name: fs
     nfs: true
     nfs_root: "/cloudstack_nfs"
     nfs_export: "/cloudstack/"
