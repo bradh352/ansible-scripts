@@ -33,3 +33,8 @@ ceph_testenv_mds:
     node1.testenv.bradhouse.dev:
     node2.testenv.bradhouse.dev:
     node3.testenv.bradhouse.dev:
+ceph_testenv_rgw:
+  hosts:
+    node1.testenv.bradhouse.dev:
+    node2.testenv.bradhouse.dev:
+    node3.testenv.bradhouse.dev:

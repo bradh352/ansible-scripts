@@ -15,6 +15,8 @@ ceph_fs:
     nfs: true
     nfs_root: "/cloudstack_nfs"
     nfs_export: "/cloudstack/"
-
-
-
+ceph_rgw:
+  realm: "testlab"
+  zonegroup: "us"
+  zone: "homelab"
+  port: 7480
