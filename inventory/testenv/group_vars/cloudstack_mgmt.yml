@@ -1,13 +1,12 @@
 ---
 host_roles: [ "base", "network_vxlanevpn", "service_ceph", "service_mariadb", "service_keepalived", "service_cloudstack" ]
-#host_roles: [ "service_cloudstack" ]
+#host_roles: [ "service_ceph" ]
 ansible_user: "{{ superuser }}"
 ansible_become_password: "{{ superuser_password }}"
 cloudstack_ceph_fs: "cloudstack"
 cloudstack_mgmt_interface: "hypervisor"
 cloudstack_hostname: "192.168.1.80"
-cloudstack_version: "4.20"
-cloudstack_systemvm: "http://download.cloudstack.org/systemvm/4.20/systemvmtemplate-4.20.1-x86_64-kvm.qcow2.bz2"
+cloudstack_version: "4.21"
 cloudstack_saml_enable: true
 cloudstack_saml_metadata_url: "https://trial-1825032.okta.com/app/exkunxhcrgytprlvh697/sso/saml/metadata"
 cloudstack_saml_user_attribute: "uid"
@@ -49,4 +48,12 @@ keepalived_vips:
       type: "ip"
       host: "localhost"
       port: 8080
+  - name: "radosgw"
+    interface: "public"
+    ips:
+      - 192.168.1.79
+    healthcheck:
+      type: "ip"
+      host: "localhost"
+      port: 7480
 
