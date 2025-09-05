@@ -33,27 +33,27 @@ keepalived_vips:
       type: "script"
       script: "/usr/local/bin/clustercheck"
   - name: "nfs"
-    interface: "public"
+    interface: "hypervisor"
     ips:
-      - 192.168.1.89
+      - 10.10.100.11
     healthcheck:
       type: "ip"
       host: "localhost"
       port: 2049
+  - name: "radosgw"
+    interface: "hypervisor"
+    ips:
+      - 10.10.100.12
+    healthcheck:
+      type: "ip"
+      host: "localhost"
+      port: 7480
   - name: "cloudstackui"
     interface: "public"
     ips:
       - 192.168.1.80
     healthcheck:
-      type: "ip"
-      host: "localhost"
-      port: 8080
-  - name: "radosgw"
-    interface: "public"
-    ips:
-      - 192.168.1.79
-    healthcheck:
-      type: "ip"
-      host: "localhost"
-      port: 7480
+      type: "http"
+      url: "http://localhost:8080"
+
 
