@@ -1,0 +1,6 @@
+---
+ansible_host: 192.168.1.138
+host_roles: [ "auth_freeipa" ]
+auth_freeipa_enroll_user: "admin"
+auth_freeipa_enroll_pass: "Test123$"
+auth_freeipa_server: "freeipa.testenv.bradhouse.dev"

@@ -1,0 +1,20 @@
+---
+ansible_host: 192.168.1.193
+host_roles: [ "auth_sssd" ]
+auth_sssd_cacert_url: "https://freeipa.testenv.bradhouse.dev/ipa/config/ca.crt"
+auth_sssd_servers: [ "freeipa.testenv.bradhouse.dev" ]
+auth_sssd_realm: "TESTENV.BRADHOUSE.DEV"
+auth_sssd_search_base: "dc=testenv,dc=bradhouse,dc=dev"
+auth_sssd_binddn: "uid=bind,cn=sysaccounts,cn=etc,dc=testenv,dc=bradhouse,dc=dev"
+auth_sssd_bindpass: "Test123$"
+auth_sssd_host_keytab: |
+  BQIAAAB3AAIAFVRFU1RFTlYuQlJBREhPVVNFLkRFVgAEaG9zdAAlcm9ja3ktaXBhY2xpZW50LnRl
+  c3RlbnYuYnJhZGhvdXNlLmRldgAAAAFop3uaAQAUACC0DBj4jwPlLz41Jht5AUfMkmjhc4FiU9v3
+  MZRwQNgLUQAAAAEAAABnAAIAFVRFU1RFTlYuQlJBREhPVVNFLkRFVgAEaG9zdAAlcm9ja3ktaXBh
+  Y2xpZW50LnRlc3RlbnYuYnJhZGhvdXNlLmRldgAAAAFop3uaAQATABDrJrPORQM0y56sTTgcfyst
+  AAAAAQAAAHcAAgAVVEVTVEVOVi5CUkFESE9VU0UuREVWAARob3N0ACVyb2NreS1pcGFjbGllbnQu
+  dGVzdGVudi5icmFkaG91c2UuZGV2AAAAAWine5oBABIAIG/xJdzbKyZGBFrVK1Q+bWNYd7wXXddU
+  ixHOjjWuVH+dAAAAAQAAAGcAAgAVVEVTVEVOVi5CUkFESE9VU0UuREVWAARob3N0ACVyb2NreS1p
+  cGFjbGllbnQudGVzdGVudi5icmFkaG91c2UuZGV2AAAAAWine5oBABEAEHJhpdlryqlt3W9xI5Yg
+  EZoAAAAB
+

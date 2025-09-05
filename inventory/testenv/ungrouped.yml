@@ -1,0 +1,6 @@
+---
+ungrouped:
+  hosts:
+    debian-ipaclient.testenv.bradhouse.dev:
+    ubuntu24-ipaclient.testenv.bradhouse.dev:
+    ubuntu-ipaclient2.testenv.bradhouse.dev:
