@@ -28,3 +28,9 @@
 [submodule "roles/service_php"]
 	path = roles/service_php
 	url = ../ansible-role-service-php
+[submodule "roles/auth_freeipa"]
+	path = roles/auth_freeipa
+	url = ../ansible-role-auth-freeipa
+[submodule "roles/auth_sssd"]
+	path = roles/auth_sssd
+	url = ../ansible-role-auth-sssd
