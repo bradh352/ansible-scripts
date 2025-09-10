@@ -1,4 +1,4 @@
-ansible
+ansible < 12
 netaddr
 passlib
 keyring
