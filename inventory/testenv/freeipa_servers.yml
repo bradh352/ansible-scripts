@@ -1,0 +1,6 @@
+---
+freeipa_servers:
+  hosts:
+    freeipa.testenv.bradhouse.dev:
+    freeipa2.testenv.bradhouse.dev:
+    freeipa3.testenv.bradhouse.dev:

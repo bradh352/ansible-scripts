@@ -34,3 +34,6 @@
 [submodule "roles/auth_sssd"]
 	path = roles/auth_sssd
 	url = ../ansible-role-auth-sssd
+[submodule "roles/service_freeipa"]
+	path = roles/service_freeipa
+	url = ../ansible-role-service-freeipa

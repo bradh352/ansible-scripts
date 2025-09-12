@@ -6,3 +6,5 @@ superuser_pubkey:
 timezone: "America/New_York"
 admin_email: "brad@brad-house.com"
 smtp_server: "smtp.gmail.com"
+ansible_user: "{{ superuser }}"
+ansible_become_password: "{{ superuser_password }}"

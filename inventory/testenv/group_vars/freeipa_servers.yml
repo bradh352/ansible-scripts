@@ -1,0 +1,23 @@
+---
+host_roles: [ "base", "service_freeipa" ]
+#host_roles: [ "service_freeipa" ]
+service_freeipa_admin_pass: "Test123$"
+service_freeipa_dm_pass: "Test123$"
+service_freeipa_realm: "TESTENV.BRADHOUSE.DEV"
+ssh_password_auth: true
+host_use_default_ip: true
+service_freeipa_idpsync_enable: true
+service_freeipa_idpsync_idp_name: "Okta"
+service_freeipa_idpsync_provider: "okta"
+service_freeipa_idpsync_provider_domain: "trial-1825032.okta.com"
+service_freeipa_idpsync_provider_domain: "trial-1825032.okta.com"
+service_freeipa_idpsync_server: "trial-1825032.ldap.okta.com"
+service_freeipa_idpsync_binddn: "uid=bind@example.com,ou=users,dc=trial-1825032,dc=okta,dc=com"
+service_freeipa_idpsync_bindpass: "Test123$"
+service_freeipa_idpsync_userdn: "ou=users,dc=trial-1825032,dc=okta,dc=com"
+service_freeipa_idpsync_groupdn: "ou=groups,dc=trial-1825032,dc=okta,dc=com"
+service_freeipa_idpsync_ignore_users:
+  - "bind@example.com"
+service_freeipa_idpsync_ignore_groups:
+  - "Okta Administrators"
+  - "Everyone"
