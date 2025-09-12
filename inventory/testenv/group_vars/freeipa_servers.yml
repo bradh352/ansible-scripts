@@ -10,7 +10,7 @@ service_freeipa_idpsync_enable: true
 service_freeipa_idpsync_idp_name: "Okta"
 service_freeipa_idpsync_provider: "okta"
 service_freeipa_idpsync_provider_domain: "trial-1825032.okta.com"
-service_freeipa_idpsync_provider_domain: "trial-1825032.okta.com"
+service_freeipa_idpsync_clientid: "0oaukvxyy47EXv0MU697"
 service_freeipa_idpsync_server: "trial-1825032.ldap.okta.com"
 service_freeipa_idpsync_binddn: "uid=bind@example.com,ou=users,dc=trial-1825032,dc=okta,dc=com"
 service_freeipa_idpsync_bindpass: "Test123$"
