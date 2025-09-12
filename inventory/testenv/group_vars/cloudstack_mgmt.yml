@@ -1,9 +1,11 @@
 ---
-host_roles: [ "base", "network_vxlanevpn", "service_ceph", "service_mariadb", "service_keepalived", "service_cloudstack" ]
-#host_roles: [ "service_cloudstack" ]
+#host_roles: [ "base", "network_vxlanevpn", "service_ceph", "service_mariadb", "service_keepalived", "service_cloudstack" ]
+host_roles: [ "service_cloudstack" ]
 cloudstack_ceph_fs: "cloudstack"
 cloudstack_mgmt_interface: "hypervisor"
-cloudstack_hostname: "192.168.1.80"
+cloudstack_hostname: "cs.testenv.bradhouse.dev"
+cloudstack_dns_email: "brad@brad-house.com"
+cloudstack_dns_provider: "godaddy"
 cloudstack_version: "4.21"
 cloudstack_saml_enable: true
 cloudstack_saml_metadata_url: "https://trial-1825032.okta.com/app/exkunxhcrgytprlvh697/sso/saml/metadata"
