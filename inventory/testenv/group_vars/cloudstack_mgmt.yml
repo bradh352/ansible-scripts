@@ -1,6 +1,6 @@
 ---
-#host_roles: [ "base", "network_vxlanevpn", "service_ceph", "service_mariadb", "service_keepalived", "service_cloudstack" ]
-host_roles: [ "service_cloudstack" ]
+host_roles: [ "base", "network_vxlanevpn", "service_ceph", "service_mariadb", "service_keepalived", "service_cloudstack" ]
+#host_roles: [ "service_cloudstack" ]
 cloudstack_ceph_fs: "cloudstack"
 cloudstack_mgmt_interface: "hypervisor"
 cloudstack_hostname: "cs.testenv.bradhouse.dev"
@@ -18,6 +18,8 @@ cloudstack_saml_userdn: "ou=users,dc=trial-1825032,dc=okta,dc=com"
 cloudstack_saml_groupdn: "ou=groups,dc=trial-1825032,dc=okta,dc=com"
 cloudstack_saml_ignore_users:
   - "bind@example.com"
+cloudstack_saml_ignore_projects:
+  - "infra"
 cloudstack_saml_groups_allowed:
   - "Everyone"
 cloudstack_saml_project_groups:
