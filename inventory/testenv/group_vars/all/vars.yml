@@ -8,3 +8,6 @@ admin_email: "brad@brad-house.com"
 smtp_server: "smtp.gmail.com"
 ansible_user: "{{ superuser }}"
 ansible_become_password: "{{ superuser_password }}"
+pc_nameservers:
+  - 10.252.1.11
+  - 10.252.1.12

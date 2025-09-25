@@ -37,3 +37,6 @@
 [submodule "roles/service_freeipa"]
 	path = roles/service_freeipa
 	url = ../ansible-role-service-freeipa
+[submodule "roles/service_bind"]
+	path = roles/service_bind
+	url = ../ansible-role-service-bind

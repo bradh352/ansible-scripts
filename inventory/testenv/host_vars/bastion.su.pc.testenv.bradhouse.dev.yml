@@ -1,0 +1,22 @@
+---
+ansible_host: 192.168.1.93
+ansible_port: 5022
+host_roles: [ "base", "network_vxlanevpn" ]
+network_interfaces:
+  - name: "enp3s0"
+    ifname: "enp3s0"
+    addresses:
+      - "10.252.0.10/24"
+    routes:
+      - to: "0.0.0.0/0"
+        via: "10.252.0.1"
+    nameservers:
+      addresses:
+        - 8.8.8.8
+#        - 10.252.1.11
+#        - 10.252.1.12
+base_additional_hosts:
+  - ip: 10.252.1.11
+    host: ns1.dns.pc.testenv.bradhouse.dev
+  - ip: 10.252.1.12
+    host: ns2.dns.pc.testenv.bradhouse.dev

@@ -1,0 +1,31 @@
+---
+dns:
+  hosts:
+    ns1.dns.pc.testenv.bradhouse.dev:
+      network_interfaces:
+        - name: "enp3s0"
+          ifname: "enp3s0"
+          addresses:
+            - "10.252.1.11/24"
+          routes:
+            - to: "0.0.0.0/0"
+              via: "10.252.1.1"
+          nameservers:
+            # addresses: "{{ pc_nameservers }}"
+            addresses:
+              - 8.8.8.8
+    ns2.dns.pc.testenv.bradhouse.dev:
+      network_interfaces:
+        - name: "enp3s0"
+          ifname: "enp3s0"
+          addresses:
+            - "10.252.0.12/24"
+          routes:
+            - to: "0.0.0.0/0"
+              via: "10.252.1.1"
+          nameservers:
+            # addresses: "{{ pc_nameservers }}"
+            addresses:
+              - 8.8.8.8
+  vars:
+    host_roles: [ "base", "network_vxlanevpn" ]
