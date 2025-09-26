@@ -40,3 +40,6 @@
 [submodule "roles/service_bind"]
 	path = roles/service_bind
 	url = ../ansible-role-service-bind
+[submodule "roles/service_mirror"]
+	path = roles/service_mirror
+	url = ../ansible-role-service-mirror
