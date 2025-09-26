@@ -19,7 +19,7 @@ dns:
         - name: "enp3s0"
           ifname: "enp3s0"
           addresses:
-            - "10.252.0.12/24"
+            - "10.252.1.12/24"
           routes:
             - to: "0.0.0.0/0"
               via: "10.252.1.1"
@@ -28,4 +28,52 @@ dns:
             addresses:
               - 8.8.8.8
   vars:
-    host_roles: [ "base", "network_vxlanevpn" ]
+    host_roles: [ "base", "network_vxlanevpn", "service_bind" ]
+    bind_recursive: true
+    bind_zones:
+      - domain: "su.pc.testenv.bradhouse.dev"
+        records:
+          - name: "bastion"
+            addresses: [ "10.252.0.10", "2620:8B8::1" ]
+      - domain: "dns.pc.testenv.bradhouse.dev"
+        records:
+          - name: "ns1"
+            addresses: [ "10.252.1.11" ]
+          - name: "ns2"
+            addresses: [ "10.252.1.12" ]
+      - domain: "mirror.pc.testenv.bradhouse.dev"
+        records:
+          - name: "mirror1"
+            addresses: [ "10.252.2.11"]
+      - domain: "ipa.pc.testenv.bradhouse.dev"
+        records:
+          - name: "ipa1"
+            addresses: [ "10.252.3.11" ]
+          - name: "ipa2"
+            addresses: [ "10.252.3.12" ]
+          - name: "ipa3"
+            addresses: [ "10.252.3.13" ]
+      - domain: "ntp.pc.testenv.bradhouse.dev"
+        records:
+          - name: "ntp1"
+            addresses: [ "10.252.4.11" ]
+          - name: "ntp2"
+            addresses: [ "10.252.4.12" ]
+      - domain: "proxy.pc.testenv.bradhouse.dev"
+        records:
+          - name: "secureproxy1"
+            addresses: [ "10.252.5.11" ]
+          - name: "cacheproxy1"
+            addresses: [ "10.252.5.21" ]
+          - name: "gitproxy1"
+            addresses: [ "10.252.5.31" ]
+      - domain: "ldapproxy.pc.testenv.bradhouse.dev"
+        records:
+          - name: "ldapproxy1"
+            addresses: [ "10.252.6.11" ]
+      - domain: "nfs.pc.testenv.bradhouse.dev"
+        records:
+          - name: "nfs1"
+            addresses: [ "10.252.7.11" ]
+          - name: "nfs2"
+            addresses: [ "10.252.7.12" ]
