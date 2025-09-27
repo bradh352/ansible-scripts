@@ -11,9 +11,9 @@ dns:
             - to: "0.0.0.0/0"
               via: "10.252.1.1"
           nameservers:
-            # addresses: "{{ pc_nameservers }}"
-            addresses:
-              - 8.8.8.8
+            addresses: "{{ pc_nameservers }}"
+            # addresses:
+            #  - 8.8.8.8
     ns2.dns.pc.testenv.bradhouse.dev:
       network_interfaces:
         - name: "enp3s0"
@@ -24,9 +24,9 @@ dns:
             - to: "0.0.0.0/0"
               via: "10.252.1.1"
           nameservers:
-            # addresses: "{{ pc_nameservers }}"
-            addresses:
-              - 8.8.8.8
+            addresses: "{{ pc_nameservers }}"
+            # addresses:
+            #  - 8.8.8.8
   vars:
     host_roles: [ "base", "network_vxlanevpn", "service_bind" ]
     bind_recursive: true
@@ -45,6 +45,9 @@ dns:
         records:
           - name: "mirror1"
             addresses: [ "10.252.2.11"]
+          - name: "mirror"
+            type: "CNAME"
+            data: "mirror1.mirror.pc.testenv.bradhouse.dev"
       - domain: "ipa.pc.testenv.bradhouse.dev"
         records:
           - name: "ipa1"
@@ -67,13 +70,27 @@ dns:
             addresses: [ "10.252.5.21" ]
           - name: "gitproxy1"
             addresses: [ "10.252.5.31" ]
+          - name: "secureproxy"
+            type: "CNAME"
+            data: "secureproxy1.proxy.pc.testenv.bradhouse.dev"
+          - name: "cacheproxy"
+            type: "CNAME"
+            data: "cacheproxy1.proxy.pc.testenv.bradhouse.dev"
+          - name: "gitproxy"
+            type: "CNAME"
+            data: "gitproxy1.proxy.pc.testenv.bradhouse.dev"
       - domain: "ldapproxy.pc.testenv.bradhouse.dev"
         records:
           - name: "ldapproxy1"
             addresses: [ "10.252.6.11" ]
+          - name: "ldapproxy"
+            type: "CNAME"
+            data: "ldapproxy1.ldapproxy.pc.testenv.bradhouse.dev"
       - domain: "nfs.pc.testenv.bradhouse.dev"
         records:
           - name: "nfs1"
             addresses: [ "10.252.7.11" ]
           - name: "nfs2"
             addresses: [ "10.252.7.12" ]
+          - name: "nfs" # VIP
+            addresses: [ "10.252.7.10" ]
