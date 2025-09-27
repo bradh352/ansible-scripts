@@ -1,0 +1,48 @@
+---
+dns:
+  hosts:
+    mirror1.mirror.pc.testenv.bradhouse.dev:
+      network_interfaces:
+        - name: "enp3s0"
+          ifname: "enp3s0"
+          addresses:
+            - "10.252.2.11/24"
+          routes:
+            - to: "0.0.0.0/0"
+              via: "10.252.2.1"
+          nameservers:
+            addresses: "{{ pc_nameservers }}"
+  vars:
+    host_roles: [ "base", "network_vxlanevpn", "service_mirror" ]
+    mirror_bwlimit: 500
+    mirror_destination: "/var/www"
+    mirror_dns_email: "brad@brad-house.com"
+    mirror_dns_provider: "godaddy"
+    mirror_dns_apikey: "{{ godaddy_apikey }}"
+    mirror_sites:
+      # Mirror list: https://mirrors.rockylinux.org/mirrormanager/mirrors
+      - id: "rocky"
+        name: "Rocky Linux"
+        type: "rsync"
+        remote: "rsync://plug-mirror.rcac.purdue.edu/rocky"
+        exclude: [ "ppc64le/", "riscv64/", "s390x/", "8/", "8.*/", "9/", "9.*/" ]
+        precheck_file: "fullfiletimelist-rocky"
+      # Mirror list: https://launchpad.net/ubuntu/+archivemirrors
+      - id: "ubuntu"
+        name: "Ubuntu Linux"
+        type: "rsync"
+        remote: "rsync://mirror.linux.ncsu.edu/ubuntu/"
+        firststage_exclude: [ "Packages*", "Sources*", "Release*", "InRelease" ]
+        exclude: [ "devel*/", "focal*/", "lunar*/", "mantic*/", "oracular*/", "trusty*/", "xenial*/" ]
+      # Mirror list: https://www.debian.org/mirror/list-full#US
+      - id: "debian"
+        name: "Debian"
+        type: "rsync"
+        remote: "rsync://plug-mirror.rcac.purdue.edu/debian"
+        firststage_exclude: [ "Packages*", "Sources*", "Release*", "InRelease" ]
+      # Mirror list: https://mirrormanager.fedoraproject.org/mirrors/EPEL
+      - id: "epel"
+        name: "EPEL"
+        type: "rsync"
+        remote: "rsync://archive.mci-1.serverforge.org/fedora-epel"
+        exclude: [ "ppc64le/", "riscv64/", "s390x/", "8/", "9/", "testing/" ]

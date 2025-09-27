@@ -11,10 +11,7 @@ network_interfaces:
       - to: "0.0.0.0/0"
         via: "10.252.0.1"
     nameservers:
-      addresses:
-        - 8.8.8.8
-#        - 10.252.1.11
-#        - 10.252.1.12
+      addresses: "{{ pc_nameservers }}"
 base_additional_hosts:
   - ip: 10.252.1.11
     host: ns1.dns.pc.testenv.bradhouse.dev
