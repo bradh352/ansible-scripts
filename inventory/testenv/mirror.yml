@@ -21,6 +21,7 @@ dns:
     mirror_dns_apikey: "{{ godaddy_apikey }}"
     mirror_sites:
       # Mirror list: https://launchpad.net/ubuntu/+archivemirrors
+      # westcoast try mirror.sfo12.us.leaseweb.net
       - id: "ubuntu"
         name: "Ubuntu Linux"
         type: "debmirror"
@@ -53,7 +54,8 @@ dns:
       - id: "epel"
         name: "EPEL"
         type: "rsync"
-        host: "archive.mci-1.serverforge.org"
+        host: "mirror.nodesdirect.com"
         remote_dir: "fedora-epel"
         rsync_exclude: [ "ppc64le/", "riscv64/", "s390x/", "8/", "9/", "testing/" ]
+        rsync_precheck_file: "fullfiletimelist-epel"
 
