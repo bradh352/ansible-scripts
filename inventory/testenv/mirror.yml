@@ -24,20 +24,20 @@ dns:
       - id: "ubuntu"
         name: "Ubuntu Linux"
         type: "debmirror"
-        host: "mirror.linux.ncsu.edu"
+        host: "mirror.nodesdirect.com"
         remote_dir: "ubuntu"
         deb_dists: [ "jammy", "jammy-updates", "jammy-security", "noble", "noble-updates", "noble-security" ]
-        deb_arch: [ "amd64", "aarch64" ]
+        deb_arch: [ "amd64", "arm64" ]
         deb_sections: [ "main", "main/installer", "multiverse", "multiverse/installer", "restricted", "restricted-installer", "universe", "universe/installer" ]
 
       # Mirror list: https://www.debian.org/mirror/list-full#US
       - id: "debian"
         name: "Debian"
         type: "debmirror"
-        host: "mirror.linux.ncsu.edu"
+        host: "mirror.nodesdirect.com"
         remote_dir: "debian"
         deb_dists: [ "bookworm", "bookworm-updates", "trixie", "trixie-updates" ]
-        deb_arch: [ "amd64", "aarch64" ]
+        deb_arch: [ "amd64", "arm64" ]
         deb_sections: [ "main", "main/installer", "contrib", "non-free", "non-free-firmware" ]
 
       # Mirror list: https://mirrors.rockylinux.org/mirrormanager/mirrors
