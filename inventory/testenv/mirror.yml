@@ -20,29 +20,40 @@ dns:
     mirror_dns_provider: "godaddy"
     mirror_dns_apikey: "{{ godaddy_apikey }}"
     mirror_sites:
+      # Mirror list: https://launchpad.net/ubuntu/+archivemirrors
+      - id: "ubuntu"
+        name: "Ubuntu Linux"
+        type: "debmirror"
+        host: "mirror.linux.ncsu.edu"
+        remote_dir: "ubuntu"
+        deb_dists: [ "jammy", "jammy-updates", "jammy-security", "noble", "noble-updates", "noble-security" ]
+        deb_arch: [ "amd64", "aarch64" ]
+        deb_sections: [ "main", "main/installer", "multiverse", "multiverse/installer", "restricted", "restricted-installer", "universe", "universe/installer" ]
+
+      # Mirror list: https://www.debian.org/mirror/list-full#US
+      - id: "debian"
+        name: "Debian"
+        type: "debmirror"
+        host: "mirror.linux.ncsu.edu"
+        remote_dir: "debian"
+        deb_dists: [ "bookworm", "bookworm-updates", "trixie", "trixie-updates" ]
+        deb_arch: [ "amd64", "aarch64" ]
+        deb_sections: [ "main", "main/installer", "contrib", "non-free", "non-free-firmware" ]
+
       # Mirror list: https://mirrors.rockylinux.org/mirrormanager/mirrors
       - id: "rocky"
         name: "Rocky Linux"
         type: "rsync"
-        remote: "rsync://plug-mirror.rcac.purdue.edu/rocky"
-        exclude: [ "ppc64le/", "riscv64/", "s390x/", "8/", "8.*/", "9/", "9.*/" ]
-        precheck_file: "fullfiletimelist-rocky"
-      # Mirror list: https://launchpad.net/ubuntu/+archivemirrors
-      - id: "ubuntu"
-        name: "Ubuntu Linux"
-        type: "rsync"
-        remote: "rsync://mirror.linux.ncsu.edu/ubuntu/"
-        firststage_exclude: [ "Packages*", "Sources*", "Release*", "InRelease" ]
-        exclude: [ "devel*/", "focal*/", "lunar*/", "mantic*/", "oracular*/", "trusty*/", "xenial*/" ]
-      # Mirror list: https://www.debian.org/mirror/list-full#US
-      - id: "debian"
-        name: "Debian"
-        type: "rsync"
-        remote: "rsync://plug-mirror.rcac.purdue.edu/debian"
-        firststage_exclude: [ "Packages*", "Sources*", "Release*", "InRelease" ]
+        host: "plug-mirror.rcac.purdue.edu"
+        remote_dir: "rocky"
+        rsync_exclude: [ "ppc64le/", "riscv64/", "s390x/", "8/", "8.*/", "9/", "9.*/" ]
+        rsync_precheck_file: "fullfiletimelist-rocky"
+
       # Mirror list: https://mirrormanager.fedoraproject.org/mirrors/EPEL
       - id: "epel"
         name: "EPEL"
         type: "rsync"
-        remote: "rsync://archive.mci-1.serverforge.org/fedora-epel"
-        exclude: [ "ppc64le/", "riscv64/", "s390x/", "8/", "9/", "testing/" ]
+        host: "archive.mci-1.serverforge.org"
+        remote_dir: "fedora-epel"
+        rsync_exclude: [ "ppc64le/", "riscv64/", "s390x/", "8/", "9/", "testing/" ]
+
