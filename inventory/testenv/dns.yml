@@ -62,6 +62,8 @@ dns:
             addresses: [ "10.252.4.11" ]
           - name: "ntp2"
             addresses: [ "10.252.4.12" ]
+          - name: "ntp"
+            addresses: [ "10.252.4.11", "10.252.4.12" ]
       - domain: "proxy.pc.testenv.bradhouse.dev"
         records:
           - name: "secureproxy1"

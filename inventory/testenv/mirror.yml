@@ -1,5 +1,5 @@
 ---
-dns:
+mirror:
   hosts:
     mirror1.mirror.pc.testenv.bradhouse.dev:
       network_interfaces:

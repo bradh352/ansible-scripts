@@ -1,0 +1,30 @@
+---
+ntp:
+  hosts:
+    ntp1.ntp.pc.testenv.bradhouse.dev:
+      network_interfaces:
+        - name: "enp3s0"
+          ifname: "enp3s0"
+          addresses:
+            - "10.252.4.11/24"
+          routes:
+            - to: "0.0.0.0/0"
+              via: "10.252.4.1"
+          nameservers:
+            addresses: "{{ pc_nameservers }}"
+      ntp_peers: [ "10.252.4.12" ]
+    ntp2.ntp.pc.testenv.bradhouse.dev:
+      network_interfaces:
+        - name: "enp3s0"
+          ifname: "enp3s0"
+          addresses:
+            - "10.252.4.12/24"
+          routes:
+            - to: "0.0.0.0/0"
+              via: "10.252.4.1"
+          nameservers:
+            addresses: "{{ pc_nameservers }}"
+      ntp_peers: [ "10.252.4.11" ]
+  vars:
+    host_roles: [ "base", "network_vxlanevpn" ]
+    ntp_pools: ["0.us.pool.ntp.org", "1.us.pool.ntp.org", "2.us.pool.ntp.org", "3.us.pool.ntp.org"]
