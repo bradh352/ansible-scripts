@@ -15,6 +15,7 @@ dns:
   vars:
     host_roles: [ "base", "network_vxlanevpn", "service_mirror" ]
     mirror_bwlimit: 500
+    mirror_data_disk: "/dev/sdb"
     mirror_destination: "/var/www"
     mirror_dns_email: "brad@brad-house.com"
     mirror_dns_provider: "godaddy"
@@ -24,22 +25,33 @@ dns:
       # westcoast try mirror.sfo12.us.leaseweb.net
       - id: "ubuntu"
         name: "Ubuntu Linux"
-        type: "debmirror"
+        type: "rsync"
         host: "mirror.nodesdirect.com"
         remote_dir: "ubuntu"
-        deb_dists: [ "jammy", "jammy-updates", "jammy-security", "noble", "noble-updates", "noble-security" ]
-        deb_arch: [ "amd64", "arm64" ]
-        deb_sections: [ "main", "main/installer", "multiverse", "multiverse/installer", "restricted", "restricted-installer", "universe", "universe/installer" ]
+        rsync_firststage_exclude: [ "Packages*", "Sources*", "Release*", "InRelease" ]
 
       # Mirror list: https://www.debian.org/mirror/list-full#US
       - id: "debian"
         name: "Debian"
-        type: "debmirror"
+        type: "rsync"
         host: "mirror.nodesdirect.com"
         remote_dir: "debian"
-        deb_dists: [ "bookworm", "bookworm-updates", "trixie", "trixie-updates" ]
-        deb_arch: [ "amd64", "arm64" ]
-        deb_sections: [ "main", "main/installer", "contrib", "non-free", "non-free-firmware" ]
+        rsync_firststage_exclude: [ "Packages*", "Sources*", "Release*", "InRelease" ]
+        rsync_exclude:
+          - "arch-riscv64*"
+          - "binary-riscv64/"
+          - "*_riscv64.deb"
+          - "*_riscv64.udeb"
+          - "installer-riscv64/"
+          - "Contents-riscv64*"
+          - "Contents-udeb-riscv64*"
+          - "arch-ppc64el*"
+          - "binary-ppc64el/"
+          - "*_ppc64el.deb"
+          - "*_ppc64el.udeb"
+          - "installer-ppc64el/"
+          - "Contents-ppc64el*"
+          - "Contents-udeb-ppc64el*"
 
       # Mirror list: https://mirrors.rockylinux.org/mirrormanager/mirrors
       - id: "rocky"
