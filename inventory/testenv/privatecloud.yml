@@ -3,12 +3,26 @@ privatecloud:
   vars:
     ntp_pools:
       - "ntp.ntp.pc.testenv.bradhouse.dev"
+    pc_nameservers:
+      - 10.252.1.11
+      - 10.252.1.12
+    network_interfaces:
+      - name: "enp3s0"
+        ifname: "enp3s0"
+        addresses: "{{ pc_host_addresses }}"
+        routes:
+          - to: "0.0.0.0/0"
+            via: "{{ pc_host_gatewayv4 }}"
+        nameservers:
+          addresses: "{{ pc_nameservers }}"
+
     #mirror_rocky: "http://mirror.mirror.pc.testenv.bradhouse.dev/rocky"
     #mirror_epel: "http://mirror.mirror.pc.testenv.bradhouse.dev/epel"
     #mirror_debian: "http://mirror.mirror.pc.testenv.bradhouse.dev/debian"
     #mirror_ubuntu: "http://mirror.mirror.pc.testenv.bradhouse.dev/ubuntu"
   children:
     dns:
+    ntp:
     mirror:
   hosts:
     bastion.su.pc.testenv.bradhouse.dev:

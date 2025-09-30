@@ -2,16 +2,9 @@
 mirror:
   hosts:
     mirror1.mirror.pc.testenv.bradhouse.dev:
-      network_interfaces:
-        - name: "enp3s0"
-          ifname: "enp3s0"
-          addresses:
-            - "10.252.2.11/24"
-          routes:
-            - to: "0.0.0.0/0"
-              via: "10.252.2.1"
-          nameservers:
-            addresses: "{{ pc_nameservers }}"
+      pc_host_addresses:
+        - "10.252.2.11/24"
+      pc_host_gatewayv4: "10.252.2.1"
   vars:
     host_roles: [ "base", "network_vxlanevpn", "service_mirror" ]
     mirror_bwlimit: 500
