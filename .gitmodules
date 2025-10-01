@@ -43,3 +43,6 @@
 [submodule "roles/service_mirror"]
 	path = roles/service_mirror
 	url = ../ansible-role-service-mirror
+[submodule "roles/service_squid"]
+	path = roles/service_squid
+	url = ../ansible-role-service-squid
