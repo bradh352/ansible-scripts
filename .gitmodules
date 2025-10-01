@@ -46,3 +46,6 @@
 [submodule "roles/service_squid"]
 	path = roles/service_squid
 	url = ../ansible-role-service-squid
+[submodule "roles/service_tinyproxy"]
+	path = roles/service_tinyproxy
+	url = ../ansible-role-service-tinyproxy
