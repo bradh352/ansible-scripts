@@ -49,3 +49,6 @@
 [submodule "roles/service_tinyproxy"]
 	path = roles/service_tinyproxy
 	url = ../ansible-role-service-tinyproxy
+[submodule "roles/service_ldapproxy"]
+	path = roles/service_ldapproxy
+	url = ../ansible-role-service-ldapproxy
