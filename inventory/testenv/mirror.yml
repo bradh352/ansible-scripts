@@ -28,7 +28,7 @@ mirror:
         name: "EPEL"
         type: "rsync"
         host: "mirror.nodesdirect.com"
-        remote_dir: "fedora-epel"
+        remote_dir: "epel"
         rsync_exclude: [ "ppc64le/", "riscv64/", "s390x/", "8/", "9/", "testing/" ]
         rsync_precheck_file: "fullfiletimelist-epel"
 
@@ -63,6 +63,12 @@ mirror:
           - "installer-ppc64el/"
           - "Contents-ppc64el*"
           - "Contents-udeb-ppc64el*"
-
+          - "arch-mips64el*"
+          - "binary-mips64el/"
+          - "*_mips64el.deb"
+          - "*_mips64el.udeb"
+          - "installer-mips64el/"
+          - "Contents-mips64el*"
+          - "Contents-udeb-mips64el*"
 
 

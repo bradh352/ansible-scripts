@@ -4,9 +4,14 @@ host_roles: [ "base", "service_freeipa" ]
 service_freeipa_admin_pass: "Test123$"
 service_freeipa_dm_pass: "Test123$"
 service_freeipa_realm: "TESTENV.BRADHOUSE.DEV"
+service_freeipa_domain: "testenv.bradhouse.dev"
+service_freeipa_bind_user: "bind2"
+service_freeipa_bind_pass: "Test123$"
 ssh_password_auth: true
 host_use_default_ip: true
 service_freeipa_idpsync_enable: true
+service_freeipa_idp_proxy: "secureproxy.proxy.us-west-1.nexthop.ai"
+service_freeipa_idp_noproxy: [ ".us-west-1.nexthop.ai" ]
 service_freeipa_idpsync_idp_name: "Okta"
 service_freeipa_idpsync_provider: "okta"
 service_freeipa_idpsync_provider_domain: "trial-1825032.okta.com"
@@ -21,3 +26,5 @@ service_freeipa_idpsync_ignore_users:
 service_freeipa_idpsync_ignore_groups:
   - "Okta Administrators"
   - "Everyone"
+service_freeipa_enroll_user: 'svc_enroll'
+service_freeipa_enroll_pass: 'Test123$'

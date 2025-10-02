@@ -15,11 +15,12 @@ privatecloud:
             via: "{{ pc_host_gatewayv4 }}"
         nameservers:
           addresses: "{{ pc_nameservers }}"
-
-    #mirror_rocky: "http://mirror.mirror.pc.testenv.bradhouse.dev/rocky"
-    #mirror_epel: "http://mirror.mirror.pc.testenv.bradhouse.dev/epel"
-    #mirror_debian: "http://mirror.mirror.pc.testenv.bradhouse.dev/debian"
-    #mirror_ubuntu: "http://mirror.mirror.pc.testenv.bradhouse.dev/ubuntu"
+    fallback_dns: 10.252.1.11
+    fallback_dns_check_host: "mirror1.mirror.pc.testenv.bradhouse.dev"
+    mirror_rocky: "http://mirror1.mirror.pc.testenv.bradhouse.dev/rocky"
+    mirror_epel: "http://mirror1.mirror.pc.testenv.bradhouse.dev/epel"
+    mirror_debian: "http://mirror1.mirror.pc.testenv.bradhouse.dev/debian"
+    mirror_ubuntu: "http://mirror1.mirror.pc.testenv.bradhouse.dev/ubuntu"
   children:
     dns:
     ntp:
