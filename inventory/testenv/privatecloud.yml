@@ -26,5 +26,6 @@ privatecloud:
     ntp:
     mirror:
     proxy:
+    ldapproxy:
   hosts:
     bastion.su.pc.testenv.bradhouse.dev:

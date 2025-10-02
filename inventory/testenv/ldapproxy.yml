@@ -1,0 +1,17 @@
+---
+ldapproxy:
+  hosts:
+    ldapproxy1.ldapproxy.pc.testenv.bradhouse.dev:
+      pc_host_addresses:
+        - "10.252.6.11/24"
+      pc_host_gatewayv4: "10.252.6.1"
+  vars:
+    host_roles: [ "base", "network_vxlanevpn", "service_ldapproxy" ]
+    ldapproxy_server: "trial-1825032.ldap.okta.com"
+    ldapproxy_suffix: "dc=trial-1825032,dc=okta,dc=com"
+    ldapproxy_binddn: "uid=bind@example.com,ou=users,dc=trial-1825032,dc=okta,dc=com"
+    ldapproxy_bindpass: "Test123$"
+    ldapproxy_tls_hostname: "ldapproxy.ldapproxy.pc.testenv.bradhouse.dev"
+    ldapproxy_dns_email: "brad@brad-house.com"
+    ldapproxy_dns_provider: "godaddy"
+    ldapproxy_dns_apikey: "{{ godaddy_apikey }}"
