@@ -5,7 +5,7 @@ proxy:
       host_roles: [ "base", "network_vxlanevpn", "service_tinyproxy" ]
       pc_host_addresses:
         - "10.252.5.11/24"
-      tinyproxy_allow: [ "*.okta.com" ]
+      tinyproxy_allow: [ "*.okta.com", "api.godaddy.com", "*.api.letsencrypt.org" ]
     cacheproxy1.proxy.pc.testenv.bradhouse.dev:
       host_roles: [ "base", "network_vxlanevpn", "service_squid" ]
       pc_host_addresses:

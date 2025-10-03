@@ -6,13 +6,23 @@ mirror:
         - "10.252.2.11/24"
       pc_host_gatewayv4: "10.252.2.1"
   vars:
-    host_roles: [ "base", "network_vxlanevpn", "service_mirror" ]
+    host_roles: [ "base", "network_vxlanevpn", "service_certbot", "service_mirror" ]
     mirror_bwlimit: 500
     mirror_data_disk: "/dev/sdb"
     mirror_destination: "/var/www"
-    mirror_dns_email: "brad@brad-house.com"
-    mirror_dns_provider: "godaddy"
-    mirror_dns_apikey: "{{ godaddy_apikey }}"
+    mirror_tls_hostname: "mirror.mirror.pc.testenv.bradhouse.dev"
+    mirror_tlscert: "/etc/nginx/{{ mirror_tls_hostname }}.fullcrt"
+    mirror_tlskey: "/etc/nginx/{{ mirror_tls_hostname }}.key"
+    certbot_email: "brad@brad-house.com"
+    certbot_provider: "godaddy"
+    certbot_apikey: "{{ godaddy_apikey }}"
+    certbot_proxy: "http://secureproxy.proxy.pc.testenv.bradhouse.dev:8080"
+    certbot_certs:
+      - domain: "{{ mirror_tls_hostname }}"
+        aliases: [ "{{ inventory_hostname }}" ]
+        path: "/etc/nginx"
+        owner: "nginx"
+        service: "nginx"
     mirror_sites:
       # Mirror list: https://mirrors.rockylinux.org/mirrormanager/mirrors
       - id: "rocky"

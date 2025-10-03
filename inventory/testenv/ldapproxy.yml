@@ -6,12 +6,22 @@ ldapproxy:
         - "10.252.6.11/24"
       pc_host_gatewayv4: "10.252.6.1"
   vars:
-    host_roles: [ "base", "network_vxlanevpn", "service_ldapproxy" ]
+    host_roles: [ "base", "network_vxlanevpn", "service_certbot", "service_ldapproxy" ]
     ldapproxy_server: "trial-1825032.ldap.okta.com"
     ldapproxy_suffix: "dc=trial-1825032,dc=okta,dc=com"
     ldapproxy_binddn: "uid=bind@example.com,ou=users,dc=trial-1825032,dc=okta,dc=com"
     ldapproxy_bindpass: "Test123$"
     ldapproxy_tls_hostname: "ldapproxy.ldapproxy.pc.testenv.bradhouse.dev"
-    ldapproxy_dns_email: "brad@brad-house.com"
-    ldapproxy_dns_provider: "godaddy"
-    ldapproxy_dns_apikey: "{{ godaddy_apikey }}"
+    ldapproxy_tlscert: "/etc/openldap/{{ ldapproxy_tls_hostname }}.fullcrt"
+    ldapproxy_tlskey: "/etc/openldap/{{ ldapproxy_tls_hostname }}.key"
+    certbot_email: "brad@brad-house.com"
+    certbot_provider: "godaddy"
+    certbot_proxy: "http://secureproxy.proxy.pc.testenv.bradhouse.dev:8080"
+    certbot_apikey: "{{ godaddy_apikey }}"
+    certbot_certs:
+      - domain: "{{ ldapproxy_tls_hostname }}"
+        aliases: [ "{{ inventory_hostname }}" ]
+        path: "/etc/openldap"
+        owner: "ldap"
+        service: "slapd"
+
