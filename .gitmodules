@@ -52,3 +52,6 @@
 [submodule "roles/service_ldapproxy"]
 	path = roles/service_ldapproxy
 	url = ../ansible-role-service-ldapproxy
+[submodule "roles/service_certbot"]
+	path = roles/service_certbot
+	url = ../ansible-role-service-certbot
