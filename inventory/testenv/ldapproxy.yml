@@ -7,9 +7,9 @@ ldapproxy:
       pc_host_gatewayv4: "10.252.6.1"
   vars:
     host_roles: [ "base", "network_vxlanevpn", "service_certbot", "service_ldapproxy" ]
-    ldapproxy_server: "trial-1825032.ldap.okta.com"
-    ldapproxy_suffix: "dc=trial-1825032,dc=okta,dc=com"
-    ldapproxy_binddn: "uid=bind@example.com,ou=users,dc=trial-1825032,dc=okta,dc=com"
+    ldapproxy_server: "trial-6940863.ldap.okta.com"
+    ldapproxy_suffix: "dc=trial-6940863,dc=okta,dc=com"
+    ldapproxy_binddn: "uid=bind@brad-house.com,ou=users,dc=trial-6940863,dc=okta,dc=com"
     ldapproxy_bindpass: "Test123$"
     ldapproxy_tls_hostname: "ldapproxy.ldapproxy.pc.testenv.bradhouse.dev"
     ldapproxy_tlscert: "/etc/openldap/{{ ldapproxy_tls_hostname }}.fullcrt"
