@@ -28,6 +28,6 @@ privatecloud:
     mirror:
     proxy:
     ldapproxy:
-    freeipa_server:
+    freeipa_servers:
   hosts:
     bastion.su.pc.testenv.bradhouse.dev:
