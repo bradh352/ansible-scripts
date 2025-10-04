@@ -38,3 +38,5 @@ freeipa_servers:
     service_freeipa_enroll_user: "svc_enroll"
     service_freeipa_enroll_pass: "Test123$"
     service_freeipa_admin_pass: "Test123$"
+    service_freeipa_dm_pass: "Test123$"
+
