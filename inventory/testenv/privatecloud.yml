@@ -21,7 +21,7 @@ privatecloud:
     mirror_epel: "http://mirror.mirror.pc.testenv.bradhouse.dev/epel"
     mirror_debian: "http://mirror.mirror.pc.testenv.bradhouse.dev/debian"
     mirror_ubuntu: "http://mirror.mirror.pc.testenv.bradhouse.dev/ubuntu"
-    ssh_password_auth: true # Needed for OIDC
+    ssh_kbdinteractive_auth: true # Needed for OIDC
   children:
     dns:
     ntp:
@@ -29,5 +29,6 @@ privatecloud:
     proxy:
     ldapproxy:
     freeipa_servers:
+    nfs:
   hosts:
     bastion.su.pc.testenv.bradhouse.dev:

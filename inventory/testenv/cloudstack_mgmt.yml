@@ -2,5 +2,140 @@
 cloudstack_mgmt:
   hosts:
     node1.testenv.bradhouse.dev:
+      ansible_host: 192.168.1.81
+      ceph_mon_ip: 10.10.100.2
+      mariadb_cluster_ip: 10.10.100.2
+      ceph_osd_chassis: "microcloud1"
+      network_vtep_ip:  "172.16.0.101/24"
+      network_underlay_asn: 4220000001
+      hypervisor_ip: "10.10.100.2/24"
+      ceph_ip: "10.10.200.2/24"
+      public_ip: "192.168.1.81/24"
     node2.testenv.bradhouse.dev:
+      ansible_host: 192.168.1.82
+      ceph_mon_ip: 10.10.100.3
+      mariadb_cluster_ip: 10.10.100.3
+      ceph_osd_chassis: "microcloud1"
+      network_vtep_ip:  "172.16.0.102/24"
+      network_underlay_asn: 4220000002
+      hypervisor_ip: "10.10.100.3/24"
+      ceph_ip: "10.10.200.3/24"
+      public_ip: "192.168.1.82/24"
     node3.testenv.bradhouse.dev:
+      ansible_host: 192.168.1.83
+      ceph_mon_ip: 10.10.100.4
+      mariadb_cluster_ip: 10.10.100.4
+      ceph_osd_chassis: "microcloud1"
+      network_vtep_ip:  "172.16.0.103/24"
+      network_underlay_asn: 4220000003
+      hypervisor_ip: "10.10.100.4/24"
+      ceph_ip: "10.10.200.4/24"
+      public_ip: "192.168.1.83/24"
+  vars:
+    host_roles: [ "base", "network_vxlanevpn", "service_ceph", "service_mariadb", "service_keepalived", "service_cloudstack" ]
+    #host_roles: [ "network_vxlanevpn" ]
+    network_underlay_interfaces:
+      - driver: "mlx5_core"
+        speed: 25000
+        fec: "rs"
+        autonegotiation: false
+    network_vxlans:
+      # Management / Hypervisor network
+      - vni: 100
+        ifname: "hypervisor"
+        mtu: 9000
+      # Storage network
+      - vni: 200
+        ifname: "ceph"
+        mtu: 9000
+      # Public network
+      - vni: 2
+        ifname: "public"
+        mtu: 1500
+    network_bridges:
+      - name: "hypervisor"
+        mtu: 9000
+        stp: false
+        vlan_aware: false
+        addresses:
+          - "{{ hypervisor_ip }}"
+        # Route to Private Cloud which has a Private Gateway pointing to this address.
+        routes:
+          - to: "10.252.0.0/16"
+            via: "10.10.100.99"
+      - name: "ceph"
+        mtu: 9000
+        stp: false
+        vlan_aware: false
+        addresses:
+          - "{{ ceph_ip }}"
+      - name: "public"
+        mtu: 1500
+        stp: false
+        vlan_aware: false
+        addresses:
+          - "{{ public_ip }}"
+        routes:
+          - to: "0.0.0.0/0"
+            via: "192.168.1.1"
+        nameservers:
+          addresses:
+            - 8.8.8.8
+            - 2001:4860:4860::8888
+    cloudstack_ceph_fs: "cloudstack"
+    cloudstack_mgmt_interface: "hypervisor"
+    cloudstack_hostname: "cs.testenv.bradhouse.dev"
+    cloudstack_dns_email: "brad@brad-house.com"
+    cloudstack_dns_provider: "godaddy"
+    cloudstack_dns_apikey: "{{ godaddy_apikey }}"
+    cloudstack_version: "4.21"
+    cloudstack_saml_enable: true
+    cloudstack_saml_metadata_url: "https://trial-1825032.okta.com/app/exkunxhcrgytprlvh697/sso/saml/metadata"
+    cloudstack_saml_user_attribute: "uid"
+    cloudstack_saml_ldap_server: "trial-1825032.ldap.okta.com"
+    cloudstack_saml_use_ssl: true
+    cloudstack_saml_binddn: "uid=bind@example.com,ou=users,dc=trial-1825032,dc=okta,dc=com"
+    cloudstack_saml_bindpass: "Test123$"
+    cloudstack_saml_userdn: "ou=users,dc=trial-1825032,dc=okta,dc=com"
+    cloudstack_saml_groupdn: "ou=groups,dc=trial-1825032,dc=okta,dc=com"
+    cloudstack_saml_ignore_users:
+      - "bind@example.com"
+    cloudstack_saml_ignore_projects:
+      - "infra"
+    cloudstack_saml_groups_allowed:
+      - "Everyone"
+    cloudstack_saml_project_groups:
+      - "some_project"
+    cloudstack_saml_admin_groups:
+      - "cs_admins"
+
+    keepalived_vips:
+      - name: "mariadb"
+        interface: "hypervisor"
+        ips: "{{ mariadb_cluster_vips }}" # From mariadb_cloudstack_testenv.yml
+        healthcheck:
+          type: "script"
+          script: "/usr/local/bin/clustercheck"
+      - name: "nfs"
+        interface: "hypervisor"
+        ips:
+          - 10.10.100.11
+        healthcheck:
+          type: "ip"
+          host: "localhost"
+          port: 2049
+      - name: "radosgw"
+        interface: "hypervisor"
+        ips:
+          - 10.10.100.12
+        healthcheck:
+          type: "ip"
+          host: "localhost"
+          port: 7480
+      - name: "cloudstackui"
+        interface: "public"
+        ips:
+          - 192.168.1.80
+        healthcheck:
+          type: "http"
+          url: "http://localhost:8080/client/#/user/login"

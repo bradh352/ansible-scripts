@@ -19,15 +19,15 @@ freeipa_servers:
     service_freeipa_bind_pass: "Test123$"
     host_use_default_ip: true
     service_freeipa_idpsync_enable: true
-    #service_freeipa_idp_proxy: "http://secureproxy.proxy.us-west-1.nexthop.ai:8080"
-    #service_freeipa_idp_noproxy: [ ".us-west-1.nexthop.ai" ]
+    service_freeipa_idp_proxy: "http://secureproxy.proxy.pc.testenv.bradhouse.dev:8080"
+    service_freeipa_idp_noproxy: [ ".pc.testenv.bradhouse.dev" ]
     service_freeipa_idpsync_idp_name: "Okta"
     service_freeipa_idpsync_provider: "okta"
     service_freeipa_idpsync_provider_domain: "trial-6940863.okta.com"
-    service_freeipa_idpsync_clientid: "0oa1ydsbaipmm4fBE1d8"
+    service_freeipa_idpsync_clientid: "0oaw3g9uub1dGhi3t697"
     service_freeipa_idpsync_server: "ldapproxy.ldapproxy.pc.testenv.bradhouse.dev"
     service_freeipa_idpsync_binddn: "uid=bind@brad-house.com,ou=users,dc=trial-6940863,dc=okta,dc=com"
-    service_freeipa_idpsync_bindpass: "{{ okta_ldap_bind_pass }}"
+    service_freeipa_idpsync_bindpass: "Test123$"
     service_freeipa_idpsync_userdn: "ou=users,dc=trial-6940863,dc=okta,dc=com"
     service_freeipa_idpsync_groupdn: "ou=groups,dc=trial-6940863,dc=okta,dc=com"
     service_freeipa_idpsync_ignore_users:
