@@ -23,6 +23,9 @@ mirror:
         path: "/etc/nginx"
         owner: "nginx"
         service: "nginx"
+    mirror_files:
+      - destdir: "keys"
+        url: "https://www.dev.centos.org/keys/RPM-GPG-KEY-CentOS-SIG-Storage"
     mirror_sites:
       # Mirror list: https://mirrors.rockylinux.org/mirrormanager/mirrors
       - id: "rocky"
@@ -41,6 +44,15 @@ mirror:
         remote_dir: "epel"
         rsync_exclude: [ "ppc64le/", "riscv64/", "s390x/", "8/", "9/", "testing/" ]
         rsync_precheck_file: "fullfiletimelist-epel"
+
+      # Mirror list: https://mirrormanager.fedoraproject.org/mirrors/CentOS
+      # Needed for Rocky10 Ceph + GaneshaNFS
+      - id: "centos-10-sig-storage"
+        name: "CentOS 10 SIG Storage"
+        type: "rsync"
+        host: "ftp-osl.osuosl.org"
+        remote_dir: "centos-stream/SIGs/10-stream/storage/"
+        rsync_exclude: [ "ppc64le/" ]
 
       # Mirror list: https://launchpad.net/ubuntu/+archivemirrors
       # westcoast try mirror.sfo12.us.leaseweb.net

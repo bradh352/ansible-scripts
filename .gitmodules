@@ -55,3 +55,6 @@
 [submodule "roles/service_certbot"]
 	path = roles/service_certbot
 	url = ../ansible-role-service-certbot
+[submodule "roles/service_nfscephfs"]
+	path = roles/service_nfscephfs
+	url = ../ansible-role-service-nfscephfs
