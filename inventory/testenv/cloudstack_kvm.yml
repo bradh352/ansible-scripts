@@ -96,8 +96,7 @@ cloudstack_kvm:
             via: "192.168.1.1"
         nameservers:
           addresses:
-            - 8.8.8.8
-            - 2001:4860:4860::8888
+            - 192.168.1.1
     cloudstack_ceph_fs: "cloudstack"
     cloudstack_mgmt_interface: "hypervisor"
     cloudstack_version: "4.21"

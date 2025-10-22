@@ -4,15 +4,24 @@ dns:
     ns1.dns.pc.testenv.bradhouse.dev:
       pc_host_addresses:
         - "10.252.1.11/24"
+      bind_ip: "10.252.1.11"
+      bind_primary: true
     ns2.dns.pc.testenv.bradhouse.dev:
       pc_host_addresses:
         - "10.252.1.12/24"
+      bind_ip: "10.252.1.12"
   vars:
     host_roles: [ "base", "network_vxlanevpn", "service_bind" ]
     pc_host_gatewayv4: "10.252.1.1"
     bind_recursive: true
     bind_use_ipv4: true
+    bind_group: "dns"
+    bind_keys:
+      - name: "dev-ddns"
+        secret: "ObHIxMEXO4wg3g3LltbmkRL+eZkpTRkYS8zwwmzbDnk="
     bind_zones:
+      - domain: "dev.pc.testenv.bradhouse.dev"
+        dynamic_key: "dev-ddns"
       - domain: "su.pc.testenv.bradhouse.dev"
         records:
           - name: "bastion"
