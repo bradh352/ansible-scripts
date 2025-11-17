@@ -32,7 +32,7 @@ cloudstack_mgmt:
       ceph_ip: "10.10.200.4/24"
       public_ip: "192.168.1.83/24"
   vars:
-    host_roles: [ "base", "network_vxlanevpn", "service_ceph", "service_mariadb", "service_keepalived", "service_cloudstack" ]
+    host_roles: [ "base", "network_vxlanevpn", "service_ceph", "service_mariadb", "service_keepalived", "service_certbot", "service_cloudstack" ]
     #host_roles: [ "network_vxlanevpn" ]
     network_underlay_interfaces:
       - driver: "mlx5_core"
@@ -84,10 +84,18 @@ cloudstack_mgmt:
     cloudstack_ceph_fs: "cloudstack"
     cloudstack_mgmt_interface: "hypervisor"
     cloudstack_hostname: "cs.testenv.bradhouse.dev"
-    cloudstack_dns_email: "brad@brad-house.com"
-    cloudstack_dns_provider: "godaddy"
-    cloudstack_dns_apikey: "{{ godaddy_apikey }}"
-    cloudstack_version: "4.21"
+    cloudstack_tlscert: "/etc/nginx/{{ cloudstack_hostname }}.fullcrt"
+    cloudstack_tlskey: "/etc/nginx/{{ cloudstack_hostname }}.key"
+    certbot_email: "brad@brad-house.com"
+    certbot_provider: "godaddy"
+    certbot_apikey: "{{ godaddy_apikey }}"
+    certbot_certs:
+      - domain: "{{ cloudstack_hostname }}"
+        aliases: [ "*.{{ cloudstack_hostname }}" ]
+        path: "/etc/nginx"
+        owner: "www-data"
+        service: "nginx"
+    cloudstack_version: "4.22"
     cloudstack_saml_enable: true
     cloudstack_saml_metadata_url: "https://trial-1825032.okta.com/app/exkunxhcrgytprlvh697/sso/saml/metadata"
     cloudstack_saml_user_attribute: "uid"

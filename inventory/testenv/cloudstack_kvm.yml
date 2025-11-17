@@ -99,4 +99,4 @@ cloudstack_kvm:
             - 192.168.1.1
     cloudstack_ceph_fs: "cloudstack"
     cloudstack_mgmt_interface: "hypervisor"
-    cloudstack_version: "4.21"
+    cloudstack_version: "4.22"
