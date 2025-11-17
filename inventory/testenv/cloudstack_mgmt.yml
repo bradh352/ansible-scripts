@@ -84,14 +84,20 @@ cloudstack_mgmt:
     cloudstack_ceph_fs: "cloudstack"
     cloudstack_mgmt_interface: "hypervisor"
     cloudstack_hostname: "cs.testenv.bradhouse.dev"
+    cloudstack_console_hostname: "console.{{ cloudstack_hostname }}"
+    cloudstack_ssvm_hostname: "ssvm.{{ cloudstack_hostname }}"
     cloudstack_tlscert: "/etc/nginx/{{ cloudstack_hostname }}.fullcrt"
     cloudstack_tlskey: "/etc/nginx/{{ cloudstack_hostname }}.key"
+    cloudstack_console_tlscert: "{{ cloudstack_tlscert }}"
+    cloudstack_console_tlskey: "{{ cloudstack_tlskey }}"
+    cloudstack_ssvm_tlscert: "{{ cloudstack_tlscert }}"
+    cloudstack_ssvm_tlskey: "{{ cloudstack_tlskey }}"
     certbot_email: "brad@brad-house.com"
     certbot_provider: "godaddy"
     certbot_apikey: "{{ godaddy_apikey }}"
     certbot_certs:
       - domain: "{{ cloudstack_hostname }}"
-        aliases: [ "*.{{ cloudstack_hostname }}" ]
+        aliases: [ "*.{{ cloudstack_console_hostname }}", "*.{{ cloudstack_ssvm_hostname }}" ]
         path: "/etc/nginx"
         owner: "www-data"
         service: "nginx"
@@ -145,4 +151,6 @@ cloudstack_mgmt:
           - 192.168.1.80
         healthcheck:
           type: "http"
-          url: "http://localhost:8080/client/#/user/login"
+          url: "https://{{ cloudstack_hostname }}/client/#/user/login"
+          verify_certs: true
+          ip: "127.0.0.1"
