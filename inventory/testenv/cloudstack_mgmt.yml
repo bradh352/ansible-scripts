@@ -33,7 +33,7 @@ cloudstack_mgmt:
       public_ip: "192.168.1.83/24"
   vars:
     host_roles: [ "base", "network_vxlanevpn", "service_ceph", "service_mariadb", "service_keepalived", "service_certbot", "service_cloudstack" ]
-    #host_roles: [ "network_vxlanevpn" ]
+    #host_roles: [ "service_cloudstack" ]
     network_underlay_interfaces:
       - driver: "mlx5_core"
         speed: 25000
@@ -84,6 +84,7 @@ cloudstack_mgmt:
     cloudstack_ceph_fs: "cloudstack"
     cloudstack_mgmt_interface: "hypervisor"
     cloudstack_hostname: "cs.testenv.bradhouse.dev"
+    cloudstack_public_subnet: "192.168.1.0/24"
     cloudstack_console_hostname: "console.{{ cloudstack_hostname }}"
     cloudstack_ssvm_hostname: "ssvm.{{ cloudstack_hostname }}"
     cloudstack_tlscert: "/etc/nginx/{{ cloudstack_hostname }}.fullcrt"
