@@ -26,7 +26,30 @@ mirror:
     mirror_files:
       - destdir: "keys"
         url: "https://www.dev.centos.org/keys/RPM-GPG-KEY-CentOS-SIG-Storage"
+      - destdir: "keys"
+        url: "https://rpm.grafana.com/gpg.key"
+        filename: "grafana-rpm.gpg"
+      - destdir: "keys"
+        url: "https://apt.grafana.com/gpg.key"
+        filename: "grafana-apt.gpg"
     mirror_sites:
+      # https://grafana.com/docs/alloy/latest/set-up/install/linux/
+      - id: "grafana-apt"
+        name: "Grafana Apt"
+        type: "debmirror"
+        host: "apt.grafana.com"
+        remote_dir: ""
+        deb_dists: [ "stable" ]
+        deb_sections: [ "main" ]
+        deb_method: "http"
+
+      # https://grafana.com/docs/alloy/latest/set-up/install/linux/
+      - id: "grafana-rpm"
+        name: "Grafana RPM"
+        type: "reposync"
+        host: "rpm.grafana.com"
+        remote_dir: ""
+
       # Mirror list: https://mirrors.rockylinux.org/mirrormanager/mirrors
       - id: "rocky"
         name: "Rocky Linux"
@@ -92,5 +115,3 @@ mirror:
           - "installer-mips64el/"
           - "Contents-mips64el*"
           - "Contents-udeb-mips64el*"
-
-
