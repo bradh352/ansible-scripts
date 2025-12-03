@@ -22,6 +22,7 @@ privatecloud:
     mirror_debian: "http://mirror.mirror.pc.testenv.bradhouse.dev/debian"
     mirror_ubuntu: "http://mirror.mirror.pc.testenv.bradhouse.dev/ubuntu"
     ssh_kbdinteractive_auth: true # Needed for OIDC
+    drop_caches: true
   children:
     dns:
     ntp:
