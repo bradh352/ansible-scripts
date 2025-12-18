@@ -81,6 +81,7 @@ cloudstack_mgmt:
         nameservers:
           addresses:
             - 192.168.1.1
+    cloudstack_mem_overprovision: 3
     cloudstack_ceph_fs: "cloudstack"
     cloudstack_mgmt_interface: "hypervisor"
     cloudstack_hostname: "cs.testenv.bradhouse.dev"
