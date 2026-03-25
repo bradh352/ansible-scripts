@@ -1,12 +1,12 @@
 ---
 dns:
   hosts:
-    ns1.dns.pc.testenv.bradhouse.dev:
+    ns1.pc.testenv.bradhouse.dev:
       pc_host_addresses:
         - "10.252.1.11/24"
       bind_ip: "10.252.1.11"
       bind_primary: true
-    ns2.dns.pc.testenv.bradhouse.dev:
+    ns2.pc.testenv.bradhouse.dev:
       pc_host_addresses:
         - "10.252.1.12/24"
       bind_ip: "10.252.1.12"
@@ -22,41 +22,31 @@ dns:
     bind_zones:
       - domain: "dev.pc.testenv.bradhouse.dev"
         dynamic_key: "dev-ddns"
-      - domain: "su.pc.testenv.bradhouse.dev"
+      - domain: "pc.testenv.bradhouse.dev"
         records:
           - name: "bastion"
             addresses: [ "10.252.0.10", "2620:8B8::1" ]
-      - domain: "dns.pc.testenv.bradhouse.dev"
-        records:
           - name: "ns1"
             addresses: [ "10.252.1.11" ]
           - name: "ns2"
             addresses: [ "10.252.1.12" ]
-      - domain: "mirror.pc.testenv.bradhouse.dev"
-        records:
           - name: "mirror1"
             addresses: [ "10.252.2.11"]
           - name: "mirror"
             type: "CNAME"
-            data: "mirror1.mirror.pc.testenv.bradhouse.dev"
-      - domain: "ipa.pc.testenv.bradhouse.dev"
-        records:
+            data: "mirror1.pc.testenv.bradhouse.dev"
           - name: "ipa1"
             addresses: [ "10.252.3.11" ]
           - name: "ipa2"
             addresses: [ "10.252.3.12" ]
           - name: "ipa3"
             addresses: [ "10.252.3.13" ]
-      - domain: "ntp.pc.testenv.bradhouse.dev"
-        records:
           - name: "ntp1"
             addresses: [ "10.252.4.11" ]
           - name: "ntp2"
             addresses: [ "10.252.4.12" ]
           - name: "ntp"
             addresses: [ "10.252.4.11", "10.252.4.12" ]
-      - domain: "proxy.pc.testenv.bradhouse.dev"
-        records:
           - name: "secureproxy1"
             addresses: [ "10.252.5.11" ]
           - name: "cacheproxy1"
@@ -65,22 +55,18 @@ dns:
             addresses: [ "10.252.5.31" ]
           - name: "secureproxy"
             type: "CNAME"
-            data: "secureproxy1.proxy.pc.testenv.bradhouse.dev"
+            data: "secureproxy1.pc.testenv.bradhouse.dev"
           - name: "cacheproxy"
             type: "CNAME"
-            data: "cacheproxy1.proxy.pc.testenv.bradhouse.dev"
+            data: "cacheproxy1.pc.testenv.bradhouse.dev"
           - name: "gitproxy"
             type: "CNAME"
-            data: "gitproxy1.proxy.pc.testenv.bradhouse.dev"
-      - domain: "ldapproxy.pc.testenv.bradhouse.dev"
-        records:
+            data: "gitproxy1.pc.testenv.bradhouse.dev"
           - name: "ldapproxy1"
             addresses: [ "10.252.6.11" ]
           - name: "ldapproxy"
             type: "CNAME"
-            data: "ldapproxy1.ldapproxy.pc.testenv.bradhouse.dev"
-      - domain: "nfs.pc.testenv.bradhouse.dev"
-        records:
+            data: "ldapproxy1.pc.testenv.bradhouse.dev"
           - name: "nfs1"
             addresses: [ "10.252.7.11" ]
           - name: "nfs2"

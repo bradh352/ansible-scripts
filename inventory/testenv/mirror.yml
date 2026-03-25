@@ -1,7 +1,7 @@
 ---
 mirror:
   hosts:
-    mirror1.mirror.pc.testenv.bradhouse.dev:
+    mirror1.pc.testenv.bradhouse.dev:
       pc_host_addresses:
         - "10.252.2.11/24"
       pc_host_gatewayv4: "10.252.2.1"
@@ -10,13 +10,13 @@ mirror:
     mirror_bwlimit: 500
     mirror_data_disk: "/dev/sdb"
     mirror_destination: "/var/www"
-    mirror_tls_hostname: "mirror.mirror.pc.testenv.bradhouse.dev"
+    mirror_tls_hostname: "mirror.pc.testenv.bradhouse.dev"
     mirror_tlscert: "/etc/nginx/{{ mirror_tls_hostname }}.fullcrt"
     mirror_tlskey: "/etc/nginx/{{ mirror_tls_hostname }}.key"
     certbot_email: "brad@brad-house.com"
     certbot_provider: "godaddy"
     certbot_apikey: "{{ godaddy_apikey }}"
-    certbot_proxy: "http://secureproxy.proxy.pc.testenv.bradhouse.dev:8080"
+    certbot_proxy: "http://secureproxy.pc.testenv.bradhouse.dev:8080"
     certbot_certs:
       - domain: "{{ mirror_tls_hostname }}"
         aliases: [ "{{ inventory_hostname }}" ]
@@ -68,14 +68,14 @@ mirror:
         rsync_exclude: [ "ppc64le/", "riscv64/", "s390x/", "8/", "9/", "testing/" ]
         rsync_precheck_file: "fullfiletimelist-epel"
 
-      # Mirror list: https://mirrormanager.fedoraproject.org/mirrors/CentOS
-      # Needed for Rocky10 Ceph + GaneshaNFS
-      - id: "centos-10-sig-storage"
-        name: "CentOS 10 SIG Storage"
-        type: "rsync"
-        host: "ftp-osl.osuosl.org"
-        remote_dir: "centos-stream/SIGs/10-stream/storage/"
-        rsync_exclude: [ "ppc64le/" ]
+      # # Mirror list: https://mirrormanager.fedoraproject.org/mirrors/CentOS
+      # # Needed for Rocky10 Ceph + GaneshaNFS
+      # - id: "centos-10-sig-storage"
+      #   name: "CentOS 10 SIG Storage"
+      #   type: "rsync"
+      #   host: "ftp-osl.osuosl.org"
+      #   remote_dir: "centos-stream/SIGs/10-stream/storage/"
+      #   rsync_exclude: [ "ppc64le/" ]
 
       # Mirror list: https://launchpad.net/ubuntu/+archivemirrors
       # westcoast try mirror.sfo12.us.leaseweb.net
@@ -86,32 +86,32 @@ mirror:
         remote_dir: "ubuntu"
         rsync_firststage_exclude: [ "Packages*", "Sources*", "Release*", "InRelease" ]
 
-      # Mirror list: https://www.debian.org/mirror/list-full#US
-      - id: "debian"
-        name: "Debian"
-        type: "rsync"
-        host: "mirror.nodesdirect.com"
-        remote_dir: "debian"
-        rsync_firststage_exclude: [ "Packages*", "Sources*", "Release*", "InRelease" ]
-        rsync_exclude:
-          - "arch-riscv64*"
-          - "binary-riscv64/"
-          - "*_riscv64.deb"
-          - "*_riscv64.udeb"
-          - "installer-riscv64/"
-          - "Contents-riscv64*"
-          - "Contents-udeb-riscv64*"
-          - "arch-ppc64el*"
-          - "binary-ppc64el/"
-          - "*_ppc64el.deb"
-          - "*_ppc64el.udeb"
-          - "installer-ppc64el/"
-          - "Contents-ppc64el*"
-          - "Contents-udeb-ppc64el*"
-          - "arch-mips64el*"
-          - "binary-mips64el/"
-          - "*_mips64el.deb"
-          - "*_mips64el.udeb"
-          - "installer-mips64el/"
-          - "Contents-mips64el*"
-          - "Contents-udeb-mips64el*"
+      # # Mirror list: https://www.debian.org/mirror/list-full#US
+      # - id: "debian"
+      #   name: "Debian"
+      #   type: "rsync"
+      #   host: "mirror.nodesdirect.com"
+      #   remote_dir: "debian"
+      #   rsync_firststage_exclude: [ "Packages*", "Sources*", "Release*", "InRelease" ]
+      #   rsync_exclude:
+      #     - "arch-riscv64*"
+      #     - "binary-riscv64/"
+      #     - "*_riscv64.deb"
+      #     - "*_riscv64.udeb"
+      #     - "installer-riscv64/"
+      #     - "Contents-riscv64*"
+      #     - "Contents-udeb-riscv64*"
+      #     - "arch-ppc64el*"
+      #     - "binary-ppc64el/"
+      #     - "*_ppc64el.deb"
+      #     - "*_ppc64el.udeb"
+      #     - "installer-ppc64el/"
+      #     - "Contents-ppc64el*"
+      #     - "Contents-udeb-ppc64el*"
+      #     - "arch-mips64el*"
+      #     - "binary-mips64el/"
+      #     - "*_mips64el.deb"
+      #     - "*_mips64el.udeb"
+      #     - "installer-mips64el/"
+      #     - "Contents-mips64el*"
+      #     - "Contents-udeb-mips64el*"

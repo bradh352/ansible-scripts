@@ -1,5 +1,5 @@
 ---
-ansible_host: 192.168.1.93
+ansible_host: 192.168.1.94
 ansible_port: 5022
 host_roles: [ "base", "network_vxlanevpn" ]
 network_interfaces:
@@ -14,6 +14,6 @@ network_interfaces:
       addresses: "{{ pc_nameservers }}"
 base_additional_hosts:
   - ip: 10.252.1.11
-    host: ns1.dns.pc.testenv.bradhouse.dev
+    host: ns1.pc.testenv.bradhouse.dev
   - ip: 10.252.1.12
-    host: ns2.dns.pc.testenv.bradhouse.dev
+    host: ns2.pc.testenv.bradhouse.dev

@@ -2,10 +2,11 @@
 privatecloud:
   vars:
     ntp_pools:
-      - "ntp.ntp.pc.testenv.bradhouse.dev"
+      - "ntp.pc.testenv.bradhouse.dev"
     pc_nameservers:
-      - 10.252.1.11
-      - 10.252.1.12
+      - 8.8.8.8
+#      - 10.252.1.11
+#      - 10.252.1.12
     network_interfaces:
       - name: "enp3s0"
         ifname: "enp3s0"
@@ -15,12 +16,12 @@ privatecloud:
             via: "{{ pc_host_gatewayv4 }}"
         nameservers:
           addresses: "{{ pc_nameservers }}"
-    fallback_dns: 10.252.1.11
-    fallback_dns_check_host: "mirror.mirror.pc.testenv.bradhouse.dev"
-    mirror_rocky: "http://mirror.mirror.pc.testenv.bradhouse.dev/rocky"
-    mirror_epel: "http://mirror.mirror.pc.testenv.bradhouse.dev/epel"
-    mirror_debian: "http://mirror.mirror.pc.testenv.bradhouse.dev/debian"
-    mirror_ubuntu: "http://mirror.mirror.pc.testenv.bradhouse.dev/ubuntu"
+    #fallback_dns: 10.252.1.11
+    #fallback_dns_check_host: "mirror.pc.testenv.bradhouse.dev"
+    # mirror_rocky: "http://mirror.pc.testenv.bradhouse.dev/rocky"
+    # mirror_epel: "http://mirror.pc.testenv.bradhouse.dev/epel"
+    # mirror_debian: "http://mirror.pc.testenv.bradhouse.dev/debian"
+    # mirror_ubuntu: "http://mirror.pc.testenv.bradhouse.dev/ubuntu"
     ssh_kbdinteractive_auth: true # Needed for OIDC
     drop_caches: true
   children:
@@ -32,4 +33,4 @@ privatecloud:
     freeipa_servers:
     nfs:
   hosts:
-    bastion.su.pc.testenv.bradhouse.dev:
+    bastion.pc.testenv.bradhouse.dev:

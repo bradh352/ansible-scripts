@@ -1,13 +1,13 @@
 ---
 freeipa_servers:
   hosts:
-    ipa1.ipa.pc.testenv.bradhouse.dev:
+    ipa1.pc.testenv.bradhouse.dev:
       pc_host_addresses:
         - "10.252.3.11/24"
-    ipa2.ipa.pc.testenv.bradhouse.dev:
+    ipa2.pc.testenv.bradhouse.dev:
       pc_host_addresses:
         - "10.252.3.12/24"
-    ipa3.ipa.pc.testenv.bradhouse.dev:
+    ipa3.pc.testenv.bradhouse.dev:
       pc_host_addresses:
         - "10.252.3.13/24"
   vars:
@@ -19,13 +19,13 @@ freeipa_servers:
     service_freeipa_bind_pass: "Test123$"
     host_use_default_ip: true
     service_freeipa_idpsync_enable: true
-    service_freeipa_idp_proxy: "http://secureproxy.proxy.pc.testenv.bradhouse.dev:8080"
+    service_freeipa_idp_proxy: "http://secureproxy.pc.testenv.bradhouse.dev:8080"
     service_freeipa_idp_noproxy: [ ".pc.testenv.bradhouse.dev" ]
     service_freeipa_idpsync_idp_name: "Okta"
     service_freeipa_idpsync_provider: "okta"
     service_freeipa_idpsync_provider_domain: "trial-6940863.okta.com"
     service_freeipa_idpsync_clientid: "0oaw3g9uub1dGhi3t697"
-    service_freeipa_idpsync_server: "ldapproxy.ldapproxy.pc.testenv.bradhouse.dev"
+    service_freeipa_idpsync_server: "ldapproxy.pc.testenv.bradhouse.dev"
     service_freeipa_idpsync_binddn: "uid=bind@brad-house.com,ou=users,dc=trial-6940863,dc=okta,dc=com"
     service_freeipa_idpsync_bindpass: "Test123$"
     service_freeipa_idpsync_userdn: "ou=users,dc=trial-6940863,dc=okta,dc=com"

@@ -1,7 +1,7 @@
 ---
 ldapproxy:
   hosts:
-    ldapproxy1.ldapproxy.pc.testenv.bradhouse.dev:
+    ldapproxy1.pc.testenv.bradhouse.dev:
       pc_host_addresses:
         - "10.252.6.11/24"
       pc_host_gatewayv4: "10.252.6.1"
@@ -11,12 +11,12 @@ ldapproxy:
     ldapproxy_suffix: "dc=trial-6940863,dc=okta,dc=com"
     ldapproxy_binddn: "uid=bind@brad-house.com,ou=users,dc=trial-6940863,dc=okta,dc=com"
     ldapproxy_bindpass: "Test123$"
-    ldapproxy_tls_hostname: "ldapproxy.ldapproxy.pc.testenv.bradhouse.dev"
+    ldapproxy_tls_hostname: "ldapproxy.pc.testenv.bradhouse.dev"
     ldapproxy_tlscert: "/etc/openldap/{{ ldapproxy_tls_hostname }}.fullcrt"
     ldapproxy_tlskey: "/etc/openldap/{{ ldapproxy_tls_hostname }}.key"
     certbot_email: "brad@brad-house.com"
     certbot_provider: "godaddy"
-    certbot_proxy: "http://secureproxy.proxy.pc.testenv.bradhouse.dev:8080"
+    certbot_proxy: "http://secureproxy.pc.testenv.bradhouse.dev:8080"
     certbot_apikey: "{{ godaddy_apikey }}"
     certbot_certs:
       - domain: "{{ ldapproxy_tls_hostname }}"
