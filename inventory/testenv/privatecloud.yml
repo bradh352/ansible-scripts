@@ -4,9 +4,8 @@ privatecloud:
     ntp_pools:
       - "ntp.pc.testenv.bradhouse.dev"
     pc_nameservers:
-      - 8.8.8.8
-#      - 10.252.1.11
-#      - 10.252.1.12
+      - 10.252.1.10
+      - 10.252.1.11
     network_interfaces:
       - name: "enp3s0"
         ifname: "enp3s0"
@@ -16,8 +15,8 @@ privatecloud:
             via: "{{ pc_host_gatewayv4 }}"
         nameservers:
           addresses: "{{ pc_nameservers }}"
-    #fallback_dns: 10.252.1.11
-    #fallback_dns_check_host: "mirror.pc.testenv.bradhouse.dev"
+    fallback_dns: 10.252.1.11
+    fallback_dns_check_host: "mirror.pc.testenv.bradhouse.dev"
     # mirror_rocky: "http://mirror.pc.testenv.bradhouse.dev/rocky"
     # mirror_epel: "http://mirror.pc.testenv.bradhouse.dev/epel"
     # mirror_debian: "http://mirror.pc.testenv.bradhouse.dev/debian"

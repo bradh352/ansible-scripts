@@ -16,7 +16,7 @@ mirror:
     certbot_email: "brad@brad-house.com"
     certbot_provider: "godaddy"
     certbot_apikey: "{{ godaddy_apikey }}"
-    certbot_proxy: "http://secureproxy.pc.testenv.bradhouse.dev:8080"
+    #certbot_proxy: "http://secureproxy.pc.testenv.bradhouse.dev:8080"
     certbot_certs:
       - domain: "{{ mirror_tls_hostname }}"
         aliases: [ "{{ inventory_hostname }}" ]
