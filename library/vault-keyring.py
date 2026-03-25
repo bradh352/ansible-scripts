@@ -50,21 +50,28 @@ __metaclass__ = type
 import sys
 import getpass
 import keyring
-
-from ansible.config.manager import ConfigManager, get_ini_config_value
+import os
+from configparser import ConfigParser
 
 
 def main():
-    config = ConfigManager()
-    username = get_ini_config_value(
-        config._parsers[config._config_file],
-        dict(section='vault', key='username')
-    ) or getpass.getuser()
+    # Find ansible.cfg file in standard locations
+    config_file = None
+    for path in ['ansible.cfg', os.path.expanduser('~/.ansible.cfg'), '/etc/ansible/ansible.cfg']:
+        if os.path.exists(path):
+            config_file = path
+            break
 
-    keyname = get_ini_config_value(
-        config._parsers[config._config_file],
-        dict(section='vault', key='keyname')
-    ) or 'ansible'
+    # Read config values with defaults
+    username = getpass.getuser()
+    keyname = 'ansible'
+
+    if config_file:
+        config = ConfigParser()
+        config.read(config_file)
+        if config.has_section('vault'):
+            username = config.get('vault', 'username', fallback=getpass.getuser())
+            keyname = config.get('vault', 'keyname', fallback='ansible')
 
     if len(sys.argv) == 2 and sys.argv[1] == 'set':
         intro = 'Storing password in "{}" user keyring using key name: {}\n'
