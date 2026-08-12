@@ -33,6 +33,7 @@ cloudstack_mgmt:
       public_ip: "192.168.1.83/24"
   vars:
     host_roles: [ "base", "network_vxlanevpn", "service_ceph", "service_mariadb", "service_keepalived", "service_certbot", "service_cloudstack" ]
+    mirror_ubuntu: "http://mirror.linux.ncsu.edu/ubuntu"
     #host_roles: [ "service_cloudstack" ]
     network_underlay_interfaces:
       - driver: "mlx5_core"

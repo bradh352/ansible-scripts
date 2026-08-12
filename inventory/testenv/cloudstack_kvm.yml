@@ -31,14 +31,14 @@ cloudstack_kvm:
       hypervisor_ip: "10.10.100.7/24"
       ceph_ip: "10.10.200.7/24"
       public_ip: "192.168.1.86/24"
-    node7.testenv.bradhouse.dev:
-      ansible_host: 192.168.1.87
-      ceph_osd_chassis: "microcloud1"
-      network_vtep_ip:  "172.16.0.107/24"
-      network_underlay_asn: 4220000007
-      hypervisor_ip: "10.10.100.8/24"
-      ceph_ip: "10.10.200.8/24"
-      public_ip: "192.168.1.87/24"
+#    node7.testenv.bradhouse.dev:
+#      ansible_host: 192.168.1.87
+#      ceph_osd_chassis: "microcloud1"
+#      network_vtep_ip:  "172.16.0.107/24"
+#      network_underlay_asn: 4220000007
+#      hypervisor_ip: "10.10.100.8/24"
+#      ceph_ip: "10.10.200.8/24"
+#      public_ip: "192.168.1.87/24"
     node8.testenv.bradhouse.dev:
       ansible_host: 192.168.1.88
       ceph_osd_chassis: "microcloud1"
@@ -50,6 +50,7 @@ cloudstack_kvm:
   vars:
     host_roles: [ "base", "network_vxlanevpn", "service_ceph", "service_cloudstack" ]
     #host_roles: [ "service_cloudstack" ]
+    mirror_ubuntu: "http://mirror.linux.ncsu.edu/ubuntu"
     network_underlay_interfaces:
       - driver: "mlx5_core"
         speed: 25000
